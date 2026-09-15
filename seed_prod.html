@@ -5,19 +5,28 @@
     <title>Configurar Usuarios Producción - Cubano Bar</title>
     <style>
         body { font-family: sans-serif; background: #060608; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .card { background: #101014; border: 1px solid #2a2a31; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        h1 { color: #ff2d3d; }
-        #status { margin: 20px 0; font-weight: bold; }
-        .btn { background: #ff2d3d; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .card { background: #101014; border: 1px solid #2a2a31; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); width: 100%; max-width: 400px; }
+        h1 { color: #ff2d3d; font-size: 24px; margin-bottom: 20px; }
+        #status { margin: 20px 0; font-weight: bold; min-height: 20px; }
+        .btn { background: #ff2d3d; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        label { display: block; text-align: left; font-size: 12px; color: #9b9ba5; margin-bottom: 5px; }
+        input { width: 100%; padding: 12px; background: #000; border: 1px solid #2a2a31; color: white; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
     </style>
 </head>
 <body>
     <div class="card">
         <h1>Configurar Roles en Producción</h1>
-        <p>Este script cargará los roles (Admin, Asistente, Boletería) en la base de datos REAL.</p>
+        <p style="font-size: 14px; color: #9b9ba5; margin-bottom: 30px;">Ingresá tus credenciales de Administrador para habilitar el sistema de roles en la nube.</p>
+
+        <label>Email de Administrador</label>
+        <input type="email" id="prodEmail" placeholder="ejemplo@gmail.com">
+
+        <label>Contraseña de Firebase</label>
+        <input type="password" id="prodPass" placeholder="Tu contraseña">
+
         <div id="status">Esperando...</div>
-        <button id="startBtn" class="btn">Cargar Usuarios Ahora</button>
+        <button id="startBtn" class="btn">Cargar Roles en la Nube</button>
     </div>
 
     <script type="module">
@@ -40,6 +49,7 @@
 
         const users = [
             { id: 'moyanojl.1984@gmail.com', role: 'admin' },
+            { id: 'moyanojl1984@gmail.com', role: 'admin' }, // Variante sin punto
             { id: 'gncesso@gmail.com', role: 'admin' },
             { id: 'alinnebogado94@gmail.com', role: 'assistant' },
             { id: 'boleteria.cubano@gmail.com', role: 'boleteria' }
@@ -49,24 +59,29 @@
         const statusDiv = document.getElementById('status');
 
         btn.addEventListener('click', async () => {
-            const email = prompt("Ingresá tu email de Administrador:");
-            const pass = prompt("Ingresá tu contraseña:");
+            const email = document.getElementById('prodEmail').value.trim();
+            const pass = document.getElementById('prodPass').value;
 
-            if (!email || !pass) return;
+            if (!email || !pass) {
+                statusDiv.innerText = "Completá email y contraseña";
+                return;
+            }
 
             btn.disabled = true;
-            statusDiv.innerText = "Autenticando...";
+            statusDiv.innerText = "Verificando identidad...";
+            statusDiv.style.color = "white";
 
             try {
                 await signInWithEmailAndPassword(auth, email, pass);
-                statusDiv.innerText = "Cargando roles...";
+                statusDiv.innerText = "Conectado. Cargando roles en la nube...";
 
                 for (const user of users) {
                     await setDoc(doc(db, "users", user.id), { role: user.role });
                 }
 
-                statusDiv.innerText = "¡ÉXITO! Todos los roles fueron cargados en Producción.";
+                statusDiv.innerText = "¡ÉXITO! Roles cargados en la nube.";
                 statusDiv.style.color = "#2ee6a6";
+                btn.style.display = "none";
             } catch (error) {
                 console.error(error);
                 statusDiv.innerText = "Error: " + error.message;

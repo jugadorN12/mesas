@@ -1,11 +1,20 @@
-- `[/]` Super Usuario y Mejoras Visuales
-    - `[ ]` Paso 1: Sistema de Super Usuario en `cubano-bar-mesas.html`
-        - `[ ]` Implementar acceso oculto (7 clics en brand).
-        - `[ ]` Cambiar visualización de mesas `ingresada` a rojo.
-        - `[ ]` Implementar "Panel Maestro" para cambios rápidos.
-    - `[ ]` Paso 2: Mejoras en `admin.html`
-        - `[ ]` Agregar inputs de seña editables en la lista.
-        - `[ ]` Implementar botón "GUARDAR CAMBIOS" con batch update.
-    - `[ ]` Paso 3: Verificación y Deploy
-        - `[ ]` Probar flujos locales.
-        - `[ ]` Deploy a Firebase.
+- `[x]` Sistema de Roles Dinámicos (Sin Hardcodeo)
+    - `[x]` Paso 1: Configuración de Base de Datos Local y Reglas
+        - `[x]` Iniciar emuladores de Firebase.
+        - `[x]` Crear colección `users` en Firestore local con los roles.
+        - `[x]` Actualizar `firestore.rules` para validación dinámica.
+    - `[x]` Paso 2: Mapa Público (`cubano-bar-mesas.html`)
+        - `[x]` Implementar Modal de Login HTML profesional.
+        - `[x]` Eliminar emails hardcodeados.
+        - `[x]` Implementar carga de rol desde Firestore para activar "Modo Maestro".
+    - `[x]` Paso 3: Panel Admin y Portal Único (`admin.html`)
+        - `[x]` Eliminar emails hardcodeados.
+        - `[x]` Implementar redirección inteligente según rol (Boletería).
+        - `[x]` Ocultar acceso a Boletería para el rol Asistente.
+    - `[x]` Paso 4: Simplificación de Boletería (`boleteria.html`)
+        - `[x]` Eliminar login interno.
+        - `[x]` Implementar verificación de rol y protección de acceso.
+    - `[ ]` Paso 5: Verificación Local
+        - `[ ]` Probar acceso como Administrador.
+        - `[ ]` Probar acceso como Asistente (verificar restricciones).
+        - `[ ]` Probar acceso como Boletería (verificar redirección).
