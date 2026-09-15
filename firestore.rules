@@ -1,26 +1,48 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Función segura para obtener el rol
+    function hasRole(role) {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/users/$(request.auth.token.email)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.role == role;
+    }
+
+    function anyRole(roles) {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/users/$(request.auth.token.email)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.role in roles;
+    }
+
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if hasRole('admin');
+    }
+
     match /config/{configId} {
       allow read: if true;
-      allow write: if request.auth != null
-        && request.auth.token.email in ['moyanojl.1984@gmail.com', 'moyanojl1984@gmail.com', 'gncesso@gmail.com'];
+      allow write: if hasRole('admin');
     }
+
     match /reservas/{mesaId} {
       allow read: if true;
-      allow create: if request.resource.data.status in ['pendiente', 'disputa']
+
+      allow create: if (request.resource.data.status in ['pendiente', 'disputa']
         && request.resource.data.nombre is string
         && request.resource.data.nombre.size() > 0
-        && request.resource.data.nombre.size() <= 60
         && request.resource.data.contacto is string
-        && request.resource.data.contacto.size() >= 5
-        && request.resource.data.contacto.size() <= 120
-        && request.resource.data.ts is int
-        && request.resource.data.expiresAt is int
-        && request.resource.data.expiresAt > request.time.toMillis()
-        && request.resource.data.expiresAt <= request.time.toMillis() + 900000;
-      allow update, delete: if request.auth != null
-        && request.auth.token.email in ['moyanojl.1984@gmail.com', 'moyanojl1984@gmail.com', 'gncesso@gmail.com'];
+        && request.resource.data.ts is int)
+        || anyRole(['admin', 'assistant', 'boleteria']);
+
+      allow update: if anyRole(['admin', 'assistant', 'boleteria']);
+
+      allow delete: if anyRole(['admin', 'assistant', 'boleteria'])
+        || (resource.data.status == 'disputa' && resource.data.expiresAt <= request.time.toMillis());
+    }
+
+    match /caja_movimientos/{movimientoId} {
+      allow read, write: if anyRole(['admin', 'assistant', 'boleteria']);
     }
   }
 }

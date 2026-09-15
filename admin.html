@@ -5,11 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cubano Bar | Administracion de mesas</title>
   <style>
-    :root{--bg:#09090d;--card:#15151c;--line:#2a2a35;--text:#f4f2ef;--muted:#9b9ba5;--red:#ff2d3d;--amber:#ffbd3e}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 0 0,#321016,transparent 38%),var(--bg);color:var(--text);font:15px Arial,sans-serif}.wrap{max-width:880px;margin:auto;padding:28px 18px 52px}.head{display:flex;justify-content:space-between;gap:16px;align-items:start;border-bottom:1px solid var(--line);padding-bottom:22px}.brand{font-size:26px;font-weight:800;letter-spacing:.5px}.brand b{color:var(--red)}h1{font-size:25px;margin:28px 0 5px}.sub{color:var(--muted);margin:0 0 22px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}.stat strong{display:block;font-size:25px;margin-bottom:4px}.stat span{color:var(--muted);font-size:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}.empty{padding:34px;color:var(--muted);text-align:center}.row{display:grid;grid-template-columns:70px 1fr auto;gap:14px;align-items:center;padding:15px;border-bottom:1px solid var(--line)}.row:last-child{border:0}.mesa{font-weight:800;font-size:20px}.detail{min-width:0}.detail b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.detail small{color:var(--muted)}.badge{display:inline-block;font-size:11px;font-weight:bold;text-transform:uppercase;border-radius:99px;padding:5px 8px;margin-top:5px}.pendiente{background:#3d2b07;color:#ffd878}.aprobada{background:#461016;color:#ff8f97}.actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:end}button{border:0;border-radius:8px;padding:9px 11px;color:white;background:#30303a;cursor:pointer;font-weight:bold}button.approve{background:var(--red)}button.delete{background:transparent;border:1px solid #5c3338;color:#ffadb2}.toolbar{display:flex;gap:10px;align-items:center}.link{color:var(--text);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-weight:bold}@media(max-width:580px){.stats{grid-template-columns:1fr}.row{grid-template-columns:52px 1fr}.actions{grid-column:1/-1;justify-content:start}.head{flex-direction:column}.toolbar{width:100%;justify-content:space-between}}
+    :root{--bg:#09090d;--card:#15151c;--line:#2a2a35;--text:#f4f2ef;--muted:#9b9ba5;--red:#ff2d3d;--amber:#ffbd3e;--blue:#58a6ff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 0 0,#321016,transparent 38%),var(--bg);color:var(--text);font:15px Arial,sans-serif}.wrap{max-width:880px;margin:auto;padding:28px 18px 52px}.head{display:flex;justify-content:space-between;gap:16px;align-items:start;border-bottom:1px solid var(--line);padding-bottom:22px}.brand{font-size:26px;font-weight:800;letter-spacing:.5px}.brand b{color:var(--red)}h1{font-size:25px;margin:28px 0 5px}.sub{color:var(--muted);margin:0 0 22px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}.stat strong{display:block;font-size:25px;margin-bottom:4px}.stat span{color:var(--muted);font-size:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}.empty{padding:34px;color:var(--muted);text-align:center}.row{display:grid;grid-template-columns:70px 1fr auto;gap:14px;align-items:center;padding:15px;border-bottom:1px solid var(--line)}.row:last-child{border:0}.mesa{font-weight:800;font-size:20px}.detail{min-width:0}.detail b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.detail small{color:var(--muted)}.badge{display:inline-block;font-size:11px;font-weight:bold;text-transform:uppercase;border-radius:99px;padding:5px 8px;margin-top:5px} .pendiente{background:#3d2b07;color:#ffd878}.aprobada{background:#461016;color:#ff8f97}.ingresada{background:#0a2e4d;color:var(--blue)}.actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:end}
+    button, .link {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 13px;
+      color: var(--text);
+      background: transparent;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 13px;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--muted);
+      transform: translateY(-1px);
+    }
+    .btn-outline:active {
+      transform: translateY(0);
+      opacity: 0.8;
+    }
+    .btn-solid { border: none; color: #fff; }
+    .btn-solid:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-solid:active { transform: translateY(0); }
+
+    .btn-actualizar { background: #30303a; }
+    .btn-guardar { background: var(--blue); }
+    .btn-arqueo { background: var(--amber); color: #000 !important; }
+    .btn-imprimir { background: #0f8f68; }
+
+    .btn-outline-blue { border-color: var(--blue); color: var(--blue); }
+    .btn-outline-red { border-color: var(--red); color: var(--red); }
+
+    .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    @media(max-width:580px){.stats{grid-template-columns:1fr}.row{grid-template-columns:52px 1fr}.actions{grid-column:1/-1;justify-content:start}.head{flex-direction:column;align-items:stretch}.toolbar{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}.toolbar button, .toolbar .link{width:100%;padding:10px 4px;font-size:12px;}}
     .login-card{max-width:420px;margin:12vh auto 0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px}.login-card h1{margin:0 0 8px}.login-card p{color:var(--muted);margin:0 0 20px}.login-card label{display:block;color:var(--muted);font-size:12px;margin:14px 0 6px}.login-card input{width:100%;border:1px solid var(--line);border-radius:8px;background:#0d0d12;color:var(--text);padding:11px}.login-card button{width:100%;margin-top:18px;background:var(--red)}.login-error{color:#ffadb2;font-size:13px;min-height:18px;margin-top:10px}.logout{background:transparent;border:1px solid var(--line)}
         .login-card .reset{display:block;width:auto;margin:14px auto 0;padding:0;background:transparent;color:var(--muted);font-size:12px}.event-card{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}.event-card h2{margin:0 0 6px;font-size:18px}.event-card p{color:var(--muted);margin:0 0 14px;font-size:13px}.event-controls{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end}.event-controls label{display:block;color:var(--muted);font-size:12px}.event-controls input,.event-controls select{width:100%;margin-top:6px;border:1px solid var(--line);border-radius:8px;background:#0d0d12;color:var(--text);padding:10px}.event-controls button{background:var(--red)}.event-status{color:var(--muted);font-size:12px;margin-top:10px;min-height:16px}.heading-controls{display:grid;grid-template-columns:1.4fr 1fr .7fr 1fr auto;gap:10px;align-items:end}.print-report{display:none}.print-button{background:#0f8f68}.print-table{width:100%;border-collapse:collapse;margin-top:20px;font-size:14px}.print-table th,.print-table td{border:1px solid #c9c9c9;padding:9px;text-align:left}.print-table th{background:#eeeeee}.print-table th:nth-child(4),.print-table td:nth-child(4){min-width:72px}.print-status{font-weight:700}.print-status.free{color:#13865e}.print-status.dispute{color:#a86b00}.print-status.confirmed{color:#c21f2d}@media(max-width:700px){.event-controls,.heading-controls{grid-template-columns:1fr}.event-controls button,.heading-controls button{width:100%}}@media print{body{background:#fff;color:#111;font:12px Arial,sans-serif}.login-view,.wrap>*:not(.print-report){display:none!important}.wrap{display:block;max-width:none;padding:0}.print-report{display:block!important}.print-report h1{font-size:22px;margin:0 0 5px}.print-report p{margin:3px 0;color:#555}.print-table{font-size:11px;margin-top:12px}.print-table th{background:#eeeeee!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.print-status{font-weight:700}}
     .capture-card{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}.capture-card h2{margin:0 0 6px;font-size:18px}.capture-card p{color:var(--muted);margin:0 0 14px;font-size:13px}.capture-toolbar{display:flex;gap:10px;align-items:center}.capture-button{background:#0f8f68}.capture-status{color:var(--muted);font-size:12px;min-height:16px}
     .countdown{color:var(--amber);font-weight:bold;margin-left:8px;font-variant-numeric: tabular-nums;}
+    .excepcion-badge{background:#4d0a3d;color:#f38ae0;font-size:10px;padding:2px 6px;border-radius:4px;margin-top:4px;display:inline-block;font-weight:bold}
+    .detail b.ingresada-text{color:var(--blue)}
   </style>
 </head>
 <body>
@@ -27,10 +66,44 @@
     </form>
   </section>
   <main class="wrap" id="adminApp" hidden>
-    <header class="head"><div class="brand">CUBANO<b>BAR</b></div><div class="toolbar"><button id="refresh">Actualizar</button><button id="printStatus" class="print-button" type="button">Imprimir estado</button><a class="link" href="cubano-bar-mesas.html">Ver mapa</a><button id="resetAll" class="delete" type="button">Resetear mesas</button><button class="logout" id="logout">Salir</button></div></header>
+    <header class="head"><div class="brand">CUBANO<b>BAR</b> <span id="adminRoleLabel" style="font-size:14px; color:var(--red); font-weight:bold; margin-left:10px; border: 1px solid var(--red); padding: 2px 8px; border-radius: 6px;"></span></div><div class="toolbar"><button id="refresh" class="btn-solid btn-actualizar">Actualizar</button><button id="saveAllSenas" class="btn-solid btn-guardar" style="display:none;">GUARDAR CAMBIOS</button><button id="btnArqueo" class="btn-solid btn-arqueo">VER ARQUEO</button><button id="printStatus" class="btn-solid btn-imprimir" type="button">Imprimir estado</button><a class="link btn-outline" href="cubano-bar-mesas.html">Ver mapa</a><a id="linkBoleteria" class="link btn-outline btn-outline-blue" href="boleteria.html">Mapa Boletería</a><button id="resetAll" class="btn-outline btn-outline-red" type="button">Resetear mesas</button><button class="btn-outline" id="logout">Salir</button></div></header>
     <h1>Administracion de reservas</h1>
     <p class="sub">Aprueba las reservas una vez que verifiques la seña. Las aprobadas aparecen en rojo en el mapa.</p>
-    <section class="stats"><div class="stat"><strong id="pendingCount">0</strong><span>Pendientes</span></div><div class="stat"><strong id="approvedCount">0</strong><span>Aprobadas</span></div><div class="stat"><strong id="totalCount">0</strong><span>Total de reservas</span></div></section>
+    <section class="stats">
+      <div class="stat"><strong id="pendingCount">0</strong><span>Pendientes</span></div>
+      <div class="stat"><strong id="approvedCount">0</strong><span>Vendidas</span></div>
+      <div class="stat"><strong id="ingresadaCount">0</strong><span>Dentro</span></div>
+      <div class="stat"><strong id="peopleTotalCount">0</strong><span>Total Personas</span></div>
+    </section>
+
+    <!-- Arqueo Panel -->
+    <section id="arqueoPanel" style="display:none; margin-bottom:30px; border: 2px solid var(--amber); border-radius:14px; padding:20px; background:rgba(255,189,62,0.05);">
+       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h2 style="margin:0; color:var(--amber);">ARQUEO DE CAJA</h2>
+          <button onclick="document.getElementById('arqueoPanel').style.display='none'">Cerrar Arqueo</button>
+       </div>
+       <div class="stats" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="stat">
+            <span style="color:var(--amber);">1. ADELANTOS (Semana)</span>
+            <strong id="arqueoAdelantos" style="color:var(--amber);">$0</strong>
+            <small style="font-size:10px; color:var(--muted);">No deberían estar en la caja física</small>
+          </div>
+          <div class="stat" style="border-color:var(--blue);">
+            <span style="color:var(--blue);">2. BOLETERÍA (Digital)</span>
+            <strong id="arqueoTransf" style="color:var(--blue);">$0</strong>
+            <small style="font-size:10px; color:var(--muted);">QR / Transferencias en puerta</small>
+          </div>
+          <div class="stat" style="border-color:var(--red);">
+            <span style="color:var(--red);">3. CAJA FÍSICA (Efectivo)</span>
+            <strong id="arqueoCash" style="color:var(--red);">$0</strong>
+            <small style="font-size:10px; color:var(--muted);">Inicial + Cobros - Retiros</small>
+          </div>
+       </div>
+       <div id="retirosDetail" style="margin-top:20px; font-size:13px;">
+          <b style="display:block; margin-bottom:8px;">Movimientos de Caja:</b>
+          <div id="cajaLog" style="max-height:150px; overflow-y:auto; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;"></div>
+       </div>
+    </section>
     <section class="capture-card">
       <h2>Captura del mapa</h2>
       <p>Generá una imagen únicamente del rectángulo del mapa para compartirla con tu equipo.</p>
@@ -74,12 +147,11 @@
       db.useEmulator("localhost", 8080);
       auth.useEmulator("http://localhost:9099");
     }
-    const DEV_EMAILS=new Set(['gncesso@gmail.com', 'moyanojl.1984@gmail.com', 'moyanojl1984@gmail.com']);
-    const ADMIN_EMAILS=DEV_EMAILS; // Como socio, tenés ambos roles
 
     const loginView=document.getElementById('loginView');
     const adminApp=document.getElementById('adminApp');
     const loginForm=document.getElementById('loginForm');
+    const saveAllSenas=document.getElementById('saveAllSenas');
     const loginError=document.getElementById('loginError');
     const emailInput=document.getElementById('emailInput');
     const passwordInput=document.getElementById('passwordInput');
@@ -87,6 +159,10 @@
     const logout=document.getElementById('logout');
     const resetAll=document.getElementById('resetAll');
     const printStatus=document.getElementById('printStatus');
+    const pendingCount = document.getElementById('pendingCount');
+    const approvedCount = document.getElementById('approvedCount');
+    const ingresadaCount = document.getElementById('ingresadaCount');
+    const peopleTotalCount = document.getElementById('peopleTotalCount');
     const printReport=document.getElementById('printReport');
     const captureMap=document.getElementById('captureMap');
     const captureStatus=document.getElementById('captureStatus');
@@ -105,9 +181,14 @@
     loginForm.addEventListener('submit',async event=>{
       event.preventDefault();
       loginError.textContent='';
+      const email = emailInput.value.trim().toLowerCase();
+      const pass = passwordInput.value;
       try{
-        await auth.signInWithEmailAndPassword(emailInput.value.trim(),passwordInput.value);
-      }catch(_){ loginError.textContent='Email o contraseña incorrectos.'; }
+        await auth.signInWithEmailAndPassword(email, pass);
+      }catch(e){
+        console.error(e);
+        loginError.textContent='Error: ' + e.message;
+      }
     });
       resetPassword.addEventListener('click',async()=>{
         const email=emailInput.value.trim();
@@ -118,21 +199,25 @@
     logout.addEventListener('click',()=>auth.signOut());
     resetAll.addEventListener('click',async()=>{
       if(!confirm('Esto liberará todas las mesas y borrará todas las reservas, incluida ULTRA VIP. ¿Continuar?')) return;
-      if(!confirm('Confirmación final: todas las mesas volverán a estar libres.')) return;
+      if(!confirm('Confirmación final: todas las mesas volverán a estar libres y la caja se reiniciará.')) return;
       resetAll.disabled=true;resetAll.textContent='Reseteando...';
       try{
         const snapshot=await db.collection('reservas').get();
         const batch=db.batch();
         snapshot.forEach(doc=>batch.delete(doc.ref));
+
+        const cajaSnapshot = await db.collection('caja_movimientos').get();
+        cajaSnapshot.forEach(doc=>batch.delete(doc.ref));
+
         await batch.commit();
-        alert('Todas las mesas quedaron libres y listas para el próximo evento.');
+        alert('Todas las mesas quedaron libres y la caja fue reiniciada para el próximo evento.');
         render();
-      }catch(_){alert('No se pudo resetear todas las mesas.');}
+      }catch(_){alert('No se pudo resetear todas las mesas y movimientos.');}
       resetAll.disabled=false;resetAll.textContent='Resetear mesas';
     });
     function printStatusLabel(reserva){
       if(!reserva) return {label:'Libre',className:'free'};
-      if(reserva.status==='aprobada'||reserva.status==='ocupada') return {label:'Pagado - reserva confirmada',className:'confirmed'};
+      if(reserva.status==='aprobada'||reserva.status==='ocupada'||reserva.status==='ingresada') return {label:'Pagado - reserva confirmada',className:'confirmed'};
       return {label:'Señado - en disputa',className:'dispute'};
     }
     function renderPrintReport(){
@@ -159,17 +244,107 @@
       saveEventLogo.disabled=false;
     });
     removeEventLogo.addEventListener('click',async()=>{try{await db.collection('config').doc('ultraVip').set({logoUrl:'',eventName:'',updatedAt:Date.now()},{merge:true});eventLogoStatus.textContent='Logo quitado del mapa.';}catch(_){eventLogoStatus.textContent='No se pudo quitar el logo.';}});
-    auth.onAuthStateChanged(user=>{
-      const allowed = user && (ADMIN_EMAILS.has(user.email.toLowerCase()) || DEV_EMAILS.has(user.email.toLowerCase()));
-      if(user && !allowed){ auth.signOut(); loginError.textContent='Esta cuenta no tiene acceso al panel.'; }
-      loginView.hidden=!!allowed;
-      adminApp.hidden=!allowed;
+    auth.onAuthStateChanged(async (user) => {
+      console.log("Auth State Changed. User:", user ? user.email : "none");
+
+      if (user) {
+        try {
+          const email = user.email.toLowerCase().trim();
+          const userDoc = await db.collection("users").doc(email).get();
+
+          if (userDoc.exists) {
+            const role = userDoc.data().role;
+            console.log("User role found:", role);
+
+            const isMaster = (role === 'admin');
+            const isAssistant = (role === 'assistant');
+            const isBoleteria = (role === 'boleteria');
+
+            if (isBoleteria) {
+              window.location.href = "boleteria.html";
+              return;
+            }
+
+            if (isMaster || isAssistant) {
+              loginView.hidden = true;
+              adminApp.hidden = false;
+              document.getElementById('adminRoleLabel').textContent = isMaster ? '(SUPERUSUARIO)' : '(ASISTENTE)';
+
+              // UI Restrictions
+              document.getElementById('resetAll').style.display = isMaster ? 'block' : 'none';
+              document.getElementById('linkBoleteria').style.display = isMaster ? 'block' : 'none';
+              document.querySelectorAll('.event-card').forEach(card => card.style.display = isMaster ? 'block' : 'none');
+              document.querySelector('.capture-card').style.display = isMaster ? 'block' : 'none';
+
+              render(); // Dibujar la lista de reservas
+            } else {
+              throw new Error('No tienes permisos de administración.');
+            }
+          } else {
+            throw new Error('Usuario no registrado en la base de datos de roles.');
+          }
+        } catch(e) {
+          console.error("Role Error:", e);
+          loginError.textContent = e.message;
+          setTimeout(() => auth.signOut(), 3000);
+        }
+      } else {
+        loginView.hidden = false;
+        adminApp.hidden = true;
+      }
     });
     const KEY='mesas-estado';
     let sharedData={};
+    let cajaMovimientos = [];
     const load=()=>sharedData;
     const formatDate=ts=>ts?new Date(ts).toLocaleString('es-AR',{dateStyle:'short',timeStyle:'short'}):'Sin fecha';
     function escapeHtml(value){const el=document.createElement('div');el.textContent=value;return el.innerHTML}
+
+    // --- Arqueo Logic ---
+    document.getElementById('btnArqueo').addEventListener('click', () => {
+      const panel = document.getElementById('arqueoPanel');
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      if (panel.style.display === 'block') renderArqueo();
+    });
+
+    function renderArqueo() {
+      let totalAdelantos = 0;
+      let totalBoleteriaTransf = 0;
+      let totalBoleteriaEfectivo = 0;
+      let initialCash = 0;
+      let retiros = 0;
+
+      const logContainer = document.getElementById('cajaLog');
+      logContainer.innerHTML = "";
+
+      cajaMovimientos.forEach(m => {
+        const row = document.createElement('div');
+        row.style.padding = "4px 0";
+        row.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
+
+        if (m.tipo === 'apertura') {
+          initialCash += m.monto;
+          row.innerHTML = `<span style="color:var(--green)">[APERTURA]</span> $${m.monto.toLocaleString()} - ${m.nota || ''}`;
+        } else if (m.tipo === 'retiro') {
+          retiros += m.monto;
+          row.innerHTML = `<span style="color:var(--red)">[RETIRO]</span> $${m.monto.toLocaleString()} - ${m.nota || ''}`;
+        }
+        logContainer.appendChild(row);
+      });
+
+      Object.values(sharedData).forEach(r => {
+        if (r.status === 'ingresada') {
+          totalAdelantos += (r.montoSenado || 0);
+          totalBoleteriaEfectivo += (r.cobroEfectivo || 0);
+          totalBoleteriaTransf += (r.cobroTransferencia || 0);
+        }
+      });
+
+      document.getElementById('arqueoAdelantos').textContent = "$" + totalAdelantos.toLocaleString();
+      document.getElementById('arqueoTransf').textContent = "$" + totalBoleteriaTransf.toLocaleString();
+      document.getElementById('arqueoCash').textContent = "$" + (initialCash + totalBoleteriaEfectivo - retiros).toLocaleString();
+    }
+
     captureMap.addEventListener('click',async()=>{
       captureMap.disabled=true;
       captureStatus.textContent='⌛ Generando imagen (esperá 5 seg)...';
@@ -189,16 +364,76 @@
     });
     function render(){
       const data=load(),items=Object.entries(data).sort((a,b)=>(b[1].ts||0)-(a[1].ts||0));
-      const pending=items.filter(([,r])=>r.status==='pendiente'||r.status==='disputa').length,approved=items.filter(([,r])=>r.status==='aprobada'||r.status==='ocupada').length;
-      pendingCount.textContent=pending;approvedCount.textContent=approved;totalCount.textContent=items.length;
+      const pending=items.filter(([,r])=>['pendiente','disputa','comprobante_subido','pendiente_revision'].includes(r.status)).length;
+      const approved=items.filter(([,r])=>['aprobada','ocupada','vendida','ingresada'].includes(r.status)).length;
+      const ingresadas=items.filter(([,r])=>r.status==='ingresada').length;
+      const totalPeople=items.reduce((sum, [,r]) => sum + (parseInt(r.cantidadPersonas) || 0), 0);
+
+      pendingCount.textContent=pending;
+      approvedCount.textContent=approved;
+      ingresadaCount.textContent=ingresadas;
+      peopleTotalCount.textContent=totalPeople;
+
+      // Ocultar botón de guardar si no hay items
+      saveAllSenas.style.display = items.length ? 'block' : 'none';
+
       list.innerHTML=items.length?'':'<div class="empty">Todavia no hay solicitudes de reserva.</div>';
       items.forEach(([mesa,r])=>{
-        const ok=r.status==='aprobada'||r.status==='ocupada',node=document.createElement('article');
-        const isDispute = r.status === 'disputa';
+        const isApproved = ['aprobada','ocupada','vendida'].includes(r.status);
+        const isIngresada = r.status==='ingresada';
+        const isPending = ['disputa','pendiente','comprobante_subido','pendiente_revision'].includes(r.status);
+
+        let statusLabel = 'En disputa';
+        let badgeClass = 'pendiente';
+        if (isApproved) { statusLabel = 'Reservada confirmada'; badgeClass = 'aprobada'; }
+        if (isIngresada) { statusLabel = 'INGRESADA'; badgeClass = 'ingresada'; }
+
+        const node=document.createElement('article');
         node.className='row';
-        node.innerHTML='<div class="mesa">'+mesa+'</div><div class="detail"><b>'+escapeHtml(r.nombre||'Sin nombre')+'</b><small>'+formatDate(r.ts)+'</small><br><span class="badge '+(ok?'aprobada':'pendiente')+'">'+(ok?'Reservada confirmada':'En disputa')+'</span>'+(isDispute && r.expiresAt ? '<span class="countdown" data-expires="'+r.expiresAt+'" data-mesa="'+mesa+'">--:--</span>' : '')+'</div><div class="actions">'+(ok?'<button data-action="pending" data-id="'+mesa+'">Volver a disputa</button>':'<button class="approve" data-action="approve" data-id="'+mesa+'">Confirmar reserva</button>')+'<button class="delete" data-action="delete" data-id="'+mesa+'">Eliminar</button></div>';
-        list.appendChild(node)
+
+        let detailHtml = `<b>${escapeHtml(r.nombre||'Sin nombre')}</b>`;
+        if (r.masterNote) {
+          detailHtml += `<div style="font-size:11px; color:var(--amber); margin-top:2px;">📝 ${escapeHtml(r.masterNote)}</div>`;
+        }
+
+        // Editable seña input
+        const senaValue = r.montoSenado || 0;
+        detailHtml += `<div style="margin-top:5px;"><label style="font-size:11px; color:var(--muted)">Seña $: </label><input type="number" class="sena-input" data-id="${mesa}" value="${senaValue}" style="width:100px; background:#0d0d12; color:var(--amber); border:1px solid var(--line); border-radius:4px; padding:2px 5px; font-weight:bold; outline:none;"></div>`;
+
+        if (isIngresada) {
+          detailHtml = `<b class="ingresada-text">${escapeHtml(r.nombre||'Sin nombre')} (${r.cantidadPersonas} pers)</b>`;
+          if (r.masterNote) {
+            detailHtml += `<div style="font-size:11px; color:var(--amber); margin-top:2px;">📝 ${escapeHtml(r.masterNote)}</div>`;
+          }
+          detailHtml += `<div style="margin-top:5px;"><label style="font-size:11px; color:var(--muted)">Seña (Semana) $: </label><input type="number" class="sena-input" data-id="${mesa}" value="${senaValue}" style="width:100px; background:#0d0d12; color:var(--amber); border:1px solid var(--line); border-radius:4px; padding:2px 5px; font-weight:bold; outline:none;"></div>`;
+
+          // Payment details for puerta
+          detailHtml += `<div style="font-size:12px; margin-top:8px; padding:8px; background:rgba(255,255,255,0.05); border-radius:6px;">`;
+          detailHtml += `<div style="color:var(--muted); font-size:10px; margin-bottom:4px;">COBRO EN PUERTA:</div>`;
+          if (r.cobroEfectivo > 0) detailHtml += `<div style="color:var(--red)">• EFECTIVO: $${r.cobroEfectivo.toLocaleString()}</div>`;
+          if (r.cobroTransferencia > 0) detailHtml += `<div style="color:var(--blue)">• TRANSF/QR: $${r.cobroTransferencia.toLocaleString()}</div>`;
+          detailHtml += `</div>`;
+
+          if (r.excepcion) detailHtml += `<br><span class="excepcion-badge">EXCEPCIÓN: Pago Total $${r.montoTotal?.toLocaleString('es-AR')} | Bebidas $${r.montoConsumicion?.toLocaleString('es-AR')}</span>`;
+        }
+
+        node.innerHTML = `
+          <div class="mesa">${mesa}</div>
+          <div class="detail">
+            ${detailHtml}
+            <small>${formatDate(r.ts)}</small><br>
+            <span class="badge ${badgeClass}">${statusLabel}</span>
+            ${isPending && r.expiresAt ? `<span class="countdown" data-expires="${r.expiresAt}" data-mesa="${mesa}">--:--</span>` : ''}
+          </div>
+          <div class="actions">
+            ${isApproved ? `<button data-action="pending" data-id="${mesa}">Volver a disputa</button>` : ''}
+            ${r.status === 'pendiente' || isPending ? `<button class="approve" data-action="approve" data-id="${mesa}">Confirmar reserva</button>` : ''}
+            <button class="delete" data-action="delete" data-id="${mesa}">Eliminar</button>
+          </div>
+        `;
+        list.appendChild(node);
       });
+      if (document.getElementById('arqueoPanel').style.display === 'block') renderArqueo();
     }
 
     // Lógica de cuenta regresiva y auto-limpieza
@@ -223,8 +458,78 @@
         el.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
       });
     }, 1000);
-    list.addEventListener('click',async event=>{const button=event.target.closest('button[data-action]');if(!button)return;const id=button.dataset.id;try{if(button.dataset.action==='approve')await db.collection('reservas').doc(id).update({status:'aprobada',approvedAt:Date.now(),approvedBy:auth.currentUser.email});if(button.dataset.action==='pending')await db.collection('reservas').doc(id).update({status:'pendiente',approvedAt:null,approvedBy:null});if(button.dataset.action==='delete')await db.collection('reservas').doc(id).delete()}catch(_){alert('No se pudo actualizar la reserva.');}});
-    refresh.addEventListener('click',render);db.collection('reservas').onSnapshot(snapshot=>{sharedData={};snapshot.forEach(doc=>sharedData[doc.id]=doc.data());render()},()=>{list.innerHTML='<div class="empty">No se pudieron cargar las reservas. Actualiza la pagina.</div>'});
+
+    saveAllSenas.addEventListener('click', async () => {
+      const inputs = document.querySelectorAll('.sena-input');
+      const btn = saveAllSenas;
+      btn.disabled = true;
+      btn.textContent = 'Guardando...';
+
+      try {
+        const batch = db.batch();
+        let changed = 0;
+        inputs.forEach(input => {
+          const mesaId = input.dataset.id;
+          const newValue = parseInt(input.value) || 0;
+          const oldValue = sharedData[mesaId]?.montoSenado || 0;
+
+          if (newValue !== oldValue) {
+            batch.update(db.collection('reservas').doc(mesaId), { montoSenado: newValue });
+            changed++;
+          }
+        });
+
+        if (changed > 0) {
+          await batch.commit();
+          alert(`${changed} montos actualizados correctamente.`);
+        } else {
+          alert('No se detectaron cambios en los montos.');
+        }
+      } catch(e) {
+        alert('Error al guardar: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'GUARDAR CAMBIOS';
+      }
+    });
+
+    list.addEventListener('click',async event=>{
+      const button=event.target.closest('button[data-action]');
+      if(!button)return;
+      const id=button.dataset.id;
+      try{
+        if(button.dataset.action==='approve') {
+          const montoStr = prompt('Ingresá el monto de la seña recibido (solo números):');
+          if (montoStr === null) return; // Cancelado
+          const monto = parseInt(montoStr.replace(/\D/g, '')) || 0;
+
+          await db.collection('reservas').doc(id).update({
+            status:'aprobada',
+            montoSenado: monto,
+            approvedAt:Date.now(),
+            approvedBy:auth.currentUser.email
+          });
+        }
+        if(button.dataset.action==='pending')await db.collection('reservas').doc(id).update({status:'pendiente',approvedAt:null,approvedBy:null,montoSenado:null});
+        if(button.dataset.action==='delete') {
+          if(!confirm('¿Eliminar esta reserva?')) return;
+          await db.collection('reservas').doc(id).delete();
+        }
+      }catch(_){alert('No se pudo actualizar la reserva.');}
+    });
+    refresh.addEventListener('click',render);
+    db.collection('reservas').onSnapshot(snapshot=>{sharedData={};snapshot.forEach(doc=>sharedData[doc.id]=doc.data());render()},()=>{list.innerHTML='<div class="empty">No se pudieron cargar las reservas. Actualiza la pagina.</div>'});
+    db.collection('caja_movimientos').orderBy('ts','desc').onSnapshot(snapshot=>{
+      cajaMovimientos = [];
+      const cutoff = Date.now() - 14 * 60 * 60 * 1000;
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.ts >= cutoff) {
+          cajaMovimientos.push({id: doc.id, ...data});
+        }
+      });
+      if (document.getElementById('arqueoPanel').style.display === 'block') renderArqueo();
+    });
   </script>
 </body>
 </html>

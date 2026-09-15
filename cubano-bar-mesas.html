@@ -18,6 +18,7 @@
     --grey: #8b8b93;
     --grey-line: #2a2a31;
     --green: #2ee6a6;
+    --blue: #58a6ff;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;}
@@ -59,6 +60,7 @@
   .dot.free{background:var(--green); box-shadow:0 0 8px rgba(46,230,166,0.7);}
   .dot.pending{background:#f6b73c; box-shadow:0 0 8px rgba(246,183,60,0.65);}
   .dot.approved{background:var(--red); box-shadow:0 0 8px var(--red-glow);}
+  .dot.ingresada-master{background:var(--blue); box-shadow:0 0 8px rgba(88,166,255,0.7);}
 
   .hero-text{
     padding:22px 20px 6px;
@@ -199,6 +201,14 @@
   .table-btn.approved{
     background:linear-gradient(145deg, #ff5b66, #d20e21 55%, #70000a);
     box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 10px rgba(255,45,61,0.4);
+  }
+  .table-btn.ingresada{
+    background:linear-gradient(145deg, #ff5b66, #d20e21 55%, #70000a);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 10px rgba(255,45,61,0.4);
+  }
+  .table-btn.ingresada-master{
+    background:linear-gradient(145deg, #58a6ff, #0a56ad 55%, #002e61);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 10px rgba(88,166,255,0.4);
   }
   .table-btn .table-label{ pointer-events:none; color:#fff; text-shadow:0 1px 3px #000; font-size: 1.1em; }
   .table-btn .x-mark{ font-size: 1.2em; text-shadow:0 1px 3px #000; display:block; color:#fff; font-family:'Bebas Neue',sans-serif; line-height:1; }
@@ -392,16 +402,32 @@
   #capturePreviewImg { max-width: 100%; max-height: 75vh; border: 2px solid var(--grey-line); border-radius: 12px; margin-bottom: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
   .preview-header { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 1px; margin-bottom: 10px; color: var(--white); }
   .preview-actions { display: flex; gap: 15px; width: 100%; max-width: 400px; }
+  /* Master Panel */
+  .master-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+  .btn-master { background: #30303a; color: white; border: 1px solid var(--grey-line); padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 13px; }
+  #masterBrand { cursor: pointer; user-select: none; }
+  .master-logout { display:none; background:transparent; border:1px solid var(--grey-line); color:var(--muted); font-size:10px; padding:4px 8px; border-radius:6px; cursor:pointer; margin-top:4px; text-transform:uppercase; font-weight:bold; }
+
+  /* Login Modal */
+  .login-modal { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; padding: 20px; }
+  .login-modal.show { display: flex; }
+  .login-card-modal { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 30px; width: 100%; max-width: 360px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+  .login-card-modal h3 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; margin: 0 0 20px; color: var(--red); letter-spacing: 1px; }
+  .login-card-modal input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--line); border-radius: 10px; color: white; padding: 12px; margin-bottom: 15px; outline: none; }
+  .login-card-modal input:focus { border-color: var(--red); }
+  .login-card-modal .btn-primary { width: 100%; margin-top: 10px; }
+  .login-card-modal .close-login { display: block; margin: 15px auto 0; background: transparent; color: var(--grey); border: none; font-size: 13px; cursor: pointer; }
 </style>
 </head>
 <body>
 
   <div class="topbar">
-    <div class="brand">CUBANO<span>BAR</span><small>Sector VIP — reservá tu mesa</small></div>
+    <div class="brand" id="masterBrand">CUBANO<span>BAR</span><small>Sector VIP — reservá tu mesa</small><button id="masterLogoutBtn" class="master-logout">Cerrar Sesión Maestro</button></div>
     <div class="legend">
       <span><span class="dot free"></span>Libre</span>
       <span><span class="dot pending"></span>En disputa</span>
       <span><span class="dot approved"></span>Vendida</span>
+      <span id="legendIngresada" style="display:none;"><span class="dot ingresada-master"></span>En Puerta</span>
     </div>
   </div>
 
@@ -451,9 +477,24 @@
 
       <div id="senaView">
         <div class="sheet-eyebrow" id="mesaEyebrow">MESA —</div>
-        <h2>Señá tu mesa</h2>
+        <h2 id="modalTitle">Señá tu mesa</h2>
 
-        <div class="alias-box">
+        <div id="masterPanel" style="display: none; margin-bottom: 20px; border-bottom: 1px solid var(--grey-line); padding-bottom: 20px;">
+          <div class="sheet-eyebrow">CONTROL MAESTRO</div>
+          <div style="margin-top: 10px; margin-bottom: 15px;">
+            <input class="name-input" id="masterNameInput" type="text" placeholder="Nombre de la reserva" style="margin-bottom: 8px;">
+            <input class="name-input" id="masterNoteInput" type="text" placeholder="Nota / Medio de pago">
+          </div>
+          <div class="master-actions">
+            <button class="btn-master" data-status="libre">LIBRE (BORRAR)</button>
+            <button class="btn-master" data-status="disputa">PENDIENTE (AMARILLO)</button>
+            <button class="btn-master" data-status="aprobada">VENDIDA (ROJO)</button>
+            <button class="btn-master" data-status="ingresada">INGRESADA (ROJO)</button>
+          </div>
+        </div>
+
+        <div id="standardForm">
+          <div class="alias-box">
           <div>
             <div class="label">Alias para transferir</div>
             <div class="value">cubanobar</div>
@@ -481,8 +522,9 @@
           <b>4.</b> La mesa queda en disputa por 15 minutos.<br>
           <b>5.</b> Apretá "Finalizar" para confirmar tu mesa.
         </div>
+        </div>
 
-        <div class="btn-row">
+        <div class="btn-row" id="standardBtnRow">
           <button class="btn-secondary" id="cancelBtn">Cancelar</button>
           <button class="btn-primary" id="finalizarBtn">Finalizar</button>
         </div>
@@ -499,6 +541,16 @@
     </div>
   </div>
 
+  <div id="loginModal" class="login-modal">
+    <div class="login-card-modal">
+      <h3>Acceso Maestro</h3>
+      <input type="email" id="masterEmail" placeholder="Email de administrador">
+      <input type="password" id="masterPass" placeholder="Contraseña">
+      <button class="btn-primary" id="doMasterLogin">Ingresar</button>
+      <button class="close-login" id="cancelMasterLogin">Cancelar</button>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <div id="capturePreviewOverlay">
@@ -512,18 +564,22 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
   const firebaseConfig = { apiKey:"AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY", authDomain:"mesas-cubano-bar.firebaseapp.com", projectId:"mesas-cubano-bar", storageBucket:"mesas-cubano-bar.firebasestorage.app", messagingSenderId:"1072135346765", appId:"1:1072135346765:web:e8a6ee5497366a8b1f5a04" };
   let firebaseDb = null;
   let firebaseFunctions = null;
+  let auth = null;
   const USE_SECURE_RESERVATION = false;
   try {
     firebase.initializeApp(firebaseConfig);
     firebaseDb = firebase.firestore();
+    auth = firebase.auth();
     if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
       firebaseDb.useEmulator("localhost", 8080);
+      auth.useEmulator("http://localhost:9099");
     }
   } catch (_) {}
   try { if(USE_SECURE_RESERVATION) firebaseFunctions = firebase.app().functions("us-central1"); } catch (_) {}
@@ -609,7 +665,7 @@
   function reservaActiva(reserva){
     if(!reserva) return false;
     if(reserva.status === "disputa" && Number.isFinite(reserva.expiresAt) && reserva.expiresAt <= Date.now()) return false;
-    return ["pendiente", "disputa", "aprobada", "ocupada", "comprobante_subido", "pendiente_revision", "vendida"].includes(reserva.status);
+    return ["pendiente", "disputa", "aprobada", "ocupada", "comprobante_subido", "pendiente_revision", "vendida", "ingresada"].includes(reserva.status);
   }
 
   function actualizarContador(){
@@ -701,6 +757,12 @@
     localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify([...getRecentAttempts(), Date.now()]));
   }
 
+  // Super User Logic
+  let masterClicks = 0;
+  let masterTimer = null;
+  let userRole = null;
+  let isMaster = false;
+
   function cargarLogoEvento(){
     if(!firebaseDb) return;
     firebaseDb.collection("config").doc("ultraVip").onSnapshot(doc=>{
@@ -772,12 +834,23 @@
     TABLES.forEach(t=>{
       const reserva = estado[t.id];
       const activa = reservaActiva(reserva);
-      const approved = activa && (reserva.status === "aprobada" || reserva.status === "ocupada" || reserva.status === "vendida");
-      const pending = activa && !approved;
-      const blocked = approved || pending;
+      const isIngresada = activa && reserva.status === "ingresada";
+      const isVentaEnPuerta = isIngresada && (reserva.nombre === "Venta en Puerta" || reserva.masterAction);
+      const approved = activa && ["aprobada", "ocupada", "vendida"].includes(reserva.status);
+      const pending = activa && ["pendiente", "disputa", "comprobante_subido", "pendiente_revision"].includes(reserva.status);
+      const blocked = approved || pending || isIngresada;
 
       const btn = document.createElement("button");
-      btn.className = "table-btn" + (approved ? " approved" : pending ? " pending" : "");
+      let statusClass = "";
+      if (isIngresada) {
+        statusClass = (isMaster && isVentaEnPuerta) ? " ingresada-master" : " ingresada";
+      } else if (approved) {
+        statusClass = " approved";
+      } else if (pending) {
+        statusClass = " pending";
+      }
+
+      btn.className = "table-btn" + statusClass;
       btn.style.left = t.x + "%";
       btn.style.top = t.y + "%";
 
@@ -785,8 +858,8 @@
       btn.style.width = btnSize + "px";
       btn.style.height = btnSize + "px";
 
-      btn.innerHTML = approved ? '<span class="x-mark">X</span>' : '<span class="table-label">' + t.id + '</span>';
-      btn.setAttribute("aria-label", "Mesa " + t.id + (approved ? " (aprobada)" : pending ? " (pendiente de aprobacion)" : " (libre)"));
+      btn.innerHTML = (approved || isIngresada) ? '<span class="x-mark">X</span>' : '<span class="table-label">' + t.id + '</span>';
+      btn.setAttribute("aria-label", "Mesa " + t.id + (isIngresada ? " (ingresada)" : approved ? " (aprobada)" : pending ? " (pendiente de aprobacion)" : " (libre)"));
 
       if(!blocked){
         btn.addEventListener("click", ()=> abrirMesa(t.id));
@@ -799,11 +872,23 @@
   function actualizarUltraVip(){
     const reserva = estado["ULTRA VIP"];
     const active = reservaActiva(reserva);
-    const confirmed = active && (reserva.status === "aprobada" || reserva.status === "ocupada" || reserva.status === "vendida");
-    const dispute = active && !confirmed;
+
+    const isIngresada = active && reserva.status === "ingresada";
+    const isVentaEnPuerta = isIngresada && (reserva.nombre === "Venta en Puerta" || reserva.masterAction);
+    const confirmed = active && ["aprobada", "ocupada", "vendida"].includes(reserva.status);
+    const dispute = active && ["pendiente", "disputa", "comprobante_subido", "pendiente_revision"].includes(reserva.status);
+
     ultraVipReserveBtn.classList.toggle("dispute", dispute);
-    ultraVipReserveBtn.classList.toggle("confirmed", confirmed);
-    ultraVipReserveBtn.textContent = confirmed ? "RESERVADO" : dispute ? "DISPUTA" : "RESERVAR";
+    ultraVipReserveBtn.classList.toggle("confirmed", (confirmed || isIngresada));
+
+    // Si está ingresada y es maestro, color azul. Si no, rojo (como vendida)
+    if (isIngresada) {
+      ultraVipReserveBtn.style.color = (isMaster && isVentaEnPuerta) ? "var(--blue)" : "var(--red)";
+    } else {
+      ultraVipReserveBtn.style.color = "";
+    }
+
+    ultraVipReserveBtn.textContent = isIngresada ? (isMaster && isVentaEnPuerta ? "EN PUERTA" : "INGRESADA") : confirmed ? "RESERVADO" : dispute ? "DISPUTA" : "RESERVAR";
   }
 
   ultraVipReserveBtn.addEventListener("click", ()=>{
@@ -813,17 +898,45 @@
   });
 
   function abrirMesa(id){
-    const active = getMyActiveDispute();
-    if (active && active.mesaId !== id) {
-      showToast("Ya tenés la mesa " + active.mesaId + " en proceso. Esperá a que venza o confirmala.");
-      return;
+    if (!isMaster) {
+      const active = getMyActiveDispute();
+      if (active && active.mesaId !== id) {
+        showToast("Ya tenés la mesa " + active.mesaId + " en proceso. Esperá a que venza o confirmala.");
+        return;
+      }
     }
 
     mesaActual = id;
     mesaEyebrow.textContent = "MESA " + id;
-    nameInput.value = "";
-    contactInput.value = "";
-    generateCaptcha();
+
+    if (isMaster) {
+      document.getElementById("masterPanel").style.display = "block";
+      document.getElementById("standardForm").style.display = "none";
+      document.getElementById("standardBtnRow").style.display = "none";
+      document.getElementById("modalTitle").textContent = "Control Maestro";
+
+      const current = estado[id];
+      const masterNameInput = document.getElementById("masterNameInput");
+      const masterNoteInput = document.getElementById("masterNoteInput");
+
+      masterNameInput.value = current?.nombre || "";
+      masterNoteInput.value = current?.masterNote || "";
+
+      // Highlight current status in buttons
+      document.querySelectorAll(".btn-master").forEach(btn => {
+        const isActive = (current && current.status === btn.dataset.status) || (!current && btn.dataset.status === 'libre');
+        btn.classList.toggle("active", isActive);
+      });
+    } else {
+      document.getElementById("masterPanel").style.display = "none";
+      document.getElementById("standardForm").style.display = "block";
+      document.getElementById("standardBtnRow").style.display = "flex";
+      document.getElementById("modalTitle").textContent = "Señá tu mesa";
+      nameInput.value = "";
+      contactInput.value = "";
+      generateCaptcha();
+    }
+
     senaView.style.display = "block";
     confirmView.classList.remove("show");
     overlay.classList.add("open");
@@ -946,6 +1059,123 @@
     actualizarUltraVip();
     cargarLogoEvento();
 
+    // Master Access Listener (7 clicks)
+    document.getElementById("masterBrand").addEventListener("click", () => {
+      masterClicks++;
+      if (masterTimer) clearTimeout(masterTimer);
+      masterTimer = setTimeout(() => { masterClicks = 0; }, 3000);
+
+      if (masterClicks === 7) {
+        if (isMaster) {
+          showToast("Ya estás en modo maestro.");
+        } else {
+          // Si ya está logueado pero no es master, mostramos el modal de todos modos
+          document.getElementById("loginModal").classList.add("show");
+        }
+        masterClicks = 0;
+      }
+    });
+
+    document.getElementById("cancelMasterLogin").addEventListener("click", () => {
+      document.getElementById("loginModal").classList.remove("show");
+    });
+
+    document.getElementById("doMasterLogin").addEventListener("click", async () => {
+      const email = document.getElementById("masterEmail").value.trim().toLowerCase();
+      const pass = document.getElementById("masterPass").value;
+      if (!email || !pass) {
+        showToast("Completá todos los campos.");
+        return;
+      }
+
+      const btn = document.getElementById("doMasterLogin");
+      btn.disabled = true;
+      btn.textContent = "Verificando...";
+
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+        document.getElementById("loginModal").classList.remove("show");
+        document.getElementById("masterEmail").value = "";
+        document.getElementById("masterPass").value = "";
+      } catch(e) {
+        console.error("Login Error:", e);
+        showToast("Error: " + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Ingresar";
+      }
+    });
+
+    if (auth) {
+      auth.onAuthStateChanged(async (user) => {
+        console.log("Auth State (Map):", user ? user.email : "Logged out");
+        if (user && firebaseDb) {
+          try {
+            const userDoc = await firebaseDb.collection("users").doc(user.email.toLowerCase()).get();
+            if (userDoc.exists) {
+              const role = userDoc.data().role;
+              isMaster = (role === "admin");
+              document.getElementById("masterLogoutBtn").style.display = isMaster ? "block" : "none";
+              document.getElementById("legendIngresada").style.display = isMaster ? "inline-block" : "none";
+              if (isMaster) showToast("Modo Maestro ACTIVADO");
+            } else {
+              isMaster = false;
+              document.getElementById("masterLogoutBtn").style.display = "none";
+              showToast("El usuario no tiene rol asignado.");
+            }
+          } catch(e) {
+            console.error("Error fetching role:", e);
+          }
+        } else {
+          isMaster = false;
+          document.getElementById("masterLogoutBtn").style.display = "none";
+        }
+        renderMesas();
+        actualizarUltraVip();
+      });
+    }
+
+    document.getElementById("masterLogoutBtn").addEventListener("click", () => {
+      if (auth) auth.signOut();
+      showToast("Sesión cerrada");
+    });
+
+    document.getElementById("masterLogoutBtn").addEventListener("click", () => {
+      if (auth) auth.signOut();
+      isMaster = false;
+      showToast("Sesión maestra cerrada");
+    });
+
+    // Master Action Buttons
+    document.querySelectorAll(".btn-master").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        if (!mesaActual || !firebaseDb) return;
+        const newStatus = btn.dataset.status;
+        const masterName = document.getElementById("masterNameInput").value.trim();
+        const masterNote = document.getElementById("masterNoteInput").value.trim();
+
+        try {
+          if (newStatus === "libre") {
+            await firebaseDb.collection("reservas").doc(mesaActual).delete();
+          } else {
+            await firebaseDb.collection("reservas").doc(mesaActual).set({
+              status: newStatus,
+              nombre: masterName || "Asignado por Admin",
+              masterNote: masterNote || "",
+              contacto: estado[mesaActual]?.contacto || "0000000000",
+              ts: estado[mesaActual]?.ts || Date.now(),
+              expiresAt: newStatus === "disputa" ? Date.now() + DISPUTE_MS : null,
+              masterAction: true
+            }, { merge: true });
+          }
+          showToast("Estado actualizado.");
+          cerrarModal();
+        } catch(e) {
+          showToast("Error al actualizar.");
+        }
+      });
+    });
+
     // Asegurar que las mesas se vean bien si cambia el tamaño de la ventana
     window.addEventListener('resize', renderMesas);
 
@@ -957,6 +1187,19 @@
         actualizarUltraVip();
         actualizarContador();
       });
+
+      // Lógica de limpieza silenciosa (Parche para plan gratuito)
+      setInterval(() => {
+        const now = Date.now();
+        Object.entries(estado).forEach(async ([mesaId, reserva]) => {
+          if (reserva.status === "disputa" && reserva.expiresAt && reserva.expiresAt <= now) {
+            // Intentar borrar la mesa vencida silenciosamente
+            try {
+              await firebaseDb.collection("reservas").doc(mesaId).delete();
+            } catch(e) { /* Falló el borrado (quizás ya lo borró otro o no tiene permiso aún) */ }
+          }
+        });
+      }, 15000); // Revisar cada 15 segundos
     }
   }
   init();

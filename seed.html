@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Seed Firestore Emulator</title>
+</head>
+<body>
+    <h1>Seeding Firestore Emulator...</h1>
+    <div id="status">Starting...</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, connectFirestoreEmulator, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            projectId: "cubano-bar-mesas", // Using the project ID from the file list if visible or generic
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Connect to the local Firestore emulator
+        connectFirestoreEmulator(db, 'localhost', 8080);
+
+        const users = [
+            { id: 'moyanojl.1984@gmail.com', role: 'admin' },
+            { id: 'gncesso@gmail.com', role: 'admin' },
+            { id: 'alinnebogado94@gmail.com', role: 'assistant' },
+            { id: 'boleteria.cubano@gmail.com', role: 'boleteria' }
+        ];
+
+        async function seed() {
+            const statusDiv = document.getElementById('status');
+            try {
+                for (const user of users) {
+                    await setDoc(doc(db, "users", user.id), { role: user.role });
+                    console.log(`Added user: ${user.id}`);
+                }
+                statusDiv.innerText = "Success! All users seeded into the local emulator.";
+                statusDiv.style.color = "green";
+            } catch (error) {
+                console.error("Error seeding users:", error);
+                statusDiv.innerText = "Error: " + error.message + ". Make sure the Firestore emulator is running on localhost:8080.";
+                statusDiv.style.color = "red";
+            }
+        }
+
+        seed();
+    </script>
+</body>
+</html>

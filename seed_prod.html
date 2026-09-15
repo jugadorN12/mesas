@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Configurar Usuarios Producción - Cubano Bar</title>
+    <style>
+        body { font-family: sans-serif; background: #060608; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { background: #101014; border: 1px solid #2a2a31; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        h1 { color: #ff2d3d; }
+        #status { margin: 20px 0; font-weight: bold; }
+        .btn { background: #ff2d3d; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Configurar Roles en Producción</h1>
+        <p>Este script cargará los roles (Admin, Asistente, Boletería) en la base de datos REAL.</p>
+        <div id="status">Esperando...</div>
+        <button id="startBtn" class="btn">Cargar Usuarios Ahora</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey:"AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY",
+            authDomain:"mesas-cubano-bar.firebaseapp.com",
+            projectId:"mesas-cubano-bar",
+            storageBucket:"mesas-cubano-bar.firebasestorage.app",
+            messagingSenderId:"1072135346765",
+            appId:"1:1072135346765:web:e8a6ee5497366a8b1f5a04"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        const users = [
+            { id: 'moyanojl.1984@gmail.com', role: 'admin' },
+            { id: 'gncesso@gmail.com', role: 'admin' },
+            { id: 'alinnebogado94@gmail.com', role: 'assistant' },
+            { id: 'boleteria.cubano@gmail.com', role: 'boleteria' }
+        ];
+
+        const btn = document.getElementById('startBtn');
+        const statusDiv = document.getElementById('status');
+
+        btn.addEventListener('click', async () => {
+            const email = prompt("Ingresá tu email de Administrador:");
+            const pass = prompt("Ingresá tu contraseña:");
+
+            if (!email || !pass) return;
+
+            btn.disabled = true;
+            statusDiv.innerText = "Autenticando...";
+
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                statusDiv.innerText = "Cargando roles...";
+
+                for (const user of users) {
+                    await setDoc(doc(db, "users", user.id), { role: user.role });
+                }
+
+                statusDiv.innerText = "¡ÉXITO! Todos los roles fueron cargados en Producción.";
+                statusDiv.style.color = "#2ee6a6";
+            } catch (error) {
+                console.error(error);
+                statusDiv.innerText = "Error: " + error.message;
+                statusDiv.style.color = "#ff2d3d";
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

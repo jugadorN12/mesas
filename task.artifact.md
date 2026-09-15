@@ -1,0 +1,11 @@
+- `[/]` Super Usuario y Mejoras Visuales
+    - `[ ]` Paso 1: Sistema de Super Usuario en `cubano-bar-mesas.html`
+        - `[ ]` Implementar acceso oculto (7 clics en brand).
+        - `[ ]` Cambiar visualización de mesas `ingresada` a rojo.
+        - `[ ]` Implementar "Panel Maestro" para cambios rápidos.
+    - `[ ]` Paso 2: Mejoras en `admin.html`
+        - `[ ]` Agregar inputs de seña editables en la lista.
+        - `[ ]` Implementar botón "GUARDAR CAMBIOS" con batch update.
+    - `[ ]` Paso 3: Verificación y Deploy
+        - `[ ]` Probar flujos locales.
+        - `[ ]` Deploy a Firebase.
