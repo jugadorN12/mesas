@@ -227,6 +227,7 @@
   <div class="sheet">
     <h2 id="modalTitle">MESA --</h2>
     <p id="modalSub" class="sheet-sub">Cargando datos...</p>
+    <div id="modalPromoBadge" style="display:none; margin:-14px 0 18px 0; padding:8px 12px; background:rgba(102,245,191,0.08); border:1px solid rgba(102,245,191,0.25); border-radius:10px; font-size:13px; color:#66f5bf; align-items:center; gap:8px;"></div>
 
     <div id="calcView">
       <div class="calc-grid">
@@ -235,7 +236,7 @@
           <div class="calc-val"><small>$</small><span id="valTotal">0</span></div>
         </div>
         <div class="calc-item" style="border-color:var(--green);">
-          <div class="calc-label" style="color:var(--green);">En Bebidas</div>
+          <div class="calc-label" id="labelDrinks" style="color:var(--green);">En Bebidas</div>
           <div class="calc-val" style="color:var(--green);"><small>$</small><span id="valDrinks">0</span></div>
         </div>
         <div class="calc-item">
@@ -407,7 +408,40 @@
 
   document.getElementById('logoutBtn').addEventListener('click', () => auth.signOut());
 
+  let pricingConfig = {
+    precioBaseMesa: 120000,
+    capacidadBase: 4,
+    precioPersonaExtra: 25000,
+    montoSena: 30000,
+    dias: [
+      { id: 1, name: "Lunes", pct: 90, active: true },
+      { id: 2, name: "Martes", pct: 85, active: true },
+      { id: 3, name: "Miércoles", pct: 80, active: true },
+      { id: 4, name: "Jueves", pct: 70, active: true },
+      { id: 5, name: "Viernes", pct: 60, active: true },
+      { id: 6, name: "Sábado", pct: 50, active: true },
+      { id: 0, name: "Domingo", pct: 90, active: true }
+    ]
+  };
+
+  function getTodayPromo() {
+    const dayOfWeek = new Date().getDay();
+    const found = pricingConfig.dias ? pricingConfig.dias.find(d => d.id === dayOfWeek) : null;
+    if (found && found.active) return found;
+    return { id: dayOfWeek, name: "Hoy", pct: 50, active: true };
+  }
+
   function initApp() {
+    db.collection("config").doc("precios_consumo").onSnapshot(doc => {
+      if (doc.exists) {
+        const data = doc.data();
+        if (data.precioBaseMesa) pricingConfig.precioBaseMesa = data.precioBaseMesa;
+        if (data.precioPersonaExtra) pricingConfig.precioPersonaExtra = data.precioPersonaExtra;
+        if (data.montoSena) pricingConfig.montoSena = data.montoSena;
+        if (data.dias && Array.isArray(data.dias)) pricingConfig.dias = data.dias;
+      }
+    });
+
     db.collection("reservas").onSnapshot(snapshot => {
       estado = {};
       snapshot.forEach(doc => { estado[doc.id] = doc.data(); });
@@ -477,10 +511,45 @@
     openModal(id, r);
   }
 
+  function formatReservationPromoInfo(r) {
+    if (!r) {
+      const today = getTodayPromo();
+      return {
+        badgeText: `⚡ <b>Venta en Puerta</b> • Promo hoy (${today.name}): <b>${today.pct}% en Bebidas</b>`,
+        pct: today.pct,
+        originText: `Promo hoy (${today.name}): ${today.pct}%`
+      };
+    }
+    
+    // Extraer día de la semana y fecha si existe el timestamp
+    let dayName = "";
+    let dateStr = "";
+    if (r.ts) {
+      const date = new Date(r.ts);
+      const days = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+      dayName = days[date.getDay()];
+      dateStr = date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
+    }
+    
+    const pct = (r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) 
+      ? r.porcentajeConsumo 
+      : getTodayPromo().pct;
+
+    let badgeText = "";
+    if (dayName && dateStr) {
+      badgeText = `📅 Reservado el <b>${dayName} ${dateStr}</b> • <b>${pct}% Reintegro en Bebidas</b>`;
+    } else {
+      badgeText = `🏷️ Promo acordada: <b>${pct}% Reintegro en Bebidas</b>`;
+    }
+
+    return { badgeText, pct, originText: `${dayName || 'Día'} ${dateStr || ''} (${pct}%)` };
+  }
+
   function openModal(id, r) {
     const overlay = document.getElementById('modalOverlay');
     const title = document.getElementById('modalTitle');
     const sub = document.getElementById('modalSub');
+    const promoBadge = document.getElementById('modalPromoBadge');
     const calcView = document.getElementById('calcView');
     const infoView = document.getElementById('infoView');
     const paymentMethodsView = document.getElementById('paymentMethodsView');
@@ -499,21 +568,30 @@
     paymentMethodsView.style.display = 'none';
     mixedPayView.style.display = 'none';
     cashManagerView.style.display = 'none';
+    promoBadge.style.display = 'none';
 
     if (r && r.status === "ingresada") {
       infoView.style.display = 'block';
       sub.textContent = "Reserva de " + (r.nombre || "Sin nombre");
+      const promoInfo = formatReservationPromoInfo(r);
       document.getElementById('infoDetails').innerHTML = `
-        Personas: ${r.cantidadPersonas}<br>
-        Total Cobrado: $${r.montoTotal.toLocaleString()}<br>
-        Entregado en Bebidas: $${r.montoConsumicion.toLocaleString()}<br>
+        Personas: ${r.cantidadPersonas || 4}<br>
+        Total Cobrado: $${(r.montoTotal || 0).toLocaleString()}<br>
+        Entregado en Bebidas: $${(r.montoConsumicion || 0).toLocaleString()}<br>
+        <span style="color:var(--green); font-size:13px; font-weight:600;">Promo aplicada: ${promoInfo.originText}</span><br>
+        ${r.ts ? `<span style="color:var(--grey); font-size:11.5px;">Fecha reserva: ${new Date(r.ts).toLocaleString('es-AR', {dateStyle:'short', timeStyle:'short'})}</span><br>` : ''}
         ${r.excepcion ? '<b style="color:var(--amber)">FUE UNA EXCEPCIÓN</b>' : ''}
       `;
     } else {
       calcView.style.display = 'block';
-      currentPeople = 4;
-      document.getElementById('peopleCount').textContent = "4";
+      currentPeople = (r && r.cantidadPersonas) ? parseInt(r.cantidadPersonas) : 4;
+      document.getElementById('peopleCount').textContent = currentPeople;
       sub.textContent = r ? "Reserva de " + (r.nombre || "Sin nombre") : "VENTA EN PUERTA (Mesa libre)";
+      
+      const promoInfo = formatReservationPromoInfo(r);
+      promoBadge.innerHTML = promoInfo.badgeText;
+      promoBadge.style.display = 'flex';
+
       updateCalc();
     }
     overlay.classList.add('open');
@@ -529,14 +607,22 @@
     const r = estado[currentMesa];
     const paid = (r && r.montoSenado) ? parseInt(r.montoSenado) : 0;
     let total, drinks;
+    const labelDrinks = document.getElementById('labelDrinks');
+
     if (isException) {
       total = parseInt(document.getElementById('exTotal').value) || 0;
       drinks = parseInt(document.getElementById('exDrinks').value) || 0;
+      if (labelDrinks) labelDrinks.textContent = "En Bebidas (Manual)";
     } else {
-      const basePrice = 120000;
-      const extraPrice = 30000;
+      const basePrice = pricingConfig.precioBaseMesa || 120000;
+      const extraPrice = pricingConfig.precioPersonaExtra || 25000;
       total = basePrice + (Math.max(0, currentPeople - 4) * extraPrice);
-      drinks = Math.floor(total * 0.8);
+      
+      const promoPct = (r && r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) 
+        ? r.porcentajeConsumo 
+        : getTodayPromo().pct;
+      drinks = Math.round((total * promoPct) / 100);
+      if (labelDrinks) labelDrinks.textContent = `En Bebidas (${promoPct}%)`;
     }
     const balance = Math.max(0, total - paid);
     currentBalance = balance;
@@ -618,6 +704,7 @@
         cantidadPersonas: currentPeople,
         montoTotal: finalTotal,
         montoConsumicion: finalDrinks,
+        porcentajeConsumo: (r && r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) ? r.porcentajeConsumo : getTodayPromo().pct,
         excepcion: isException,
         metodoCobro: metodo,
         cobroEfectivo: cash,

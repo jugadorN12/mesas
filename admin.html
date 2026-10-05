@@ -132,6 +132,57 @@
       </div>
       <div class="event-status" id="headingStatus"></div>
     </section>
+
+    <!-- Panel de Precios y Promociones de Consumo -->
+    <section class="event-card" id="pricingPromoCard">
+      <h2>⚙️ Precios de Mesas & Reintegro en Consumo por Día</h2>
+      <p>Configurá el valor base de la mesa (hasta 4 personas), el adicional por persona extra y el porcentaje que vuelve en consumo según el día de la semana.</p>
+      
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:18px;">
+        <div>
+          <label style="color:var(--muted); font-size:12px; font-weight:bold;">Precio Base Mesa (1 a 4 personas) $</label>
+          <input id="precioBaseInput" type="number" value="120000" style="width:100%; margin-top:6px; border:1px solid var(--line); border-radius:8px; background:#0d0d12; color:var(--text); padding:10px; font-weight:bold; font-size:15px;">
+        </div>
+        <div>
+          <label style="color:var(--muted); font-size:12px; font-weight:bold;">Precio por Persona Extra (5ta en adelante) $</label>
+          <input id="precioExtraInput" type="number" value="25000" style="width:100%; margin-top:6px; border:1px solid var(--line); border-radius:8px; background:#0d0d12; color:var(--text); padding:10px; font-weight:bold; font-size:15px;">
+        </div>
+        <div>
+          <label style="color:var(--muted); font-size:12px; font-weight:bold;">Monto Seña Requerida $</label>
+          <input id="montoSenaConfigInput" type="number" value="30000" style="width:100%; margin-top:6px; border:1px solid var(--line); border-radius:8px; background:#0d0d12; color:var(--amber); padding:10px; font-weight:bold; font-size:15px;">
+        </div>
+      </div>
+
+      <h3 style="font-size:15px; margin:15px 0 8px; color:var(--amber);">Porcentaje de Consumo según el Día de Reserva:</h3>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; text-align:left; font-size:13px;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--line); color:var(--muted);">
+              <th style="padding:8px;">Día</th>
+              <th style="padding:8px;">% en Consumo</th>
+              <th style="padding:8px;">Ejemplo Mesa Base ($120.000)</th>
+              <th style="padding:8px; text-align:center;">Activo</th>
+            </tr>
+          </thead>
+          <tbody id="promoDaysTableBody">
+            <!-- Días generados por JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin: 15px 0; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+        <input type="checkbox" id="mostrarBannerPromoInput" style="transform: scale(1.3); cursor: pointer;">
+        <label for="mostrarBannerPromoInput" style="font-weight: bold; font-size: 13.5px; color: var(--text); cursor: pointer;">
+          Publicar banner promocional en el mapa (activar cuando desees mostrar el cartel de consumo a los clientes)
+        </label>
+      </div>
+
+      <div style="margin-top:18px; display:flex; gap:12px; align-items:center;">
+        <button id="savePricingPromoBtn" class="btn-solid btn-guardar" type="button" style="padding:10px 20px;">Guardar Precios y Promociones</button>
+        <span id="pricingPromoStatus" class="event-status" style="margin:0; font-weight:bold;"></span>
+      </div>
+    </section>
+
     <section class="print-report" id="printReport" aria-hidden="true"></section>
     <section class="card" id="list"></section>
   </main>
@@ -244,6 +295,142 @@
       saveEventLogo.disabled=false;
     });
     removeEventLogo.addEventListener('click',async()=>{try{await db.collection('config').doc('ultraVip').set({logoUrl:'',eventName:'',updatedAt:Date.now()},{merge:true});eventLogoStatus.textContent='Logo quitado del mapa.';}catch(_){eventLogoStatus.textContent='No se pudo quitar el logo.';}});
+
+    // --- Lógica de Configuración de Precios y % de Consumo por Día ---
+    const DAYS_CONFIG_DEFAULT = [
+      { id: 1, name: "Lunes", pct: 90, active: true },
+      { id: 2, name: "Martes", pct: 85, active: true },
+      { id: 3, name: "Miércoles", pct: 80, active: true },
+      { id: 4, name: "Jueves", pct: 70, active: true },
+      { id: 5, name: "Viernes", pct: 60, active: true },
+      { id: 6, name: "Sábado", pct: 50, active: true },
+      { id: 0, name: "Domingo", pct: 90, active: true }
+    ];
+
+    let currentUserRole = null;
+    let currentPricingConfig = {
+      precioBaseMesa: 120000,
+      capacidadBase: 4,
+      precioPersonaExtra: 25000,
+      montoSena: 30000,
+      dias: JSON.parse(JSON.stringify(DAYS_CONFIG_DEFAULT))
+    };
+
+    function renderPricingTable() {
+      const tbody = document.getElementById('promoDaysTableBody');
+      const basePrice = Number(document.getElementById('precioBaseInput').value) || 120000;
+      tbody.innerHTML = '';
+
+      currentPricingConfig.dias.forEach((d, idx) => {
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+        
+        const consumoMonto = Math.round((basePrice * d.pct) / 100);
+        const mesaCosto = basePrice - consumoMonto;
+
+        tr.innerHTML = `
+          <td style="padding:10px 8px; font-weight:bold; color:var(--text);">${d.name}</td>
+          <td style="padding:10px 8px;">
+            <div style="display:flex; align-items:center; gap:4px;">
+              <input type="number" min="0" max="100" value="${d.pct}" data-idx="${idx}" class="day-pct-input" style="width:65px; background:#0d0d12; color:var(--amber); border:1px solid var(--line); border-radius:6px; padding:4px 8px; font-weight:bold; font-size:14px;">
+              <span style="color:var(--muted); font-weight:bold;">%</span>
+            </div>
+          </td>
+          <td style="padding:10px 8px; color:var(--muted);" class="day-example-${idx}">
+            <b style="color:var(--green);">$${consumoMonto.toLocaleString('es-AR')}</b> en consumo <span style="font-size:11px;">(costo mesa: $${mesaCosto.toLocaleString('es-AR')})</span>
+          </td>
+          <td style="padding:10px 8px; text-align:center;">
+            <input type="checkbox" data-idx="${idx}" class="day-active-input" ${d.active ? 'checked' : ''} style="transform:scale(1.2); cursor:pointer;">
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Asegurar que los controles estén habilitados tanto para admin como para asistente
+      document.getElementById('precioBaseInput').disabled = false;
+      document.getElementById('precioExtraInput').disabled = false;
+      document.getElementById('montoSenaConfigInput').disabled = false;
+      document.getElementById('mostrarBannerPromoInput').disabled = false;
+      document.getElementById('savePricingPromoBtn').style.display = 'inline-block';
+      document.getElementById('pricingPromoStatus').textContent = '';
+
+      // Listeners en inputs de la tabla para recalcular en vivo
+      tbody.querySelectorAll('.day-pct-input').forEach(inp => {
+        inp.addEventListener('input', (e) => {
+          const idx = Number(e.target.dataset.idx);
+          const val = Math.max(0, Math.min(100, Number(e.target.value) || 0));
+          currentPricingConfig.dias[idx].pct = val;
+          const currentBase = Number(document.getElementById('precioBaseInput').value) || 120000;
+          const consumoMonto = Math.round((currentBase * val) / 100);
+          const mesaCosto = currentBase - consumoMonto;
+          const exCol = tbody.querySelector(`.day-example-${idx}`);
+          if (exCol) {
+            exCol.innerHTML = `<b style="color:var(--green);">$${consumoMonto.toLocaleString('es-AR')}</b> en consumo <span style="font-size:11px;">(costo mesa: $${mesaCosto.toLocaleString('es-AR')})</span>`;
+          }
+        });
+      });
+
+      tbody.querySelectorAll('.day-active-input').forEach(inp => {
+        inp.addEventListener('change', (e) => {
+          const idx = Number(e.target.dataset.idx);
+          currentPricingConfig.dias[idx].active = e.target.checked;
+        });
+      });
+    }
+
+    document.getElementById('precioBaseInput').addEventListener('input', () => {
+      renderPricingTable();
+    });
+
+    // Cargar config de precios y promociones de Firestore
+    db.collection('config').doc('precios_consumo').onSnapshot(doc => {
+      if (doc.exists) {
+        const data = doc.data();
+        if (data.precioBaseMesa) document.getElementById('precioBaseInput').value = data.precioBaseMesa;
+        if (data.precioPersonaExtra) document.getElementById('precioExtraInput').value = data.precioPersonaExtra;
+        if (data.montoSena) document.getElementById('montoSenaConfigInput').value = data.montoSena;
+        document.getElementById('mostrarBannerPromoInput').checked = !!data.mostrarBannerPromo;
+        if (data.dias && Array.isArray(data.dias)) {
+          currentPricingConfig.dias = data.dias;
+        }
+      }
+      renderPricingTable();
+    });
+
+    document.getElementById('savePricingPromoBtn').addEventListener('click', async () => {
+      const statusEl = document.getElementById('pricingPromoStatus');
+      const btn = document.getElementById('savePricingPromoBtn');
+      btn.disabled = true;
+      statusEl.style.color = "var(--muted)";
+      statusEl.textContent = "Guardando...";
+
+      const precioBaseMesa = Number(document.getElementById('precioBaseInput').value) || 120000;
+      const precioPersonaExtra = Number(document.getElementById('precioExtraInput').value) || 25000;
+      const montoSena = Number(document.getElementById('montoSenaConfigInput').value) || 30000;
+      const mostrarBannerPromo = document.getElementById('mostrarBannerPromoInput').checked;
+
+      const payload = {
+        precioBaseMesa,
+        capacidadBase: 4,
+        precioPersonaExtra,
+        montoSena,
+        mostrarBannerPromo,
+        dias: currentPricingConfig.dias,
+        updatedAt: Date.now(),
+        updatedBy: auth.currentUser ? auth.currentUser.email : 'admin'
+      };
+
+      try {
+        await db.collection('config').doc('precios_consumo').set(payload, { merge: true });
+        statusEl.style.color = "var(--green)";
+        statusEl.textContent = "✅ Precios y promociones guardados correctamente.";
+        setTimeout(() => { statusEl.textContent = ""; }, 4000);
+      } catch (err) {
+        statusEl.style.color = "var(--red)";
+        statusEl.textContent = "❌ Error al guardar: " + err.message;
+      }
+      btn.disabled = false;
+    });
     auth.onAuthStateChanged(async (user) => {
       console.log("Auth State Changed. User:", user ? user.email : "none");
 
@@ -255,6 +442,7 @@
           if (userDoc.exists) {
             const role = userDoc.data().role;
             console.log("User role found:", role);
+            currentUserRole = role;
 
             const isMaster = (role === 'admin');
             const isAssistant = (role === 'assistant');
@@ -273,9 +461,17 @@
               // UI Restrictions
               document.getElementById('resetAll').style.display = isMaster ? 'block' : 'none';
               document.getElementById('linkBoleteria').style.display = isMaster ? 'block' : 'none';
-              document.querySelectorAll('.event-card').forEach(card => card.style.display = isMaster ? 'block' : 'none');
               document.querySelector('.capture-card').style.display = isMaster ? 'block' : 'none';
 
+              document.querySelectorAll('.event-card').forEach(card => {
+                if (card.id === 'pricingPromoCard') {
+                  card.style.display = 'block'; // Visible para admin y asistente
+                } else {
+                  card.style.display = isMaster ? 'block' : 'none';
+                }
+              });
+
+              renderPricingTable();
               render(); // Dibujar la lista de reservas
             } else {
               throw new Error('No tienes permisos de administración.');
@@ -391,21 +587,50 @@
         const node=document.createElement('article');
         node.className='row';
 
-        let detailHtml = `<b>${escapeHtml(r.nombre||'Sin nombre')}</b>`;
+        let detailHtml = `<b>${escapeHtml(r.nombre||'Sin nombre')} (${r.cantidadPersonas || 4} pers)</b>`;
+        if (r.precioTotal) {
+          detailHtml += `<div style="font-size:11.5px; color:var(--text); margin-top:2px;">Mesa: <b>$${(r.precioTotal||0).toLocaleString('es-AR')}</b> ${r.montoConsumoCredito ? `| <span style="color:var(--green); font-weight:bold;">Voucher Barra (${r.porcentajeConsumo || 0}%): +$${(r.montoConsumoCredito||0).toLocaleString('es-AR')}</span>` : ''}</div>`;
+        }
         if (r.masterNote) {
           detailHtml += `<div style="font-size:11px; color:var(--amber); margin-top:2px;">📝 ${escapeHtml(r.masterNote)}</div>`;
         }
 
-        // Editable seña input
+        // Editable seña e input de vendedor
         const senaValue = r.montoSenado || 0;
-        detailHtml += `<div style="margin-top:5px;"><label style="font-size:11px; color:var(--muted)">Seña $: </label><input type="number" class="sena-input" data-id="${mesa}" value="${senaValue}" style="width:100px; background:#0d0d12; color:var(--amber); border:1px solid var(--line); border-radius:4px; padding:2px 5px; font-weight:bold; outline:none;"></div>`;
+        const vendedorValue = r.vendedor || '';
+        detailHtml += `
+          <div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+            <div>
+              <label style="font-size:11px; color:var(--muted)">Seña $: </label>
+              <input type="number" class="sena-input" data-id="${mesa}" value="${senaValue}" style="width:85px; background:#0d0d12; color:var(--amber); border:1px solid var(--line); border-radius:4px; padding:2px 5px; font-weight:bold; outline:none;">
+            </div>
+            <div>
+              <label style="font-size:11px; color:var(--muted)">Vendido por: </label>
+              <input type="text" class="vendedor-input" data-id="${mesa}" placeholder="Nombre del vendedor" value="${escapeHtml(vendedorValue)}" style="width:130px; background:#0d0d12; color:var(--text); border:1px solid var(--line); border-radius:4px; padding:2px 6px; font-size:12px; outline:none;">
+            </div>
+          </div>
+        `;
 
         if (isIngresada) {
-          detailHtml = `<b class="ingresada-text">${escapeHtml(r.nombre||'Sin nombre')} (${r.cantidadPersonas} pers)</b>`;
+          detailHtml = `<b class="ingresada-text">${escapeHtml(r.nombre||'Sin nombre')} (${r.cantidadPersonas || 4} pers)</b>`;
+          if (r.precioTotal) {
+            detailHtml += `<div style="font-size:11.5px; color:var(--text); margin-top:2px;">Mesa: <b>$${(r.precioTotal||0).toLocaleString('es-AR')}</b> ${r.montoConsumoCredito ? `| <span style="color:var(--green); font-weight:bold;">Voucher Barra (${r.porcentajeConsumo || 0}%): +$${(r.montoConsumoCredito||0).toLocaleString('es-AR')}</span>` : ''}</div>`;
+          }
           if (r.masterNote) {
             detailHtml += `<div style="font-size:11px; color:var(--amber); margin-top:2px;">📝 ${escapeHtml(r.masterNote)}</div>`;
           }
-          detailHtml += `<div style="margin-top:5px;"><label style="font-size:11px; color:var(--muted)">Seña (Semana) $: </label><input type="number" class="sena-input" data-id="${mesa}" value="${senaValue}" style="width:100px; background:#0d0d12; color:var(--amber); border:1px solid var(--line); border-radius:4px; padding:2px 5px; font-weight:bold; outline:none;"></div>`;
+          detailHtml += `
+            <div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+              <div>
+                <label style="font-size:11px; color:var(--muted)">Seña (Semana) $: </label>
+                <input type="number" class="sena-input" data-id="${mesa}" value="${senaValue}" style="width:85px; background:#0d0d12; color:var(--amber); border:1px solid var(--line); border-radius:4px; padding:2px 5px; font-weight:bold; outline:none;">
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--muted)">Vendido por: </label>
+                <input type="text" class="vendedor-input" data-id="${mesa}" placeholder="Nombre del vendedor" value="${escapeHtml(vendedorValue)}" style="width:130px; background:#0d0d12; color:var(--text); border:1px solid var(--line); border-radius:4px; padding:2px 6px; font-size:12px; outline:none;">
+              </div>
+            </div>
+          `;
 
           // Payment details for puerta
           detailHtml += `<div style="font-size:12px; margin-top:8px; padding:8px; background:rgba(255,255,255,0.05); border-radius:6px;">`;
@@ -460,30 +685,47 @@
     }, 1000);
 
     saveAllSenas.addEventListener('click', async () => {
-      const inputs = document.querySelectorAll('.sena-input');
+      const senaInputs = document.querySelectorAll('.sena-input');
+      const vendedorInputs = document.querySelectorAll('.vendedor-input');
       const btn = saveAllSenas;
       btn.disabled = true;
       btn.textContent = 'Guardando...';
 
       try {
         const batch = db.batch();
-        let changed = 0;
-        inputs.forEach(input => {
+        const updates = {};
+
+        senaInputs.forEach(input => {
           const mesaId = input.dataset.id;
           const newValue = parseInt(input.value) || 0;
           const oldValue = sharedData[mesaId]?.montoSenado || 0;
 
           if (newValue !== oldValue) {
-            batch.update(db.collection('reservas').doc(mesaId), { montoSenado: newValue });
-            changed++;
+            updates[mesaId] = updates[mesaId] || {};
+            updates[mesaId].montoSenado = newValue;
           }
         });
 
-        if (changed > 0) {
+        vendedorInputs.forEach(input => {
+          const mesaId = input.dataset.id;
+          const newValue = input.value.trim();
+          const oldValue = (sharedData[mesaId]?.vendedor || '').trim();
+
+          if (newValue !== oldValue) {
+            updates[mesaId] = updates[mesaId] || {};
+            updates[mesaId].vendedor = newValue;
+          }
+        });
+
+        const changedMesaIds = Object.keys(updates);
+        if (changedMesaIds.length > 0) {
+          changedMesaIds.forEach(mesaId => {
+            batch.update(db.collection('reservas').doc(mesaId), updates[mesaId]);
+          });
           await batch.commit();
-          alert(`${changed} montos actualizados correctamente.`);
+          alert(`${changedMesaIds.length} reserva(s) actualizada(s) correctamente.`);
         } else {
-          alert('No se detectaron cambios en los montos.');
+          alert('No se detectaron cambios.');
         }
       } catch(e) {
         alert('Error al guardar: ' + e.message);

@@ -1,2 +1,5 @@
 .firebase/
 functions/node_modules/
+.artifacts/
+*.local
+.idea/planningMode.xml

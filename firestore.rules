@@ -22,7 +22,7 @@ service cloud.firestore {
 
     match /config/{configId} {
       allow read: if true;
-      allow write: if hasRole('admin');
+      allow write: if anyRole(['admin', 'assistant']);
     }
 
     match /reservas/{mesaId} {
