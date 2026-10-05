@@ -101,6 +101,13 @@
   }
   .map-heading strong{ color:var(--white); font-family:'Bebas Neue',sans-serif; font-size:17px; letter-spacing:1px; }
   .map-heading strong .event-date{margin-left:8px;color:var(--green);font-family:inherit;font-size:.72em;letter-spacing:.8px}
+  .event-tabs-wrap{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);padding:3px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);}
+  .event-tab-btn{border:1px solid transparent;background:transparent;color:var(--grey);font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;gap:6px;line-height:1;}
+  .event-tab-btn .tab-date{color:var(--grey);font-size:0.8em;letter-spacing:0.8px;transition:color 0.2s;}
+  .event-tab-btn.active{background:rgba(255,255,255,0.16);color:var(--white);box-shadow:0 2px 10px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.25);}
+  .event-tab-btn.active .tab-date{color:var(--green);font-weight:bold;}
+  .event-tab-btn:hover:not(.active){color:var(--white);background:rgba(255,255,255,0.08);}
+  @media(max-width:480px){.event-tab-btn{font-size:14px;padding:5px 9px;gap:4px;}}
   .map-heading-actions{display:flex;align-items:center;gap:10px;margin-left:auto;}
   .map-heading-actions span{color:var(--green);white-space:nowrap;}
   .ultra-vip-overlay{position:absolute;left:52%;top:11.5%;z-index:3;width:34%;padding:0;border:0;background:transparent;color:var(--green);font:clamp(15px,3.5vw,24px) 'Bebas Neue',sans-serif;letter-spacing:1px;line-height:1;cursor:pointer;text-align:center;text-shadow:0 1px 3px #000}
@@ -568,7 +575,22 @@
   </div>
 
   <div class="map-wrap" id="ultraVipSection" aria-label="Sección Ultra VIP">
-    <div class="map-heading"><strong id="ultraVipHeading">ULTRA VIP</strong><div class="map-heading-actions"><span id="freeTablesCount" aria-live="polite">23 mesas libres</span></div></div>
+    <div class="map-heading">
+      <div id="singleHeadingWrap">
+        <strong id="ultraVipHeading">ULTRA VIP</strong>
+      </div>
+      <div id="eventTabsWrap" class="event-tabs-wrap" style="display:none;">
+        <button type="button" id="tabPublicFecha1" class="event-tab-btn active" aria-label="Ver mapa fecha 1">
+          <span class="tab-title" id="tabPublicFecha1Title">ULTRA VIP</span>
+          <span class="tab-date" id="tabPublicFecha1Date"></span>
+        </button>
+        <button type="button" id="tabPublicFecha2" class="event-tab-btn" aria-label="Ver mapa fecha 2">
+          <span class="tab-title" id="tabPublicFecha2Title">FECHA 2</span>
+          <span class="tab-date" id="tabPublicFecha2Date"></span>
+        </button>
+      </div>
+      <div class="map-heading-actions"><span id="freeTablesCount" aria-live="polite">23 mesas libres</span></div>
+    </div>
     <div class="map-frame" id="plano-mesas">
       <button class="ultra-vip-overlay" id="ultraVipReserveBtn" type="button" aria-label="Reservar en ULTRA VIP">RESERVAR</button>
       <img class="event-logo-overlay" id="eventLogoOverlay" alt="Logo del evento ULTRA VIP">
@@ -877,6 +899,24 @@
   const planoMesas = document.getElementById("plano-mesas");
   const ultraVipReserveBtn = document.getElementById("ultraVipReserveBtn");
   const ultraVipHeading = document.getElementById("ultraVipHeading");
+  const singleHeadingWrap = document.getElementById("singleHeadingWrap");
+  const eventTabsWrap = document.getElementById("eventTabsWrap");
+  const tabPublicFecha1 = document.getElementById("tabPublicFecha1");
+  const tabPublicFecha2 = document.getElementById("tabPublicFecha2");
+  const tabPublicFecha1Title = document.getElementById("tabPublicFecha1Title");
+  const tabPublicFecha1Date = document.getElementById("tabPublicFecha1Date");
+  const tabPublicFecha2Title = document.getElementById("tabPublicFecha2Title");
+  const tabPublicFecha2Date = document.getElementById("tabPublicFecha2Date");
+
+  let currentEventKey = 'fecha1';
+  let configFecha1 = {};
+  let configFecha2 = {};
+  let reservasUnsub = null;
+
+  function getActiveReservasCollection() {
+    return currentEventKey === 'fecha1' ? 'reservas' : 'reservas_fecha2';
+  }
+
   const eventLogoOverlay = document.getElementById("eventLogoOverlay");
   const mapImg = document.getElementById("mapImg");
   if(mapImg) mapImg.src = "Gemini_Generated_Image_pxpekipxpekipxpe.jpg";
@@ -918,7 +958,8 @@
   }
 
   function getMyActiveDispute() {
-    const myDispute = JSON.parse(localStorage.getItem("my-dispute") || "null");
+    const key = "my-dispute-" + currentEventKey;
+    const myDispute = JSON.parse(localStorage.getItem(key) || "null");
     if (myDispute && myDispute.expiresAt > Date.now()) {
       return myDispute;
     }
@@ -1026,62 +1067,132 @@
   let userRole = null;
   let isMaster = false;
 
+  function aplicarConfiguracionActiva(){
+    const cfg = currentEventKey === 'fecha1' ? configFecha1 : configFecha2;
+    eventLogoOverlay.src = cfg.logoUrl || "";
+    eventLogoOverlay.alt = cfg.eventName ? "Logo de " + cfg.eventName : "Logo del evento ULTRA VIP";
+    eventLogoOverlay.style.display = cfg.logoUrl ? "block" : "none";
+
+    const dobleActiva = !!configFecha1.dobleFechaActiva;
+    if(dobleActiva){
+      singleHeadingWrap.style.display = "none";
+      eventTabsWrap.style.display = "inline-flex";
+
+      tabPublicFecha1Title.textContent = configFecha1.headingText || "DOMINGO 11";
+      tabPublicFecha1Date.textContent = configFecha1.eventDate !== undefined ? configFecha1.eventDate : "OCT";
+      tabPublicFecha2Title.textContent = configFecha2.headingText || "SÁBADO 10";
+      tabPublicFecha2Date.textContent = configFecha2.eventDate !== undefined ? configFecha2.eventDate : "OCT";
+
+      tabPublicFecha1.classList.toggle('active', currentEventKey === 'fecha1');
+      tabPublicFecha2.classList.toggle('active', currentEventKey === 'fecha2');
+    }else{
+      if(currentEventKey !== 'fecha1'){
+        currentEventKey = 'fecha1';
+        escucharReservas();
+      }
+      singleHeadingWrap.style.display = "block";
+      eventTabsWrap.style.display = "none";
+
+      ultraVipHeading.childNodes[0].textContent = configFecha1.headingText || "ULTRA VIP";
+      ultraVipHeading.style.fontSize = configFecha1.headingSize ? configFecha1.headingSize + "px" : "17px";
+      ultraVipHeading.style.fontFamily = configFecha1.headingFont || "'Bebas Neue', sans-serif";
+      const dateNode = ultraVipHeading.querySelector('.event-date');
+      if(dateNode) dateNode.remove();
+      if(configFecha1.eventDate){
+        const date = document.createElement('span');
+        date.className = 'event-date';
+        date.textContent = configFecha1.eventDate;
+        ultraVipHeading.appendChild(date);
+      }
+    }
+  }
+
   function cargarLogoEvento(){
     if(!firebaseDb) return;
     firebaseDb.collection("config").doc("ultraVip").onSnapshot(doc=>{
-      const data = doc.exists ? doc.data() : {};
-      eventLogoOverlay.src = data.logoUrl || "";
-      eventLogoOverlay.alt = data.eventName ? "Logo de " + data.eventName : "Logo del evento ULTRA VIP";
-      eventLogoOverlay.style.display = data.logoUrl ? "block" : "none";
-      ultraVipHeading.childNodes[0].textContent = data.headingText || "ULTRA VIP";
-      ultraVipHeading.style.fontSize = data.headingSize ? data.headingSize + "px" : "17px";
-      ultraVipHeading.style.fontFamily = data.headingFont || "'Bebas Neue', sans-serif";
-      const dateNode = ultraVipHeading.querySelector('.event-date');
-      if(dateNode) dateNode.remove();
-      if(data.eventDate){
-        const date = document.createElement('span');
-        date.className = 'event-date';
-        date.textContent = data.eventDate;
-        ultraVipHeading.appendChild(date);
-      }
+      configFecha1 = doc.exists ? doc.data() : {};
+      aplicarConfiguracionActiva();
+    });
+    firebaseDb.collection("config").doc("ultraVip_fecha2").onSnapshot(doc=>{
+      configFecha2 = doc.exists ? doc.data() : {};
+      aplicarConfiguracionActiva();
+    });
+  }
+
+  function getActiveStorageKey() {
+    return "mesas-estado-" + currentEventKey;
+  }
+
+  function switchPublicEvent(key){
+    if(currentEventKey === key) return;
+    currentEventKey = key;
+    if(overlay && overlay.classList.contains("open")) {
+      cerrarModal();
+    }
+    aplicarConfiguracionActiva();
+    escucharReservas();
+  }
+
+  function escucharReservas(){
+    if(!firebaseDb) return;
+    if(reservasUnsub){
+      reservasUnsub();
+      reservasUnsub = null;
+    }
+    const colName = getActiveReservasCollection();
+    estado = {};
+    renderMesas();
+    actualizarUltraVip();
+    actualizarContador();
+
+    reservasUnsub = firebaseDb.collection(colName).onSnapshot(snapshot => {
+      estado = {};
+      snapshot.forEach(doc => { estado[doc.id] = doc.data(); });
+      renderMesas();
+      actualizarUltraVip();
+      actualizarContador();
+    }, err => {
+      console.error("Error escuchando " + colName, err);
     });
   }
 
   async function cargarEstado(){
+    const storageKey = getActiveStorageKey();
     try{
       if(firebaseDb){
-        const snapshot = await firebaseDb.collection("reservas").get();
+        const snapshot = await firebaseDb.collection(getActiveReservasCollection()).get();
         estado = {};
         snapshot.forEach(doc => { estado[doc.id] = doc.data(); });
         return;
       }
       if(window.storage && window.storage.get){
-        const res = await window.storage.get(STORAGE_KEY, true);
+        const res = await window.storage.get(storageKey, true);
         estado = res && res.value ? JSON.parse(res.value) : {};
       }else{
-        estado = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        estado = JSON.parse(localStorage.getItem(storageKey) || "{}");
       }
     }catch(e){
-      try{ estado = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }catch(_){ estado = {}; }
+      try{ estado = JSON.parse(localStorage.getItem(storageKey) || "{}"); }catch(_){ estado = {}; }
     }
   }
 
   async function guardarEstado(){
+    const storageKey = getActiveStorageKey();
     try{
       if(firebaseDb && mesaActual && estado[mesaActual]){
-        await firebaseDb.collection("reservas").doc(mesaActual).set(estado[mesaActual]);
+        await firebaseDb.collection(getActiveReservasCollection()).doc(mesaActual).set(estado[mesaActual]);
         return true;
       }
       const value = JSON.stringify(estado);
       if(window.storage && window.storage.set){
-        await window.storage.set(STORAGE_KEY, value, true);
+        await window.storage.set(storageKey, value, true);
       }else{
-        localStorage.setItem(STORAGE_KEY, value);
+        localStorage.setItem(storageKey, value);
       }
       return true;
     }catch(e){
       try{
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(estado));
+        localStorage.setItem(storageKey, JSON.stringify(estado));
         return true;
       }catch(_){ return false; }
     }
@@ -1347,7 +1458,7 @@
     btn.textContent = "Finalizar";
 
     if(ok){
-      localStorage.setItem("my-dispute", JSON.stringify({ mesaId: mesaActual, expiresAt: now + DISPUTE_MS }));
+      localStorage.setItem("my-dispute-" + currentEventKey, JSON.stringify({ mesaId: mesaActual, expiresAt: now + DISPUTE_MS }));
       recordAttempt();
       renderMesas();
       actualizarUltraVip();
@@ -1447,14 +1558,17 @@
 
     document.getElementById("masterLogoutBtn").addEventListener("click", () => {
       if (auth) auth.signOut();
-      showToast("Sesión cerrada");
-    });
-
-    document.getElementById("masterLogoutBtn").addEventListener("click", () => {
-      if (auth) auth.signOut();
       isMaster = false;
       showToast("Sesión maestra cerrada");
     });
+
+    // Eventos de Solapas de Doble Fecha
+    if (tabPublicFecha1) {
+      tabPublicFecha1.addEventListener("click", () => switchPublicEvent('fecha1'));
+    }
+    if (tabPublicFecha2) {
+      tabPublicFecha2.addEventListener("click", () => switchPublicEvent('fecha2'));
+    }
 
     // Master Action Buttons
     document.querySelectorAll(".btn-master").forEach(btn => {
@@ -1463,12 +1577,13 @@
         const newStatus = btn.dataset.status;
         const masterName = document.getElementById("masterNameInput").value.trim();
         const masterNote = document.getElementById("masterNoteInput").value.trim();
+        const targetCol = getActiveReservasCollection();
 
         try {
           if (newStatus === "libre") {
-            await firebaseDb.collection("reservas").doc(mesaActual).delete();
+            await firebaseDb.collection(targetCol).doc(mesaActual).delete();
           } else {
-            await firebaseDb.collection("reservas").doc(mesaActual).set({
+            await firebaseDb.collection(targetCol).doc(mesaActual).set({
               status: newStatus,
               nombre: masterName || "Asignado por Admin",
               masterNote: masterNote || "",
@@ -1490,22 +1605,16 @@
     window.addEventListener('resize', renderMesas);
 
     if(firebaseDb){
-      firebaseDb.collection("reservas").onSnapshot(snapshot => {
-        estado = {};
-        snapshot.forEach(doc => { estado[doc.id] = doc.data(); });
-        renderMesas();
-        actualizarUltraVip();
-        actualizarContador();
-      });
+      escucharReservas();
 
       // Lógica de limpieza silenciosa (Parche para plan gratuito)
       setInterval(() => {
         const now = Date.now();
+        const targetCol = getActiveReservasCollection();
         Object.entries(estado).forEach(async ([mesaId, reserva]) => {
           if (reserva.status === "disputa" && reserva.expiresAt && reserva.expiresAt <= now) {
-            // Intentar borrar la mesa vencida silenciosamente
             try {
-              await firebaseDb.collection("reservas").doc(mesaId).delete();
+              await firebaseDb.collection(targetCol).doc(mesaId).delete();
             } catch(e) { /* Falló el borrado (quizás ya lo borró otro o no tiene permiso aún) */ }
           }
         });

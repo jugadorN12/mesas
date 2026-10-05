@@ -41,6 +41,22 @@ service cloud.firestore {
         || (resource.data.status == 'disputa' && resource.data.expiresAt <= request.time.toMillis());
     }
 
+    match /reservas_fecha2/{mesaId} {
+      allow read: if true;
+
+      allow create: if (request.resource.data.status in ['pendiente', 'disputa']
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() > 0
+        && request.resource.data.contacto is string
+        && request.resource.data.ts is int)
+        || anyRole(['admin', 'assistant', 'boleteria']);
+
+      allow update: if anyRole(['admin', 'assistant', 'boleteria']);
+
+      allow delete: if anyRole(['admin', 'assistant', 'boleteria'])
+        || (resource.data.status == 'disputa' && resource.data.expiresAt <= request.time.toMillis());
+    }
+
     match /caja_movimientos/{movimientoId} {
       allow read, write: if anyRole(['admin', 'assistant', 'boleteria']);
     }

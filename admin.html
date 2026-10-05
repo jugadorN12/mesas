@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cubano Bar | Administracion de mesas</title>
   <style>
-    :root{--bg:#09090d;--card:#15151c;--line:#2a2a35;--text:#f4f2ef;--muted:#9b9ba5;--red:#ff2d3d;--amber:#ffbd3e;--blue:#58a6ff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 0 0,#321016,transparent 38%),var(--bg);color:var(--text);font:15px Arial,sans-serif}.wrap{max-width:880px;margin:auto;padding:28px 18px 52px}.head{display:flex;justify-content:space-between;gap:16px;align-items:start;border-bottom:1px solid var(--line);padding-bottom:22px}.brand{font-size:26px;font-weight:800;letter-spacing:.5px}.brand b{color:var(--red)}h1{font-size:25px;margin:28px 0 5px}.sub{color:var(--muted);margin:0 0 22px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}.stat strong{display:block;font-size:25px;margin-bottom:4px}.stat span{color:var(--muted);font-size:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}.empty{padding:34px;color:var(--muted);text-align:center}.row{display:grid;grid-template-columns:70px 1fr auto;gap:14px;align-items:center;padding:15px;border-bottom:1px solid var(--line)}.row:last-child{border:0}.mesa{font-weight:800;font-size:20px}.detail{min-width:0}.detail b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.detail small{color:var(--muted)}.badge{display:inline-block;font-size:11px;font-weight:bold;text-transform:uppercase;border-radius:99px;padding:5px 8px;margin-top:5px} .pendiente{background:#3d2b07;color:#ffd878}.aprobada{background:#461016;color:#ff8f97}.ingresada{background:#0a2e4d;color:var(--blue)}.actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:end}
+    :root{--bg:#09090d;--card:#15151c;--line:#2a2a35;--text:#f4f2ef;--muted:#9b9ba5;--red:#ff2d3d;--amber:#ffbd3e;--gold:#f6b73c;--blue:#58a6ff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 0 0,#321016,transparent 38%),var(--bg);color:var(--text);font:15px Arial,sans-serif}.wrap{max-width:880px;margin:auto;padding:28px 18px 52px}.head{display:flex;justify-content:space-between;gap:16px;align-items:start;border-bottom:1px solid var(--line);padding-bottom:22px}.brand{font-size:26px;font-weight:800;letter-spacing:.5px}.brand b{color:var(--red)}h1{font-size:25px;margin:28px 0 5px}.sub{color:var(--muted);margin:0 0 22px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}.stat strong{display:block;font-size:25px;margin-bottom:4px}.stat span{color:var(--muted);font-size:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}.empty{padding:34px;color:var(--muted);text-align:center}.row{display:grid;grid-template-columns:70px 1fr auto;gap:14px;align-items:center;padding:15px;border-bottom:1px solid var(--line)}.row:last-child{border:0}.mesa{font-weight:800;font-size:20px}.detail{min-width:0}.detail b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.detail small{color:var(--muted)}.badge{display:inline-block;font-size:11px;font-weight:bold;text-transform:uppercase;border-radius:99px;padding:5px 8px;margin-top:5px} .pendiente{background:#3d2b07;color:#ffd878}.aprobada{background:#461016;color:#ff8f97}.ingresada{background:#0a2e4d;color:var(--blue)}.actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:end}
     button, .link {
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -67,6 +67,42 @@
   </section>
   <main class="wrap" id="adminApp" hidden>
     <header class="head"><div class="brand">CUBANO<b>BAR</b> <span id="adminRoleLabel" style="font-size:14px; color:var(--red); font-weight:bold; margin-left:10px; border: 1px solid var(--red); padding: 2px 8px; border-radius: 6px;"></span></div><div class="toolbar"><button id="refresh" class="btn-solid btn-actualizar">Actualizar</button><button id="saveAllSenas" class="btn-solid btn-guardar" style="display:none;">GUARDAR CAMBIOS</button><button id="btnArqueo" class="btn-solid btn-arqueo">VER ARQUEO</button><button id="printStatus" class="btn-solid btn-imprimir" type="button">Imprimir estado</button><a class="link btn-outline" href="cubano-bar-mesas.html">Ver mapa</a><a id="linkBoleteria" class="link btn-outline btn-outline-blue" href="boleteria.html">Mapa Boletería</a><button id="resetAll" class="btn-outline btn-outline-red" type="button">Resetear mesas</button><button class="btn-outline" id="logout">Salir</button></div></header>
+
+    <!-- Selector Maestro de Evento / Fecha -->
+    <section class="event-selector-card" style="margin: 18px 0 16px; padding: 16px 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); border-radius: 14px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+        <span style="font-weight: 800; color: var(--gold); font-size: 13.5px; letter-spacing: 0.5px;">ADMINISTRAR EVENTO:</span>
+        <button type="button" id="btnAdminFecha1" class="btn-event-selector" style="padding: 9px 20px; border-radius: 8px; font-weight: 800; font-size: 13.5px; cursor: pointer; border: 2px solid var(--gold); background: var(--gold); color: #000; transition: all .2s;">📅 FECHA 1 (Principal)</button>
+        <button type="button" id="btnAdminFecha2" class="btn-event-selector" style="padding: 9px 20px; border-radius: 8px; font-weight: 800; font-size: 13.5px; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); background: transparent; color: #fff; transition: all .2s;">📅 FECHA 2 (Segunda)</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.35); padding: 8px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+        <input type="checkbox" id="toggleDobleFecha" style="transform: scale(1.3); cursor: pointer;">
+        <label for="toggleDobleFecha" style="cursor: pointer; font-size: 13px; font-weight: bold; color: var(--text);">
+          Activar solapa doble fecha en el mapa público
+        </label>
+        <span id="dobleFechaBadge" style="font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 6px; background: #333; color: #aaa;">DESACTIVADA</span>
+      </div>
+      <div id="boleteriaControlWrap" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.35); padding: 8px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+        <label for="selectBoleteriaMode" style="font-size: 13px; font-weight: bold; color: var(--gold);">
+          🚪 Turno Boletería:
+        </label>
+        <select id="selectBoleteriaMode" style="background: #101015; color: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; font-size: 13px; font-weight: bold; cursor: pointer;">
+          <option value="auto">Automático por horario (Sábado hasta Dom 7am / Domingo)</option>
+          <option value="fecha2">Forzar Sábado (Fecha 2)</option>
+          <option value="fecha1">Forzar Domingo (Fecha 1)</option>
+        </select>
+      </div>
+    </section>
+
+    <div id="activeEventBanner" style="margin-bottom: 22px; padding: 12px 18px; border-radius: 10px; background: rgba(255,189,62,0.08); border-left: 5px solid var(--gold); font-size: 14px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
+      <div>
+        <strong style="color: var(--gold);">Panel activo:</strong> 
+        <span id="activeEventTitle" style="color: #fff; font-weight: bold; margin-left: 6px;">FECHA 1 (Principal)</span>
+        <span id="activeCollectionTag" style="font-size: 11px; margin-left: 8px; padding: 3px 8px; background: rgba(255,255,255,0.1); border-radius: 4px; color: var(--gold); font-family: monospace;">Colección: reservas</span>
+      </div>
+      <span style="font-size: 12px; color: var(--muted);">Configuración, logo y reservas totalmente aislados de la otra fecha.</span>
+    </div>
+
     <h1>Administracion de reservas</h1>
     <p class="sub">Aprueba las reservas una vez que verifiques la seña. Las aprobadas aparecen en rojo en el mapa.</p>
     <section class="stats">
@@ -229,6 +265,167 @@
     const saveHeading=document.getElementById('saveHeading');
     const headingStatus=document.getElementById('headingStatus');
     const TABLE_ORDER=['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','B','C','D','ULTRA VIP'];
+
+    // --- Control de Doble Evento / Fechas Aisladas ---
+    const btnAdminFecha1 = document.getElementById('btnAdminFecha1');
+    const btnAdminFecha2 = document.getElementById('btnAdminFecha2');
+    const toggleDobleFecha = document.getElementById('toggleDobleFecha');
+    const dobleFechaBadge = document.getElementById('dobleFechaBadge');
+    const selectBoleteriaMode = document.getElementById('selectBoleteriaMode');
+    const activeEventTitle = document.getElementById('activeEventTitle');
+    const activeCollectionTag = document.getElementById('activeCollectionTag');
+
+    let currentAdminEvent = 'fecha1';
+    let configData1 = {};
+    let configData2 = {};
+    let reservasUnsub = null;
+
+    function getActiveCollection() {
+      return currentAdminEvent === 'fecha1' ? 'reservas' : 'reservas_fecha2';
+    }
+
+    function getActiveConfigDoc() {
+      return currentAdminEvent === 'fecha1' ? 'ultraVip' : 'ultraVip_fecha2';
+    }
+
+    function populateConfigInputs(data) {
+      eventNameInput.value = data?.eventName || '';
+      eventLogoUrlInput.value = data?.logoUrl || '';
+      headingTextInput.value = data?.headingText || (currentAdminEvent === 'fecha1' ? 'DOMINGO 11' : 'SÁBADO 10');
+      headingDateInput.value = data?.eventDate !== undefined ? data.eventDate : 'OCT';
+      headingSizeInput.value = data?.headingSize || 17;
+      headingFontInput.value = data?.headingFont || "'Bebas Neue', sans-serif";
+    }
+
+    function listenReservas() {
+      if (reservasUnsub) {
+        reservasUnsub();
+        reservasUnsub = null;
+      }
+      const colName = getActiveCollection();
+      sharedData = {};
+      render();
+
+      reservasUnsub = db.collection(colName).onSnapshot(snapshot => {
+        sharedData = {};
+        snapshot.forEach(doc => sharedData[doc.id] = doc.data());
+        render();
+      }, () => {
+        list.innerHTML = '<div class="empty">No se pudieron cargar las reservas de ' + colName + '. Actualiza la página.</div>';
+      });
+    }
+
+    function switchAdminEvent(newEventKey) {
+      if (currentAdminEvent === newEventKey) return;
+      currentAdminEvent = newEventKey;
+
+      if (currentAdminEvent === 'fecha1') {
+        btnAdminFecha1.style.background = 'var(--gold)';
+        btnAdminFecha1.style.color = '#000';
+        btnAdminFecha1.style.borderColor = 'var(--gold)';
+        btnAdminFecha2.style.background = 'transparent';
+        btnAdminFecha2.style.color = '#fff';
+        btnAdminFecha2.style.borderColor = 'rgba(255,255,255,0.2)';
+        activeEventTitle.textContent = 'FECHA 1 (' + (configData1.headingText || 'DOMINGO 11') + ' ' + (configData1.eventDate || 'OCT') + ')';
+        activeCollectionTag.textContent = 'Colección: reservas';
+        populateConfigInputs(configData1);
+      } else {
+        btnAdminFecha2.style.background = 'var(--gold)';
+        btnAdminFecha2.style.color = '#000';
+        btnAdminFecha2.style.borderColor = 'var(--gold)';
+        btnAdminFecha1.style.background = 'transparent';
+        btnAdminFecha1.style.color = '#fff';
+        btnAdminFecha1.style.borderColor = 'rgba(255,255,255,0.2)';
+        activeEventTitle.textContent = 'FECHA 2 (' + (configData2.headingText || 'SÁBADO 10') + ' ' + (configData2.eventDate || 'OCT') + ')';
+        activeCollectionTag.textContent = 'Colección: reservas_fecha2';
+        populateConfigInputs(configData2);
+      }
+
+      listenReservas();
+    }
+
+    btnAdminFecha1.addEventListener('click', () => switchAdminEvent('fecha1'));
+    btnAdminFecha2.addEventListener('click', () => switchAdminEvent('fecha2'));
+
+    toggleDobleFecha.addEventListener('change', async () => {
+      try {
+        await db.collection('config').doc('ultraVip').set({
+          dobleFechaActiva: toggleDobleFecha.checked,
+          updatedAt: Date.now()
+        }, { merge: true });
+      } catch (err) {
+        alert('Error al cambiar estado de doble fecha: ' + err.message);
+        toggleDobleFecha.checked = !toggleDobleFecha.checked;
+      }
+    });
+
+    if (selectBoleteriaMode) {
+      selectBoleteriaMode.addEventListener('change', async () => {
+        try {
+          await db.collection('config').doc('ultraVip').set({
+            boleteriaOverride: selectBoleteriaMode.value,
+            updatedAt: Date.now()
+          }, { merge: true });
+        } catch (err) {
+          alert('Error al cambiar modo de boletería: ' + err.message);
+        }
+      });
+    }
+
+    db.collection('config').doc('ultraVip').onSnapshot(doc => {
+      if (doc.exists) {
+        configData1 = doc.data();
+        const dobleActiva = !!configData1.dobleFechaActiva;
+        toggleDobleFecha.checked = dobleActiva;
+        dobleFechaBadge.textContent = dobleActiva ? 'ACTIVADA' : 'DESACTIVADA';
+        dobleFechaBadge.style.background = dobleActiva ? 'var(--blue)' : '#333';
+        dobleFechaBadge.style.color = '#fff';
+
+        // Si doble fecha está desactivada, ocultar Fecha 2 y control de turno de Boletería
+        if (btnAdminFecha2) {
+          btnAdminFecha2.style.display = dobleActiva ? 'inline-block' : 'none';
+        }
+        const bolWrap = document.getElementById('boleteriaControlWrap');
+        if (bolWrap) {
+          bolWrap.style.display = dobleActiva ? 'flex' : 'none';
+        }
+
+        if (!dobleActiva && currentAdminEvent === 'fecha2') {
+          switchAdminEvent('fecha1');
+        }
+
+        if (selectBoleteriaMode) {
+          selectBoleteriaMode.value = configData1.boleteriaOverride || 'auto';
+        }
+        btnAdminFecha1.textContent = '📅 ' + (configData1.headingText || 'DOMINGO 11') + (configData1.eventDate ? ' ' + configData1.eventDate : '');
+        if (currentAdminEvent === 'fecha1') {
+          populateConfigInputs(configData1);
+        }
+      }
+    });
+
+    db.collection('config').doc('ultraVip_fecha2').onSnapshot(async doc => {
+      if (doc.exists) {
+        configData2 = doc.data();
+        btnAdminFecha2.textContent = '📅 ' + (configData2.headingText || 'SÁBADO 10') + (configData2.eventDate ? ' ' + configData2.eventDate : ' OCT');
+        if (currentAdminEvent === 'fecha2') {
+          populateConfigInputs(configData2);
+        }
+      } else {
+        // Inicializar automáticamente con SÁBADO 10 OCT
+        try {
+          await db.collection('config').doc('ultraVip_fecha2').set({
+            headingText: 'SÁBADO 10',
+            eventDate: 'OCT',
+            headingSize: 17,
+            headingFont: "'Bebas Neue', sans-serif",
+            eventName: 'Sábado 10 de Octubre',
+            logoUrl: ''
+          }, { merge: true });
+        } catch(_) {}
+      }
+    });
+
     loginForm.addEventListener('submit',async event=>{
       event.preventDefault();
       loginError.textContent='';
@@ -249,21 +446,25 @@
       });
     logout.addEventListener('click',()=>auth.signOut());
     resetAll.addEventListener('click',async()=>{
-      if(!confirm('Esto liberará todas las mesas y borrará todas las reservas, incluida ULTRA VIP. ¿Continuar?')) return;
-      if(!confirm('Confirmación final: todas las mesas volverán a estar libres y la caja se reiniciará.')) return;
+      const targetCol = getActiveCollection();
+      const targetName = currentAdminEvent === 'fecha1' ? 'FECHA 1 (Principal)' : 'FECHA 2 (Segunda)';
+      if(!confirm(`Esto liberará TODAS las mesas de la ${targetName}.\n\nColección afectada: ${targetCol}.\nLa otra fecha NO será modificada. ¿Continuar?`)) return;
+      if(!confirm(`Confirmación final: todas las mesas de ${targetName} volverán a estar libres.`)) return;
       resetAll.disabled=true;resetAll.textContent='Reseteando...';
       try{
-        const snapshot=await db.collection('reservas').get();
+        const snapshot=await db.collection(targetCol).get();
         const batch=db.batch();
         snapshot.forEach(doc=>batch.delete(doc.ref));
 
-        const cajaSnapshot = await db.collection('caja_movimientos').get();
-        cajaSnapshot.forEach(doc=>batch.delete(doc.ref));
+        if(currentAdminEvent === 'fecha1') {
+          const cajaSnapshot = await db.collection('caja_movimientos').get();
+          cajaSnapshot.forEach(doc=>batch.delete(doc.ref));
+        }
 
         await batch.commit();
-        alert('Todas las mesas quedaron libres y la caja fue reiniciada para el próximo evento.');
+        alert(`Todas las mesas de la ${targetName} quedaron libres.`);
         render();
-      }catch(_){alert('No se pudo resetear todas las mesas y movimientos.');}
+      }catch(e){alert('No se pudo resetear: ' + e.message);}
       resetAll.disabled=false;resetAll.textContent='Resetear mesas';
     });
     function printStatusLabel(reserva){
@@ -273,28 +474,51 @@
     }
     function renderPrintReport(){
       const data=load();
-      const eventName=headingTextInput.value.trim()||'ULTRA VIP';
+      const eventName=headingTextInput.value.trim()||(currentAdminEvent === 'fecha1' ? 'ULTRA VIP' : 'SEGUNDA FECHA');
       const eventDate=headingDateInput.value.trim();
+      const eventTag = currentAdminEvent === 'fecha1' ? 'FECHA 1' : 'FECHA 2';
       const rows=TABLE_ORDER.map(mesa=>{
         const reserva=data[mesa],state=printStatusLabel(reserva);
         return '<tr><td>'+escapeHtml(mesa)+'</td><td>'+escapeHtml(reserva?.nombre||'-')+'</td><td class="print-status '+state.className+'">'+state.label+'</td><td class="print-amount">&nbsp;</td><td>'+(reserva?.ts?formatDate(reserva.ts):'-')+'</td></tr>';
       }).join('');
-      printReport.innerHTML='<h1>CUBANO BAR - Estado de mesas</h1><p><strong>Evento:</strong> '+escapeHtml(eventName)+(eventDate?' | <strong>Fecha:</strong> '+escapeHtml(eventDate):'')+'</p><p>Impreso: '+new Date().toLocaleString('es-AR')+'</p><table class="print-table"><thead><tr><th>Mesa</th><th>Nombre / reserva</th><th>Estado</th><th>Monto</th><th>Fecha y hora</th></tr></thead><tbody>'+rows+'</tbody></table>';
+      printReport.innerHTML='<h1>CUBANO BAR - Estado de mesas ('+eventTag+')</h1><p><strong>Evento:</strong> '+escapeHtml(eventName)+(eventDate?' | <strong>Fecha:</strong> '+escapeHtml(eventDate):'')+'</p><p>Impreso: '+new Date().toLocaleString('es-AR')+'</p><table class="print-table"><thead><tr><th>Mesa</th><th>Nombre / reserva</th><th>Estado</th><th>Monto</th><th>Fecha y hora</th></tr></thead><tbody>'+rows+'</tbody></table>';
     }
     printStatus.addEventListener('click',()=>{renderPrintReport();window.print();});
-    db.collection('config').doc('ultraVip').onSnapshot(doc=>{if(doc.exists){const data=doc.data();eventNameInput.value=data.eventName||'';eventLogoUrlInput.value=data.logoUrl||'';headingTextInput.value=data.headingText||'ULTRA VIP';headingDateInput.value=data.eventDate||'';headingSizeInput.value=data.headingSize||17;headingFontInput.value=data.headingFont||"'Bebas Neue', sans-serif";}});
-    saveHeading.addEventListener('click',async()=>{try{await db.collection('config').doc('ultraVip').set({headingText:headingTextInput.value.trim()||'ULTRA VIP',eventDate:headingDateInput.value.trim(),headingSize:Math.max(10,Math.min(40,Number(headingSizeInput.value)||17)),headingFont:headingFontInput.value,updatedAt:Date.now()},{merge:true});headingStatus.textContent='Encabezado actualizado.';}catch(_){headingStatus.textContent='No se pudo actualizar el encabezado.';}});
+
+    saveHeading.addEventListener('click',async()=>{
+      const targetDoc = getActiveConfigDoc();
+      const targetName = currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2';
+      try{
+        await db.collection('config').doc(targetDoc).set({
+          headingText:headingTextInput.value.trim()||'ULTRA VIP',
+          eventDate:headingDateInput.value.trim(),
+          headingSize:Math.max(10,Math.min(40,Number(headingSizeInput.value)||17)),
+          headingFont:headingFontInput.value,
+          updatedAt:Date.now()
+        },{merge:true});
+        headingStatus.textContent='Encabezado de ' + targetName + ' actualizado.';
+      }catch(_){headingStatus.textContent='No se pudo actualizar el encabezado.';}
+    });
     saveEventLogo.addEventListener('click',async()=>{
       const logoUrl=eventLogoUrlInput.value.trim();
+      const targetDoc = getActiveConfigDoc();
+      const targetName = currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2';
       if(!logoUrl){eventLogoStatus.textContent='Pegá la URL pública del logo.';return;}
       saveEventLogo.disabled=true;eventLogoStatus.textContent='Guardando logo...';
       try{
-        await db.collection('config').doc('ultraVip').set({eventName:eventNameInput.value.trim(),logoUrl,updatedAt:Date.now(),updatedBy:auth.currentUser.email},{merge:true});
-        eventLogoStatus.textContent='Logo publicado correctamente.';
+        await db.collection('config').doc(targetDoc).set({eventName:eventNameInput.value.trim(),logoUrl,updatedAt:Date.now(),updatedBy:auth.currentUser.email},{merge:true});
+        eventLogoStatus.textContent='Logo de ' + targetName + ' publicado correctamente.';
       }catch(error){eventLogoStatus.textContent='No se pudo guardar el logo.';}
       saveEventLogo.disabled=false;
     });
-    removeEventLogo.addEventListener('click',async()=>{try{await db.collection('config').doc('ultraVip').set({logoUrl:'',eventName:'',updatedAt:Date.now()},{merge:true});eventLogoStatus.textContent='Logo quitado del mapa.';}catch(_){eventLogoStatus.textContent='No se pudo quitar el logo.';}});
+    removeEventLogo.addEventListener('click',async()=>{
+      const targetDoc = getActiveConfigDoc();
+      const targetName = currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2';
+      try{
+        await db.collection('config').doc(targetDoc).set({logoUrl:'',eventName:'',updatedAt:Date.now()},{merge:true});
+        eventLogoStatus.textContent='Logo de ' + targetName + ' quitado del mapa.';
+      }catch(_){eventLogoStatus.textContent='No se pudo quitar el logo.';}
+    });
 
     // --- Lógica de Configuración de Precios y % de Consumo por Día ---
     const DAYS_CONFIG_DEFAULT = [
@@ -673,7 +897,7 @@
           el.textContent = "Expirado";
           // Borrar de Firebase automáticamente si no se refrescó la UI
           try {
-            await db.collection('reservas').doc(mesaId).delete();
+            await db.collection(getActiveCollection()).doc(mesaId).delete();
           } catch(e) { console.error("Error auto-deleting:", e); }
           return;
         }
@@ -694,6 +918,7 @@
       try {
         const batch = db.batch();
         const updates = {};
+        const col = getActiveCollection();
 
         senaInputs.forEach(input => {
           const mesaId = input.dataset.id;
@@ -720,10 +945,10 @@
         const changedMesaIds = Object.keys(updates);
         if (changedMesaIds.length > 0) {
           changedMesaIds.forEach(mesaId => {
-            batch.update(db.collection('reservas').doc(mesaId), updates[mesaId]);
+            batch.update(db.collection(col).doc(mesaId), updates[mesaId]);
           });
           await batch.commit();
-          alert(`${changedMesaIds.length} reserva(s) actualizada(s) correctamente.`);
+          alert(`${changedMesaIds.length} reserva(s) de ${currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2'} actualizada(s) correctamente.`);
         } else {
           alert('No se detectaron cambios.');
         }
@@ -739,28 +964,29 @@
       const button=event.target.closest('button[data-action]');
       if(!button)return;
       const id=button.dataset.id;
+      const col = getActiveCollection();
       try{
         if(button.dataset.action==='approve') {
           const montoStr = prompt('Ingresá el monto de la seña recibido (solo números):');
           if (montoStr === null) return; // Cancelado
           const monto = parseInt(montoStr.replace(/\D/g, '')) || 0;
 
-          await db.collection('reservas').doc(id).update({
+          await db.collection(col).doc(id).update({
             status:'aprobada',
             montoSenado: monto,
             approvedAt:Date.now(),
             approvedBy:auth.currentUser.email
           });
         }
-        if(button.dataset.action==='pending')await db.collection('reservas').doc(id).update({status:'pendiente',approvedAt:null,approvedBy:null,montoSenado:null});
+        if(button.dataset.action==='pending')await db.collection(col).doc(id).update({status:'pendiente',approvedAt:null,approvedBy:null,montoSenado:null});
         if(button.dataset.action==='delete') {
           if(!confirm('¿Eliminar esta reserva?')) return;
-          await db.collection('reservas').doc(id).delete();
+          await db.collection(col).doc(id).delete();
         }
       }catch(_){alert('No se pudo actualizar la reserva.');}
     });
     refresh.addEventListener('click',render);
-    db.collection('reservas').onSnapshot(snapshot=>{sharedData={};snapshot.forEach(doc=>sharedData[doc.id]=doc.data());render()},()=>{list.innerHTML='<div class="empty">No se pudieron cargar las reservas. Actualiza la pagina.</div>'});
+    listenReservas();
     db.collection('caja_movimientos').orderBy('ts','desc').onSnapshot(snapshot=>{
       cajaMovimientos = [];
       const cutoff = Date.now() - 14 * 60 * 60 * 1000;

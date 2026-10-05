@@ -201,6 +201,10 @@
       <div class="brand">CUBANO<span>BAR</span></div>
       <button id="logoutBtn" style="background:transparent; border:none; color:var(--grey); font-size:12px; cursor:pointer;">Salir</button>
     </div>
+    <div id="boleteriaEventBanner" style="display:none; margin: 8px 0 12px; padding: 8px 14px; background: rgba(245, 197, 24, 0.08); border: 1px solid rgba(245, 197, 24, 0.25); border-radius: 8px; text-align: center;">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--grey); display: block;">Turno de Boletería Activo</span>
+      <span id="boleteriaEventTitle" style="font-size: 15px; font-weight: 800; color: var(--amber); letter-spacing: 0.5px;"></span>
+    </div>
     <div class="cash-tools" id="cashTools">
       <button class="btn-tool" id="btnCajaInicial">Caja Inicial</button>
       <button class="btn-tool" id="btnRetiro">Retiro</button>
@@ -442,12 +446,94 @@
       }
     });
 
-    db.collection("reservas").onSnapshot(snapshot => {
+    let currentBolEvent = 'fecha2';
+    let bolReservasUnsub = null;
+    let config1 = {};
+    let config2 = {};
+
+    window.getActiveBolCollection = function() {
+      return currentBolEvent === 'fecha1' ? 'reservas' : 'reservas_fecha2';
+    };
+
+    function calcularEventoBoleteria() {
+      if (!config1.dobleFechaActiva) return 'fecha1';
+
+      if (config1.boleteriaOverride === 'fecha1') return 'fecha1';
+      if (config1.boleteriaOverride === 'fecha2') return 'fecha2';
+
+      // Cálculo de fecha/hora de turno:
+      // "en boleteria solo tiene que ver la fecha del sabado hasta que finalice el evento osea hasta el domingo 7am
+      // despues de ese horario si tiene que ver las reservas del evento del domingo que comienza a las 23:59 de ese dia hasta terminar el evento"
+      const now = new Date();
+      const day = now.getDay(); // 0: Domingo, 1: Lunes, ..., 6: Sábado
+      const hour = now.getHours();
+
+      if (day === 0) { // Domingo
+        return (hour < 7) ? 'fecha2' : 'fecha1';
+      } else if (day === 1) { // Lunes
+        return (hour < 7) ? 'fecha1' : 'fecha2';
+      } else if (day === 6) { // Sábado
+        return 'fecha2';
+      } else {
+        // Miércoles, Jueves, Viernes: próximo evento en puerta es Sábado (Fecha 2)
+        return 'fecha2';
+      }
+    }
+
+    function actualizarEventoBoleteria() {
+      const nuevoEvento = calcularEventoBoleteria();
+      const banner = document.getElementById('boleteriaEventBanner');
+      const title = document.getElementById('boleteriaEventTitle');
+
+      if (banner && title) {
+        banner.style.display = 'block';
+        const cfg = (nuevoEvento === 'fecha1') ? config1 : config2;
+        const fechaStr = (cfg.headingText || (nuevoEvento === 'fecha1' ? 'DOMINGO 11' : 'SÁBADO 10')) + (cfg.eventDate ? ' ' + cfg.eventDate : '');
+        title.textContent = 'EVENTO: ' + fechaStr;
+      }
+
+      if (currentBolEvent !== nuevoEvento || !bolReservasUnsub) {
+        currentBolEvent = nuevoEvento;
+        listenBoleteriaReservas();
+      }
+    }
+
+    function listenBoleteriaReservas() {
+      if (bolReservasUnsub) {
+        bolReservasUnsub();
+        bolReservasUnsub = null;
+      }
       estado = {};
-      snapshot.forEach(doc => { estado[doc.id] = doc.data(); });
       renderMesas();
       actualizarUltraVip();
+
+      const colName = window.getActiveBolCollection();
+      bolReservasUnsub = db.collection(colName).onSnapshot(snapshot => {
+        estado = {};
+        snapshot.forEach(doc => { estado[doc.id] = doc.data(); });
+        renderMesas();
+        actualizarUltraVip();
+      }, err => {
+        console.error("Error escuchando " + colName, err);
+      });
+    }
+
+    db.collection("config").doc("ultraVip").onSnapshot(doc => {
+      if (doc.exists) {
+        config1 = doc.data();
+        actualizarEventoBoleteria();
+      }
     });
+
+    db.collection("config").doc("ultraVip_fecha2").onSnapshot(doc => {
+      if (doc.exists) {
+        config2 = doc.data();
+        actualizarEventoBoleteria();
+      }
+    });
+
+    // Revisar cambio de turno automáticamente cada minuto
+    setInterval(actualizarEventoBoleteria, 60000);
 
     db.collection("caja_movimientos").orderBy("ts", "desc").onSnapshot(snapshot => {
       cajaMovimientos = [];
@@ -713,8 +799,8 @@
         ingresadaBy: auth.currentUser.email
       };
       if (!dataToSave.ts) dataToSave.ts = Date.now();
-      if (!dataToSave.nombre) dataToSave.nombre = "Venta en Puerta";
-      await db.collection('reservas').doc(currentMesa).set(dataToSave, { merge: true });
+      const targetCol = window.getActiveBolCollection ? window.getActiveBolCollection() : 'reservas';
+      await db.collection(targetCol).doc(currentMesa).set(dataToSave, { merge: true });
       showToast("Cobro registrado correctamente.");
       document.getElementById('modalOverlay').classList.remove('open');
     } catch (e) {
