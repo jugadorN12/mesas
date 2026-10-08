@@ -730,7 +730,7 @@
   <div id="loginModal" class="login-modal">
     <div class="login-card-modal">
       <h3>Acceso Maestro</h3>
-      <input type="email" id="masterEmail" placeholder="Email de administrador">
+      <input type="email" id="masterEmail" placeholder="Email (Admin o Asistente)">
       <input type="password" id="masterPass" placeholder="Contraseña">
       <button class="btn-primary" id="doMasterLogin">Ingresar</button>
       <button class="close-login" id="cancelMasterLogin">Cancelar</button>
@@ -1535,11 +1535,13 @@
             const userDoc = await firebaseDb.collection("users").doc(user.email.toLowerCase()).get();
             if (userDoc.exists) {
               const role = userDoc.data().role;
-              isMaster = (role === "admin");
+              userRole = role;
+              isMaster = (role === "admin" || role === "assistant");
               document.getElementById("masterLogoutBtn").style.display = isMaster ? "block" : "none";
               document.getElementById("legendIngresada").style.display = isMaster ? "inline-block" : "none";
-              if (isMaster) showToast("Modo Maestro ACTIVADO");
+              if (isMaster) showToast(role === "assistant" ? "Modo Asistente ACTIVADO" : "Modo Maestro ACTIVADO");
             } else {
+              userRole = null;
               isMaster = false;
               document.getElementById("masterLogoutBtn").style.display = "none";
               showToast("El usuario no tiene rol asignado.");
@@ -1548,6 +1550,7 @@
             console.error("Error fetching role:", e);
           }
         } else {
+          userRole = null;
           isMaster = false;
           document.getElementById("masterLogoutBtn").style.display = "none";
         }
@@ -1558,8 +1561,9 @@
 
     document.getElementById("masterLogoutBtn").addEventListener("click", () => {
       if (auth) auth.signOut();
+      userRole = null;
       isMaster = false;
-      showToast("Sesión maestra cerrada");
+      showToast("Sesión cerrada");
     });
 
     // Eventos de Solapas de Doble Fecha
@@ -1585,7 +1589,7 @@
           } else {
             await firebaseDb.collection(targetCol).doc(mesaActual).set({
               status: newStatus,
-              nombre: masterName || "Asignado por Admin",
+              nombre: masterName || (userRole === "assistant" ? "Asignado por Asistente" : "Asignado por Admin"),
               masterNote: masterNote || "",
               contacto: estado[mesaActual]?.contacto || "0000000000",
               ts: estado[mesaActual]?.ts || Date.now(),

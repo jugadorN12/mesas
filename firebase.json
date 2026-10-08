@@ -18,7 +18,8 @@
       "firebase.json",
       ".firebaserc",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "*.bak"
     ],
     "cleanUrls": true
   },
