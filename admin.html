@@ -951,6 +951,7 @@
         const hasEx = !!(r.esExcepcion || r.excepcion);
         const exPersonas = (r.cantidadPersonas !== undefined && r.cantidadPersonas !== null) ? parseInt(r.cantidadPersonas) : 4;
         const exTotal = r.precioTotal || r.montoTotal || (hasEx ? 100000 : 0);
+        const exPrecioPersona = (r.precioPorPersona !== undefined && r.precioPorPersona !== null) ? r.precioPorPersona : (exTotal && exPersonas ? Math.round(exTotal / exPersonas) : 25000);
         const exDrinksPct = (r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) ? r.porcentajeConsumo : 80;
         const exDrinksMonto = r.montoConsumicion || r.montoConsumoCredito || Math.round((exTotal * exDrinksPct) / 100);
         const exSena = senaValue;
@@ -968,21 +969,26 @@
             </div>
 
             <div id="exBody_${mesa}" style="display: ${hasEx ? 'block' : 'none'}; margin-top:10px;">
-              <!-- Selector libre de personas -->
-              <div style="margin-bottom:8px;">
-                <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:3px; font-weight:600;">Personas autorizadas</label>
-                <div class="people-picker-box">
-                  <button type="button" class="btn-picker-step" onclick="changeExPeople('${mesa}', -1)">-</button>
-                  <input type="number" min="1" class="ex-input ex-input-personas" data-id="${mesa}" value="${exPersonas}" oninput="recalcExMesa('${mesa}')" style="width:70px; text-align:center;">
-                  <button type="button" class="btn-picker-step" onclick="changeExPeople('${mesa}', 1)">+</button>
-                  <span style="font-size:11.5px; color:var(--muted); margin-left:4px;">(Permite 1, 2, 3 o las que acuerden)</span>
+              <!-- Selector libre de personas y Precio por Persona -->
+              <div class="ex-field-row" style="margin-bottom:8px;">
+                <div class="ex-field-col">
+                  <label>Personas autorizadas</label>
+                  <div class="people-picker-box">
+                    <button type="button" class="btn-picker-step" onclick="changeExPeople('${mesa}', -1)">-</button>
+                    <input type="number" min="1" class="ex-input ex-input-personas" data-id="${mesa}" value="${exPersonas}" oninput="recalcExMesa('${mesa}')" style="width:60px; text-align:center;">
+                    <button type="button" class="btn-picker-step" onclick="changeExPeople('${mesa}', 1)">+</button>
+                  </div>
+                </div>
+                <div class="ex-field-col">
+                  <label>Precio p/Persona ($)</label>
+                  <input type="number" class="ex-input ex-input-precio-persona" data-id="${mesa}" placeholder="Ej: 25000" value="${exPrecioPersona || ''}" oninput="onExPrecioPersonaInput('${mesa}')">
                 </div>
               </div>
 
               <div class="ex-field-row">
                 <div class="ex-field-col">
                   <label>Total Acordado ($)</label>
-                  <input type="number" class="ex-input ex-input-total" data-id="${mesa}" placeholder="Ej: 100000" value="${exTotal || ''}" oninput="recalcExMesa('${mesa}')">
+                  <input type="number" class="ex-input ex-input-total" data-id="${mesa}" placeholder="Ej: 100000" value="${exTotal || ''}" oninput="onExTotalInput('${mesa}')">
                 </div>
                 <div class="ex-field-col">
                   <label>En Bebidas (% o $ directo)</label>
@@ -1126,11 +1132,45 @@
       recalcExMesa(mesaId);
     };
 
+    window.onExPrecioPersonaInput = function(mesaId) {
+      const pInput = document.querySelector(`.ex-input-precio-persona[data-id="${mesaId}"]`);
+      const personasIn = document.querySelector(`.ex-input-personas[data-id="${mesaId}"]`);
+      const totalIn = document.querySelector(`.ex-input-total[data-id="${mesaId}"]`);
+      if (!pInput || !personasIn || !totalIn) return;
+
+      const precioP = parseInt(pInput.value) || 0;
+      const personas = parseInt(personasIn.value) || 1;
+      if (precioP > 0) {
+        totalIn.value = precioP * personas;
+      }
+      recalcExMesa(mesaId);
+    };
+
+    window.onExTotalInput = function(mesaId) {
+      const pInput = document.querySelector(`.ex-input-precio-persona[data-id="${mesaId}"]`);
+      const personasIn = document.querySelector(`.ex-input-personas[data-id="${mesaId}"]`);
+      const totalIn = document.querySelector(`.ex-input-total[data-id="${mesaId}"]`);
+      if (!pInput || !personasIn || !totalIn) return;
+
+      const total = parseInt(totalIn.value) || 0;
+      const personas = parseInt(personasIn.value) || 1;
+      if (total > 0 && personas > 0) {
+        pInput.value = Math.round(total / personas);
+      }
+      recalcExMesa(mesaId);
+    };
+
     window.changeExPeople = function(mesaId, delta) {
       const input = document.querySelector(`.ex-input-personas[data-id="${mesaId}"]`);
+      const pInput = document.querySelector(`.ex-input-precio-persona[data-id="${mesaId}"]`);
+      const totalIn = document.querySelector(`.ex-input-total[data-id="${mesaId}"]`);
       if (input) {
         let val = Math.max(1, (parseInt(input.value) || 4) + delta);
         input.value = val;
+        const precioP = parseInt(pInput ? pInput.value : 0) || 0;
+        if (precioP > 0 && totalIn) {
+          totalIn.value = precioP * val;
+        }
         recalcExMesa(mesaId);
       }
     };
@@ -1171,7 +1211,7 @@
       const elSal = document.getElementById(`exSummarySaldo_${mesaId}`);
 
       if (elTot) elTot.textContent = `$${total.toLocaleString('es-AR')}`;
-      if (elBeb) elBeb.textContent = `+$${bebidasMonto.toLocaleString('es-AR')}`;
+      if (elBeb) elBeb.textContent = `+$${bebidasMonto.toLocaleString('es-AR')} (${bebidasPct}%)`;
       if (elSen) elSen.textContent = `$${sena.toLocaleString('es-AR')}`;
       if (elSal) {
         if (saldo === 0 && total > 0) {
@@ -1190,6 +1230,7 @@
       const col = getActiveCollection();
 
       const personasIn = document.querySelector(`.ex-input-personas[data-id="${mesaId}"]`);
+      const precioPersonaIn = document.querySelector(`.ex-input-precio-persona[data-id="${mesaId}"]`);
       const totalIn = document.querySelector(`.ex-input-total[data-id="${mesaId}"]`);
       const bebidasIn = document.querySelector(`.ex-input-bebidas[data-id="${mesaId}"]`);
       const senaIn = document.querySelector(`.ex-input-sena[data-id="${mesaId}"]`);
@@ -1197,6 +1238,7 @@
 
       const personas = parseInt(personasIn ? personasIn.value : 4) || 4;
       const total = parseInt(totalIn ? totalIn.value : 0) || 0;
+      const precioPersona = parseInt(precioPersonaIn ? precioPersonaIn.value : 0) || (personas > 0 ? Math.round(total / personas) : 0);
       const sena = parseInt(senaIn ? senaIn.value : 0) || 0;
       const vendedor = vendedorIn ? vendedorIn.value.trim() : '';
 
@@ -1232,6 +1274,7 @@
             excepcion: true,
             responsableExcepcion: responsable,
             cantidadPersonas: personas,
+            precioPorPersona: precioPersona,
             precioTotal: total,
             montoTotal: total,
             porcentajeConsumo: bebidasPct,

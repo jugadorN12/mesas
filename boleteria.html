@@ -262,20 +262,27 @@
       </div>
 
       <div class="people-ctrl">
-        <button class="people-btn" onclick="adjustPeople(-1)">-</button>
-        <span class="people-num" id="peopleCount">4</span>
-        <button class="people-btn" onclick="adjustPeople(1)">+</button>
+        <button type="button" class="people-btn" onclick="adjustPeople(-1)">-</button>
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <input type="number" min="1" class="people-num" id="peopleCount" value="4" oninput="onPeopleInput()" style="background:transparent; border:none; color:#fff; text-align:center; width:90px; outline:none; -moz-appearance:textfield; font-family:'Bebas Neue',sans-serif; font-size:48px;">
+          <span style="font-size:11px; color:var(--muted); margin-top:-6px; font-weight:600;">personas</span>
+        </div>
+        <button type="button" class="people-btn" onclick="adjustPeople(1)">+</button>
       </div>
 
       <button class="ex-btn" id="toggleException">¿ES UNA EXCEPCIÓN? (Precio manual)</button>
 
       <div id="exceptionForm">
         <div class="field-row">
-          <label>Total a pagar en efectivo</label>
+          <label>Precio por persona ($)</label>
+          <input type="number" id="exPrecioPersona" placeholder="Ej: 25000">
+        </div>
+        <div class="field-row">
+          <label>Total Mesa ($)</label>
           <input type="number" id="exTotal" placeholder="0">
         </div>
         <div class="field-row">
-          <label>Total a entregar en bebidas</label>
+          <label>Total a entregar en bebidas ($)</label>
           <input type="number" id="exDrinks" placeholder="0">
         </div>
       </div>
@@ -393,6 +400,10 @@
   let isException = false;
   let currentBalance = 0;
   let cajaMovimientos = [];
+  let exPactadaPrecioPersona = 0;
+  let exPactadaDrinksPct = 80;
+  let exPactadaSena = 0;
+  let exResponsable = '';
 
   auth.onAuthStateChanged(async (user) => {
     if (user) {
@@ -709,38 +720,37 @@
     } else {
       calcView.style.display = 'block';
       currentPeople = (r && r.cantidadPersonas) ? parseInt(r.cantidadPersonas) : 4;
-      document.getElementById('peopleCount').textContent = currentPeople;
+      const countEl = document.getElementById('peopleCount');
+      if (countEl) countEl.value = currentPeople;
       sub.textContent = r ? "Reserva de " + (r.nombre || "Sin nombre") : "VENTA EN PUERTA (Mesa libre)";
       
       if (hasPactadaEx) {
         isException = true;
         const exTotalVal = r.precioTotal || r.montoTotal || 0;
-        const exDrinksPct = (r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) ? r.porcentajeConsumo : 0;
-        const exDrinksVal = (r.montoConsumicion !== undefined && r.montoConsumicion !== null) ? r.montoConsumicion : (r.montoConsumoCredito || Math.round((exTotalVal * exDrinksPct) / 100));
-        const exSenado = (r.montoSenado !== undefined && r.montoSenado !== null) ? r.montoSenado : 0;
-        const exSaldo = Math.max(0, exTotalVal - exSenado);
-        const exPctAbonado = r.porcentajeAbonado !== undefined ? r.porcentajeAbonado : (exTotalVal > 0 ? Math.round((exSenado / exTotalVal) * 100) : 0);
-        const exPctSaldo = r.porcentajeSaldo !== undefined ? r.porcentajeSaldo : (exTotalVal > 0 ? Math.max(0, 100 - exPctAbonado) : 0);
-        const responsable = r.responsableExcepcion || 'Admin / Asistente';
+        exPactadaPrecioPersona = (r.precioPorPersona !== undefined && r.precioPorPersona !== null && r.precioPorPersona > 0)
+          ? parseInt(r.precioPorPersona)
+          : (exTotalVal && currentPeople > 0 ? Math.round(exTotalVal / currentPeople) : 0);
+        exPactadaDrinksPct = (r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) ? parseInt(r.porcentajeConsumo) : 80;
+        exPactadaSena = (r.montoSenado !== undefined && r.montoSenado !== null) ? parseInt(r.montoSenado) : 0;
+        exResponsable = r.responsableExcepcion || 'Admin / Asistente';
 
-        document.getElementById('exTotal').value = exTotalVal;
-        document.getElementById('exDrinks').value = exDrinksVal;
+        if (document.getElementById('exPrecioPersona')) document.getElementById('exPrecioPersona').value = exPactadaPrecioPersona || '';
+        if (document.getElementById('exTotal')) document.getElementById('exTotal').value = exTotalVal;
+        const initialDrinks = (r.montoConsumicion !== undefined && r.montoConsumicion !== null) ? r.montoConsumicion : (r.montoConsumoCredito || Math.round((exTotalVal * exPactadaDrinksPct) / 100));
+        if (document.getElementById('exDrinks')) document.getElementById('exDrinks').value = initialDrinks;
 
-        if (exDetails) {
-          exDetails.innerHTML = `
-            👤 <b>Autorizado por:</b> <span style="color:var(--white);">${escapeHtml(responsable)}</span><br>
-            👥 <b>Personas autorizadas:</b> <span style="color:var(--blue); font-weight:bold;">${currentPeople} personas</span><br>
-            🍹 <b>Porcentaje en bebidas:</b> <span style="color:var(--green); font-weight:bold;">${exDrinksPct}% ($${exDrinksVal.toLocaleString()})</span><br>
-            💵 <b>Abonó:</b> <span style="color:var(--amber); font-weight:bold;">${exPctAbonado}% ($${exSenado.toLocaleString()})</span><br>
-            🚪 <b>Debe pagar para ingreso final:</b> <span style="color:${exSaldo === 0 && exTotalVal > 0 ? 'var(--green)' : 'var(--red)'}; font-weight:bold;">${exSaldo === 0 && exTotalVal > 0 ? 'PAGADA COMPLETA — $0' : `${exPctSaldo}% ($${exSaldo.toLocaleString()})`}</span>
-            ${r.masterNote ? `<br><span style="color:var(--grey); font-size:11.5px;">📝 Nota: ${escapeHtml(r.masterNote)}</span>` : ''}
-          `;
-        }
         if (exBadge) exBadge.style.display = 'block';
         promoBadge.style.display = 'none';
         document.getElementById('toggleException').textContent = "MODIFICAR VALORES MANUALMENTE";
       } else {
         isException = false;
+        exPactadaPrecioPersona = 0;
+        exPactadaDrinksPct = getTodayPromo().pct;
+        exPactadaSena = (r && r.montoSenado !== undefined && r.montoSenado !== null) ? parseInt(r.montoSenado) : 0;
+        exResponsable = '';
+        if (document.getElementById('exPrecioPersona')) document.getElementById('exPrecioPersona').value = '';
+        if (document.getElementById('exTotal')) document.getElementById('exTotal').value = '';
+        if (document.getElementById('exDrinks')) document.getElementById('exDrinks').value = '';
         if (exBadge) exBadge.style.display = 'none';
         const promoInfo = formatReservationPromoInfo(r);
         promoBadge.innerHTML = promoInfo.badgeText;
@@ -755,21 +765,72 @@
 
   function adjustPeople(delta) {
     currentPeople = Math.max(1, currentPeople + delta);
-    document.getElementById('peopleCount').textContent = currentPeople;
+    const countEl = document.getElementById('peopleCount');
+    if (countEl) countEl.value = currentPeople;
     updateCalc();
+  }
+
+  function onPeopleInput() {
+    const countEl = document.getElementById('peopleCount');
+    let val = parseInt(countEl?.value);
+    if (isNaN(val) || val < 1) val = 1;
+    currentPeople = val;
+    updateCalc();
+  }
+
+  function renderModalExDetails(total, drinks, paid, unitPrice) {
+    const exDetails = document.getElementById('modalExcepcionDetails');
+    if (!exDetails) return;
+    const r = estado[currentMesa] || {};
+    const saldo = Math.max(0, total - paid);
+    const pctAbonado = total > 0 ? Math.round((paid / total) * 100) : 0;
+    const pctSaldo = total > 0 ? Math.max(0, 100 - pctAbonado) : 0;
+    const unitPriceStr = unitPrice > 0 ? ` <span style="color:var(--muted); font-size:11px;">($${unitPrice.toLocaleString('es-AR')} c/u)</span>` : '';
+
+    exDetails.innerHTML = `
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 12px; margin-top:4px; font-size:12px;">
+        <div>👤 <b>Autorizado por:</b> <span style="color:var(--white);">${escapeHtml(exResponsable || 'Admin / Asistente')}</span></div>
+        <div>👥 <b>Ingresan:</b> <span style="color:var(--blue); font-weight:bold;">${currentPeople} personas</span>${unitPriceStr}</div>
+        <div>🍹 <b>En Bebidas:</b> <span style="color:var(--green); font-weight:bold;">+$${drinks.toLocaleString('es-AR')} (${exPactadaDrinksPct}%)</span></div>
+        <div>💵 <b>Abonó:</b> <span style="color:var(--amber); font-weight:bold;">$${paid.toLocaleString('es-AR')} (${pctAbonado}%)</span></div>
+      </div>
+      <div style="margin-top:8px; padding-top:6px; border-top:1px solid rgba(255,189,62,0.3); font-size:12.5px;">
+        🚪 <b>Saldo a cobrar en puerta:</b> 
+        <span style="color:${saldo === 0 && total > 0 ? 'var(--green)' : 'var(--red)'}; font-weight:800; font-size:13.5px;">
+          ${saldo === 0 && total > 0 ? 'PAGADA COMPLETA — $0' : `$${saldo.toLocaleString('es-AR')} (${pctSaldo}%)`}
+        </span>
+      </div>
+      ${r.masterNote ? `<div style="color:var(--grey); font-size:11.5px; margin-top:4px;">📝 Nota: <i>${escapeHtml(r.masterNote)}</i></div>` : ''}
+    `;
   }
 
   function updateCalc() {
     const r = estado[currentMesa];
-    const paid = (r && r.montoSenado) ? parseInt(r.montoSenado) : 0;
+    const paid = isException ? exPactadaSena : ((r && r.montoSenado) ? parseInt(r.montoSenado) : 0);
     let total, drinks;
     const labelDrinks = document.getElementById('labelDrinks');
 
     if (isException) {
-      total = parseInt(document.getElementById('exTotal').value) || 0;
-      drinks = parseInt(document.getElementById('exDrinks').value) || 0;
-      const drinksPct = (r && r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) ? r.porcentajeConsumo : null;
-      if (labelDrinks) labelDrinks.textContent = drinksPct !== null ? `En Bebidas (${drinksPct}%)` : "En Bebidas (Manual)";
+      const manualUnitPrice = parseInt(document.getElementById('exPrecioPersona')?.value) || 0;
+      const unitPrice = exPactadaPrecioPersona > 0 ? exPactadaPrecioPersona : manualUnitPrice;
+
+      if (unitPrice > 0) {
+        total = currentPeople * unitPrice;
+        const drinksPct = exPactadaDrinksPct > 0 ? exPactadaDrinksPct : 80;
+        drinks = Math.round((total * drinksPct) / 100);
+
+        if (document.getElementById('exTotal')) document.getElementById('exTotal').value = total;
+        if (document.getElementById('exDrinks')) document.getElementById('exDrinks').value = drinks;
+        if (document.getElementById('exPrecioPersona')) document.getElementById('exPrecioPersona').value = unitPrice;
+        if (labelDrinks) labelDrinks.textContent = `En Bebidas (${drinksPct}%)`;
+      } else {
+        total = parseInt(document.getElementById('exTotal')?.value) || 0;
+        drinks = parseInt(document.getElementById('exDrinks')?.value) || 0;
+        const drinksPct = (r && r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) ? r.porcentajeConsumo : null;
+        if (labelDrinks) labelDrinks.textContent = drinksPct !== null ? `En Bebidas (${drinksPct}%)` : "En Bebidas (Manual)";
+      }
+
+      renderModalExDetails(total, drinks, paid, unitPrice);
     } else {
       const basePrice = pricingConfig.precioBaseMesa || 120000;
       const extraPrice = pricingConfig.precioPersonaExtra || 25000;
@@ -781,17 +842,57 @@
       drinks = Math.round((total * promoPct) / 100);
       if (labelDrinks) labelDrinks.textContent = `En Bebidas (${promoPct}%)`;
     }
+
     const balance = Math.max(0, total - paid);
     currentBalance = balance;
-    document.getElementById('valTotal').textContent = total.toLocaleString();
-    document.getElementById('valDrinks').textContent = drinks.toLocaleString();
-    document.getElementById('valPaid').textContent = paid.toLocaleString();
-    document.getElementById('valBalance').textContent = balance.toLocaleString();
+    document.getElementById('valTotal').textContent = total.toLocaleString('es-AR');
+    document.getElementById('valDrinks').textContent = drinks.toLocaleString('es-AR');
+    document.getElementById('valPaid').textContent = paid.toLocaleString('es-AR');
+    document.getElementById('valBalance').textContent = balance.toLocaleString('es-AR');
+
+    const confirmBtn = document.getElementById('confirmIngreso');
+    if (confirmBtn) {
+      if (balance === 0 && total > 0) {
+        confirmBtn.textContent = "CONFIRMAR INGRESO (PAGADA COMPLETA $0)";
+        confirmBtn.style.background = "var(--green)";
+        confirmBtn.style.color = "#060608";
+        confirmBtn.style.boxShadow = "0 8px 20px rgba(46,230,166,0.3)";
+      } else {
+        confirmBtn.textContent = `COBRAR SALDO ($${balance.toLocaleString('es-AR')})`;
+        confirmBtn.style.background = "var(--blue)";
+        confirmBtn.style.color = "#fff";
+        confirmBtn.style.boxShadow = "0 8px 20px rgba(88,166,255,0.3)";
+      }
+    }
   }
 
-  document.getElementById('exTotal').addEventListener('input', updateCalc);
-  document.getElementById('exDrinks').addEventListener('input', updateCalc);
-  document.getElementById('toggleException').addEventListener('click', () => {
+  document.getElementById('exPrecioPersona')?.addEventListener('input', () => {
+    const val = parseInt(document.getElementById('exPrecioPersona').value) || 0;
+    exPactadaPrecioPersona = val;
+    updateCalc();
+  });
+
+  document.getElementById('exTotal')?.addEventListener('input', () => {
+    const val = parseInt(document.getElementById('exTotal').value) || 0;
+    if (currentPeople > 0 && val > 0) {
+      exPactadaPrecioPersona = Math.round(val / currentPeople);
+      if (document.getElementById('exPrecioPersona')) {
+        document.getElementById('exPrecioPersona').value = exPactadaPrecioPersona;
+      }
+    }
+    updateCalc();
+  });
+
+  document.getElementById('exDrinks')?.addEventListener('input', () => {
+    const total = parseInt(document.getElementById('exTotal')?.value) || 0;
+    const drinks = parseInt(document.getElementById('exDrinks')?.value) || 0;
+    if (total > 0 && drinks > 0) {
+      exPactadaDrinksPct = Math.min(100, Math.round((drinks / total) * 100));
+    }
+    updateCalc();
+  });
+
+  document.getElementById('toggleException')?.addEventListener('click', () => {
     isException = !isException;
     document.getElementById('exceptionForm').style.display = isException ? 'block' : 'none';
     document.getElementById('toggleException').textContent = isException ? "VOLVER A CÁLCULO AUTOMÁTICO" : "¿ES UNA EXCEPCIÓN? (Precio manual)";
@@ -799,11 +900,15 @@
   });
 
   document.getElementById('confirmIngreso').addEventListener('click', () => {
+    if (currentBalance === 0) {
+      finalizarCobro('completo_adelantado', 0, 0);
+      return;
+    }
     document.getElementById('calcView').style.display = 'none';
     document.getElementById('paymentMethodsView').style.display = 'block';
-    document.getElementById('payBalanceLabel').textContent = "$" + currentBalance.toLocaleString();
+    document.getElementById('payBalanceLabel').textContent = "$" + currentBalance.toLocaleString('es-AR');
     document.querySelectorAll('.pay-total-val').forEach(el => {
-      el.textContent = "$" + currentBalance.toLocaleString();
+      el.textContent = "$" + currentBalance.toLocaleString('es-AR');
     });
   });
 
@@ -835,7 +940,7 @@
     const cash = parseInt(document.getElementById('mixCash').value) || 0;
     const transf = parseInt(document.getElementById('mixTransf').value) || 0;
     if (cash + transf !== currentBalance) {
-      showToast("La suma debe ser $" + currentBalance.toLocaleString());
+      showToast("La suma debe ser $" + currentBalance.toLocaleString('es-AR'));
       return;
     }
     await finalizarCobro('mixto', cash, transf);
@@ -852,38 +957,41 @@
     btnConfirm.disabled = true;
     btnMixed.disabled = true;
     const r = estado[currentMesa] || {};
-    const finalTotal = parseInt(document.getElementById('valTotal').textContent.replace(/\D/g,''));
-    const finalDrinks = parseInt(document.getElementById('valDrinks').textContent.replace(/\D/g,''));
+    const finalTotal = parseInt(document.getElementById('valTotal').textContent.replace(/\D/g,'')) || 0;
+    const finalDrinks = parseInt(document.getElementById('valDrinks').textContent.replace(/\D/g,'')) || 0;
     try {
       const isEx = isException || !!(r && (r.esExcepcion || r.excepcion));
-      const senaMonto = (r && r.montoSenado !== undefined && r.montoSenado !== null) ? r.montoSenado : 0;
-      const pctAbonado = (r && r.porcentajeAbonado !== undefined) ? r.porcentajeAbonado : (finalTotal > 0 ? Math.round((senaMonto / finalTotal) * 100) : 0);
-      const pctSaldo = (r && r.porcentajeSaldo !== undefined) ? r.porcentajeSaldo : (finalTotal > 0 ? Math.max(0, 100 - pctAbonado) : 0);
+      const senaMonto = isEx ? exPactadaSena : ((r && r.montoSenado !== undefined && r.montoSenado !== null) ? r.montoSenado : 0);
+      const pctAbonado = (finalTotal > 0 ? Math.round((senaMonto / finalTotal) * 100) : 0);
+      const pctSaldo = (finalTotal > 0 ? Math.max(0, 100 - pctAbonado) : 0);
+      const unitPrice = exPactadaPrecioPersona > 0 ? exPactadaPrecioPersona : (r.precioPorPersona || (currentPeople > 0 ? Math.round(finalTotal / currentPeople) : 0));
 
       const dataToSave = {
         ...r,
         status: 'ingresada',
         cantidadPersonas: currentPeople,
+        precioPorPersona: unitPrice,
         montoTotal: finalTotal,
         precioTotal: finalTotal,
         montoConsumicion: finalDrinks,
         montoConsumoCredito: finalDrinks,
-        porcentajeConsumo: (r && r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) ? r.porcentajeConsumo : getTodayPromo().pct,
+        porcentajeConsumo: isEx ? exPactadaDrinksPct : ((r && r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) ? r.porcentajeConsumo : getTodayPromo().pct),
         excepcion: isEx,
         esExcepcion: isEx,
         responsableExcepcion: r.responsableExcepcion || (isEx ? ('Cobrado en boletería por ' + (auth?.currentUser?.email || 'boleteria')) : null),
+        montoSenado: senaMonto,
         porcentajeAbonado: pctAbonado,
         porcentajeSaldo: pctSaldo,
         metodoCobro: metodo,
         cobroEfectivo: cash,
         cobroTransferencia: transf,
         ingresadaAt: Date.now(),
-        ingresadaBy: auth.currentUser.email
+        ingresadaBy: auth.currentUser?.email || 'boleteria'
       };
       if (!dataToSave.ts) dataToSave.ts = Date.now();
       const targetCol = window.getActiveBolCollection ? window.getActiveBolCollection() : 'reservas';
       await db.collection(targetCol).doc(currentMesa).set(dataToSave, { merge: true });
-      showToast("Cobro registrado correctamente.");
+      showToast("Cobro registrado e ingreso confirmado.");
       document.getElementById('modalOverlay').classList.remove('open');
     } catch (e) {
       alert("Error al guardar: " + e.message);
