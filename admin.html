@@ -947,6 +947,10 @@
           detailHtml += `<div style="font-size:11px; color:var(--amber); margin-top:2px;">📝 ${escapeHtml(r.masterNote)}</div>`;
         }
 
+        // Datos de seña y vendedor
+        const senaValue = (r.montoSenado !== undefined && r.montoSenado !== null) ? r.montoSenado : 0;
+        const vendedorValue = r.vendedor || r.responsableExcepcion || '';
+
         // Datos de excepción si existen
         const hasEx = !!(r.esExcepcion || r.excepcion);
         const exPersonas = (r.cantidadPersonas !== undefined && r.cantidadPersonas !== null) ? parseInt(r.cantidadPersonas) : 4;
