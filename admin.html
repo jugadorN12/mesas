@@ -49,6 +49,134 @@
     .countdown{color:var(--amber);font-weight:bold;margin-left:8px;font-variant-numeric: tabular-nums;}
     .excepcion-badge{background:#4d0a3d;color:#f38ae0;font-size:10px;padding:2px 6px;border-radius:4px;margin-top:4px;display:inline-block;font-weight:bold}
     .detail b.ingresada-text{color:var(--blue)}
+
+    /* Estilos Tarjeta de Excepción (Admin y Asistente) */
+    .ex-card-section {
+      margin-top: 10px;
+      padding: 12px;
+      background: rgba(255, 189, 62, 0.04);
+      border: 1px solid rgba(255, 189, 62, 0.35);
+      border-radius: 12px;
+      font-size: 13px;
+    }
+    .ex-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .ex-card-title {
+      font-weight: 800;
+      color: var(--amber);
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ex-badge-role {
+      font-size: 10.5px;
+      color: var(--muted);
+      font-weight: normal;
+    }
+    .ex-field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    @media(max-width:480px){
+      .ex-field-row { grid-template-columns: 1fr; }
+    }
+    .ex-field-col label {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 3px;
+      font-weight: 600;
+    }
+    .ex-input {
+      width: 100%;
+      background: #0d0d12;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 7px 9px;
+      font-size: 13px;
+      font-weight: bold;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    .ex-input:focus {
+      border-color: var(--gold);
+    }
+    .people-picker-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-picker-step {
+      background: #202028;
+      border: 1px solid var(--line);
+      color: #fff;
+      border-radius: 6px;
+      width: 34px;
+      height: 34px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .btn-picker-step:hover { background: #2a2a35; }
+    .btn-picker-step:active { background: #353545; }
+    .ex-summary-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1.5px solid #2ee6a6;
+      box-shadow: 0 0 12px rgba(46, 230, 166, 0.15);
+      border-radius: 10px;
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+    .ex-pill-saldo {
+      margin-top: 6px;
+      padding: 6px 10px;
+      background: #ff2d3d;
+      box-shadow: 0 0 12px rgba(255, 45, 61, 0.45);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 12.5px;
+      border-radius: 99px;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+    .ex-pill-saldo.pagada {
+      background: #2ee6a6;
+      box-shadow: 0 0 12px rgba(46, 230, 166, 0.45);
+      color: #060608;
+    }
+    .btn-guardar-mesa {
+      background: var(--blue) !important;
+      color: #fff !important;
+      border: none !important;
+      padding: 7px 14px !important;
+      border-radius: 6px !important;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 12px;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+    .btn-guardar-mesa:hover {
+      filter: brightness(1.15);
+      transform: translateY(-1px);
+    }
   </style>
 </head>
 <body>
@@ -819,36 +947,102 @@
           detailHtml += `<div style="font-size:11px; color:var(--amber); margin-top:2px;">📝 ${escapeHtml(r.masterNote)}</div>`;
         }
 
-        // Editable seña e input de vendedor
-        const senaValue = r.montoSenado || 0;
-        const vendedorValue = r.vendedor || '';
-        detailHtml += `
-          <div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-            <div>
-              <label style="font-size:11px; color:var(--muted)">Seña $: </label>
-              <input type="number" class="sena-input" data-id="${mesa}" value="${senaValue}" style="width:85px; background:#0d0d12; color:var(--amber); border:1px solid var(--line); border-radius:4px; padding:2px 5px; font-weight:bold; outline:none;">
+        // Datos de excepción si existen
+        const hasEx = !!(r.esExcepcion || r.excepcion);
+        const exPersonas = (r.cantidadPersonas !== undefined && r.cantidadPersonas !== null) ? parseInt(r.cantidadPersonas) : 4;
+        const exTotal = r.precioTotal || r.montoTotal || (hasEx ? 100000 : 0);
+        const exDrinksPct = (r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) ? r.porcentajeConsumo : 80;
+        const exDrinksMonto = r.montoConsumicion || r.montoConsumoCredito || Math.round((exTotal * exDrinksPct) / 100);
+        const exSena = senaValue;
+        const exVendedor = vendedorValue;
+        const exSaldo = Math.max(0, exTotal - exSena);
+
+        let exModuleHtml = `
+          <div class="ex-card-section" data-mesa="${mesa}">
+            <div class="ex-card-header" onclick="toggleExCard('${mesa}')">
+              <span class="ex-card-title">
+                <input type="checkbox" class="ex-chk" data-id="${mesa}" ${hasEx ? 'checked' : ''} onclick="event.stopPropagation();" onchange="toggleExChk('${mesa}', this.checked)" style="transform:scale(1.25); accent-color:var(--amber); cursor:pointer;">
+                ⚡ VENTA CON EXCEPCIÓN <span class="ex-badge-role">(Solo Admin y Asistente)</span>
+              </span>
+              <span style="font-size:12px; color:var(--muted); cursor:pointer;" id="exArrow_${mesa}">${hasEx ? '▲' : '▼'}</span>
             </div>
-            <div>
-              <label style="font-size:11px; color:var(--muted)">Vendido por: </label>
-              <input type="text" class="vendedor-input" data-id="${mesa}" placeholder="Nombre del vendedor" value="${escapeHtml(vendedorValue)}" style="width:130px; background:#0d0d12; color:var(--text); border:1px solid var(--line); border-radius:4px; padding:2px 6px; font-size:12px; outline:none;">
+
+            <div id="exBody_${mesa}" style="display: ${hasEx ? 'block' : 'none'}; margin-top:10px;">
+              <!-- Selector libre de personas -->
+              <div style="margin-bottom:8px;">
+                <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:3px; font-weight:600;">Personas autorizadas</label>
+                <div class="people-picker-box">
+                  <button type="button" class="btn-picker-step" onclick="changeExPeople('${mesa}', -1)">-</button>
+                  <input type="number" min="1" class="ex-input ex-input-personas" data-id="${mesa}" value="${exPersonas}" oninput="recalcExMesa('${mesa}')" style="width:70px; text-align:center;">
+                  <button type="button" class="btn-picker-step" onclick="changeExPeople('${mesa}', 1)">+</button>
+                  <span style="font-size:11.5px; color:var(--muted); margin-left:4px;">(Permite 1, 2, 3 o las que acuerden)</span>
+                </div>
+              </div>
+
+              <div class="ex-field-row">
+                <div class="ex-field-col">
+                  <label>Total Acordado ($)</label>
+                  <input type="number" class="ex-input ex-input-total" data-id="${mesa}" placeholder="Ej: 100000" value="${exTotal || ''}" oninput="recalcExMesa('${mesa}')">
+                </div>
+                <div class="ex-field-col">
+                  <label>En Bebidas (% o $ directo)</label>
+                  <input type="text" class="ex-input ex-input-bebidas" data-id="${mesa}" placeholder="Ej: 80% o 80000" value="${hasEx ? (r.porcentajeConsumo ? r.porcentajeConsumo + '%' : (r.montoConsumicion || '')) : ''}" oninput="recalcExMesa('${mesa}')">
+                </div>
+              </div>
+
+              <div class="ex-field-row">
+                <div class="ex-field-col">
+                  <label>Seña Abonada ($)</label>
+                  <input type="number" class="ex-input ex-input-sena" data-id="${mesa}" placeholder="Ej: 30000" value="${exSena || 0}" oninput="recalcExMesa('${mesa}')">
+                </div>
+                <div class="ex-field-col">
+                  <label>Vendido por</label>
+                  <input type="text" class="ex-input ex-input-vendedor" data-id="${mesa}" placeholder="Nombre del vendedor" value="${escapeHtml(exVendedor)}" oninput="recalcExMesa('${mesa}')">
+                </div>
+              </div>
+
+              <!-- Caja verde neón con cuentas ya hechas -->
+              <div class="ex-summary-box" id="exSummary_${mesa}">
+                <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
+                  <span>Total:</span>
+                  <b id="exSummaryTotal_${mesa}">$${exTotal.toLocaleString('es-AR')}</b>
+                </div>
+                <div style="display:flex; justify-content:space-between; color:#2ee6a6; margin-bottom:2px;">
+                  <span>Voucher Barra:</span>
+                  <b id="exSummaryBebidas_${mesa}">+$${exDrinksMonto.toLocaleString('es-AR')}</b>
+                </div>
+                <div style="display:flex; justify-content:space-between; color:var(--amber); margin-bottom:4px;">
+                  <span>Ya señó:</span>
+                  <b id="exSummarySena_${mesa}">$${exSena.toLocaleString('es-AR')}</b>
+                </div>
+                <div class="ex-pill-saldo ${exSaldo === 0 && exTotal > 0 ? 'pagada' : ''}" id="exSummarySaldo_${mesa}">
+                  ${exSaldo === 0 && exTotal > 0 ? `PAGADA COMPLETA — INGRESO DIRECTO (${exPersonas} pers)` : `SALDO A COBRAR EN PUERTA: $${exSaldo.toLocaleString('es-AR')}`}
+                </div>
+              </div>
+
+              <button type="button" class="btn-guardar-mesa" onclick="guardarExcepcionMesa('${mesa}')">Guardar Cambios</button>
             </div>
           </div>
         `;
 
-        if (r.esExcepcion || r.excepcion) {
-          const resp = r.responsableExcepcion || 'Admin/Asistente';
-          const tot = r.precioTotal || r.montoTotal || 0;
-          const bebi = r.montoConsumicion || r.montoConsumoCredito || 0;
-          const sen = r.montoSenado || 0;
-          const sal = Math.max(0, tot - sen);
+        if (!hasEx) {
+          // Si no es excepción, mostramos los inputs tradicionales de seña y vendedor
           detailHtml += `
-            <div style="margin-top:6px; padding:6px 10px; background:rgba(255,189,62,0.1); border:1px solid rgba(255,189,62,0.3); border-radius:8px; font-size:11.5px; line-height:1.4;">
-              <span style="color:var(--amber); font-weight:800;">⚡ VENTA CON EXCEPCIÓN (${escapeHtml(resp)})</span><br>
-              Bebidas: <b>${r.porcentajeConsumo || 0}%</b> ($${bebi.toLocaleString('es-AR')}) | Total: <b>$${tot.toLocaleString('es-AR')}</b><br>
-              Abonó: <b>${r.porcentajeAbonado || (tot > 0 ? Math.round((sen/tot)*100) : 0)}% ($${sen.toLocaleString('es-AR')})</b> | Resta pagar: <b style="color:var(--red);">${r.porcentajeSaldo || (tot > 0 ? Math.max(0, 100 - Math.round((sen/tot)*100)) : 0)}% ($${sal.toLocaleString('es-AR')})</b>
+            <div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+              <div>
+                <label style="font-size:11px; color:var(--muted)">Seña $: </label>
+                <input type="number" class="sena-input" data-id="${mesa}" value="${senaValue}" style="width:85px; background:#0d0d12; color:var(--amber); border:1px solid var(--line); border-radius:4px; padding:2px 5px; font-weight:bold; outline:none;">
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--muted)">Vendido por: </label>
+                <input type="text" class="vendedor-input" data-id="${mesa}" placeholder="Nombre del vendedor" value="${escapeHtml(vendedorValue)}" style="width:130px; background:#0d0d12; color:var(--text); border:1px solid var(--line); border-radius:4px; padding:2px 6px; font-size:12px; outline:none;">
+              </div>
             </div>
           `;
         }
+
+        // Incorporamos el módulo de excepción debajo
+        detailHtml += exModuleHtml;
 
         if (isIngresada) {
           detailHtml = `<b class="ingresada-text">${escapeHtml(r.nombre||'Sin nombre')} (${r.cantidadPersonas || 4} pers)</b>`;
@@ -858,18 +1052,6 @@
           if (r.masterNote) {
             detailHtml += `<div style="font-size:11px; color:var(--amber); margin-top:2px;">📝 ${escapeHtml(r.masterNote)}</div>`;
           }
-          detailHtml += `
-            <div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-              <div>
-                <label style="font-size:11px; color:var(--muted)">Seña (Semana) $: </label>
-                <input type="number" class="sena-input" data-id="${mesa}" value="${senaValue}" style="width:85px; background:#0d0d12; color:var(--amber); border:1px solid var(--line); border-radius:4px; padding:2px 5px; font-weight:bold; outline:none;">
-              </div>
-              <div>
-                <label style="font-size:11px; color:var(--muted)">Vendido por: </label>
-                <input type="text" class="vendedor-input" data-id="${mesa}" placeholder="Nombre del vendedor" value="${escapeHtml(vendedorValue)}" style="width:130px; background:#0d0d12; color:var(--text); border:1px solid var(--line); border-radius:4px; padding:2px 6px; font-size:12px; outline:none;">
-              </div>
-            </div>
-          `;
 
           // Payment details for puerta
           detailHtml += `<div style="font-size:12px; margin-top:8px; padding:8px; background:rgba(255,255,255,0.05); border-radius:6px;">`;
@@ -925,6 +1107,158 @@
         el.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
       });
     }, 1000);
+
+    // --- Funciones para Tarjetas de Excepción (Admin y Asistente) ---
+    window.toggleExCard = function(mesaId) {
+      const body = document.getElementById('exBody_' + mesaId);
+      const arrow = document.getElementById('exArrow_' + mesaId);
+      if (!body) return;
+      const isShown = body.style.display !== 'none';
+      body.style.display = isShown ? 'none' : 'block';
+      if (arrow) arrow.textContent = isShown ? '▼' : '▲';
+    };
+
+    window.toggleExChk = function(mesaId, isChecked) {
+      const body = document.getElementById('exBody_' + mesaId);
+      const arrow = document.getElementById('exArrow_' + mesaId);
+      if (body) body.style.display = isChecked ? 'block' : 'none';
+      if (arrow) arrow.textContent = isChecked ? '▲' : '▼';
+      recalcExMesa(mesaId);
+    };
+
+    window.changeExPeople = function(mesaId, delta) {
+      const input = document.querySelector(`.ex-input-personas[data-id="${mesaId}"]`);
+      if (input) {
+        let val = Math.max(1, (parseInt(input.value) || 4) + delta);
+        input.value = val;
+        recalcExMesa(mesaId);
+      }
+    };
+
+    window.recalcExMesa = function(mesaId) {
+      const totalIn = document.querySelector(`.ex-input-total[data-id="${mesaId}"]`);
+      const bebidasIn = document.querySelector(`.ex-input-bebidas[data-id="${mesaId}"]`);
+      const senaIn = document.querySelector(`.ex-input-sena[data-id="${mesaId}"]`);
+      const personasIn = document.querySelector(`.ex-input-personas[data-id="${mesaId}"]`);
+      if (!totalIn) return;
+
+      const total = parseInt(totalIn.value) || 0;
+      const sena = parseInt(senaIn ? senaIn.value : 0) || 0;
+      const personas = parseInt(personasIn ? personasIn.value : 4) || 4;
+      let bebidasRaw = (bebidasIn ? bebidasIn.value : '').trim();
+      let bebidasMonto = 0;
+      let bebidasPct = 0;
+
+      if (bebidasRaw.includes('%')) {
+        bebidasPct = parseInt(bebidasRaw.replace('%', '')) || 0;
+        bebidasMonto = Math.round((total * bebidasPct) / 100);
+      } else {
+        const parsedNum = parseInt(bebidasRaw) || 0;
+        if (parsedNum <= 100 && parsedNum > 0) {
+          bebidasPct = parsedNum;
+          bebidasMonto = Math.round((total * bebidasPct) / 100);
+        } else {
+          bebidasMonto = parsedNum;
+          bebidasPct = total > 0 ? Math.round((bebidasMonto / total) * 100) : 0;
+        }
+      }
+
+      const saldo = Math.max(0, total - sena);
+
+      const elTot = document.getElementById(`exSummaryTotal_${mesaId}`);
+      const elBeb = document.getElementById(`exSummaryBebidas_${mesaId}`);
+      const elSen = document.getElementById(`exSummarySena_${mesaId}`);
+      const elSal = document.getElementById(`exSummarySaldo_${mesaId}`);
+
+      if (elTot) elTot.textContent = `$${total.toLocaleString('es-AR')}`;
+      if (elBeb) elBeb.textContent = `+$${bebidasMonto.toLocaleString('es-AR')}`;
+      if (elSen) elSen.textContent = `$${sena.toLocaleString('es-AR')}`;
+      if (elSal) {
+        if (saldo === 0 && total > 0) {
+          elSal.className = "ex-pill-saldo pagada";
+          elSal.textContent = `PAGADA COMPLETA — INGRESO DIRECTO (${personas} pers)`;
+        } else {
+          elSal.className = "ex-pill-saldo";
+          elSal.textContent = `SALDO A COBRAR EN PUERTA: $${saldo.toLocaleString('es-AR')} (${personas} personas)`;
+        }
+      }
+    };
+
+    window.guardarExcepcionMesa = async function(mesaId) {
+      const chk = document.querySelector(`.ex-chk[data-id="${mesaId}"]`);
+      const isChecked = chk ? chk.checked : false;
+      const col = getActiveCollection();
+
+      const personasIn = document.querySelector(`.ex-input-personas[data-id="${mesaId}"]`);
+      const totalIn = document.querySelector(`.ex-input-total[data-id="${mesaId}"]`);
+      const bebidasIn = document.querySelector(`.ex-input-bebidas[data-id="${mesaId}"]`);
+      const senaIn = document.querySelector(`.ex-input-sena[data-id="${mesaId}"]`);
+      const vendedorIn = document.querySelector(`.ex-input-vendedor[data-id="${mesaId}"]`);
+
+      const personas = parseInt(personasIn ? personasIn.value : 4) || 4;
+      const total = parseInt(totalIn ? totalIn.value : 0) || 0;
+      const sena = parseInt(senaIn ? senaIn.value : 0) || 0;
+      const vendedor = vendedorIn ? vendedorIn.value.trim() : '';
+
+      let bebidasRaw = (bebidasIn ? bebidasIn.value : '').trim();
+      let bebidasMonto = 0;
+      let bebidasPct = 0;
+      if (bebidasRaw.includes('%')) {
+        bebidasPct = parseInt(bebidasRaw.replace('%', '')) || 0;
+        bebidasMonto = Math.round((total * bebidasPct) / 100);
+      } else {
+        const parsedNum = parseInt(bebidasRaw) || 0;
+        if (parsedNum <= 100 && parsedNum > 0) {
+          bebidasPct = parsedNum;
+          bebidasMonto = Math.round((total * bebidasPct) / 100);
+        } else {
+          bebidasMonto = parsedNum;
+          bebidasPct = total > 0 ? Math.round((bebidasMonto / total) * 100) : 0;
+        }
+      }
+
+      const saldo = Math.max(0, total - sena);
+      const pctAbonado = total > 0 ? Math.round((sena / total) * 100) : 0;
+      const pctSaldo = total > 0 ? Math.max(0, 100 - pctAbonado) : 0;
+
+      try {
+        let payload = {};
+        if (isChecked) {
+          const email = auth?.currentUser?.email || (isMaster ? 'admin' : 'asistente');
+          const responsable = (isMaster ? `Admin (${email})` : `Asistente (${email})`);
+
+          payload = {
+            esExcepcion: true,
+            excepcion: true,
+            responsableExcepcion: responsable,
+            cantidadPersonas: personas,
+            precioTotal: total,
+            montoTotal: total,
+            porcentajeConsumo: bebidasPct,
+            montoConsumicion: bebidasMonto,
+            montoConsumoCredito: bebidasMonto,
+            montoSenado: sena,
+            saldoPuerta: saldo,
+            porcentajeAbonado: pctAbonado,
+            porcentajeSaldo: pctSaldo,
+            vendedor: vendedor
+          };
+        } else {
+          payload = {
+            esExcepcion: false,
+            excepcion: false,
+            cantidadPersonas: personas,
+            montoSenado: sena,
+            vendedor: vendedor
+          };
+        }
+
+        await db.collection(col).doc(mesaId).update(payload);
+        alert(`Mesa ${mesaId} guardada correctamente.`);
+      } catch(e) {
+        alert("Error al guardar: " + e.message);
+      }
+    };
 
     saveAllSenas.addEventListener('click', async () => {
       const senaInputs = document.querySelectorAll('.sena-input');

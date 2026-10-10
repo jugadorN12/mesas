@@ -729,9 +729,10 @@
         if (exDetails) {
           exDetails.innerHTML = `
             👤 <b>Autorizado por:</b> <span style="color:var(--white);">${escapeHtml(responsable)}</span><br>
+            👥 <b>Personas autorizadas:</b> <span style="color:var(--blue); font-weight:bold;">${currentPeople} personas</span><br>
             🍹 <b>Porcentaje en bebidas:</b> <span style="color:var(--green); font-weight:bold;">${exDrinksPct}% ($${exDrinksVal.toLocaleString()})</span><br>
             💵 <b>Abonó:</b> <span style="color:var(--amber); font-weight:bold;">${exPctAbonado}% ($${exSenado.toLocaleString()})</span><br>
-            🚪 <b>Debe pagar para ingreso final:</b> <span style="color:var(--red); font-weight:bold;">${exPctSaldo}% ($${exSaldo.toLocaleString()})</span>
+            🚪 <b>Debe pagar para ingreso final:</b> <span style="color:${exSaldo === 0 && exTotalVal > 0 ? 'var(--green)' : 'var(--red)'}; font-weight:bold;">${exSaldo === 0 && exTotalVal > 0 ? 'PAGADA COMPLETA — $0' : `${exPctSaldo}% ($${exSaldo.toLocaleString()})`}</span>
             ${r.masterNote ? `<br><span style="color:var(--grey); font-size:11.5px;">📝 Nota: ${escapeHtml(r.masterNote)}</span>` : ''}
           `;
         }
