@@ -638,6 +638,42 @@
             <input class="name-input" id="masterNameInput" type="text" placeholder="Nombre de la reserva" style="margin-bottom: 8px;">
             <input class="name-input" id="masterNoteInput" type="text" placeholder="Nota / Medio de pago">
           </div>
+
+          <!-- Módulo de Excepción / Trato Especial (Admin y Asistente) -->
+          <div style="margin-bottom: 15px; padding: 12px; background: rgba(255, 189, 62, 0.07); border: 1px dashed rgba(255, 189, 62, 0.4); border-radius: 10px;">
+            <label style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; color: var(--amber); cursor: pointer;">
+              <input type="checkbox" id="masterIsExcepcion" style="transform: scale(1.2); accent-color: var(--amber); cursor: pointer;">
+              ⚡ Venta con Excepción (Trato Especial)
+            </label>
+            <div id="masterExcepcionFields" style="display: none; margin-top: 12px;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                <div>
+                  <label class="field-label" style="font-size: 11px;">Personas autorizadas</label>
+                  <input class="name-input" id="masterExPersonas" type="number" min="1" value="4" style="margin-top: 3px; padding: 8px;">
+                </div>
+                <div>
+                  <label class="field-label" style="font-size: 11px;">Precio Total Mesa ($)</label>
+                  <input class="name-input" id="masterExTotal" type="number" placeholder="Ej: 120000" style="margin-top: 3px; padding: 8px;">
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                <div>
+                  <label class="field-label" style="font-size: 11px;">% en Bebidas</label>
+                  <input class="name-input" id="masterExDrinksPct" type="number" placeholder="Ej: 90" style="margin-top: 3px; padding: 8px;">
+                </div>
+                <div>
+                  <label class="field-label" style="font-size: 11px;">Seña Abonada ($)</label>
+                  <input class="name-input" id="masterExSena" type="number" placeholder="Ej: 30000" style="margin-top: 3px; padding: 8px;">
+                </div>
+              </div>
+              <div id="masterExPreview" style="font-size: 12px; line-height: 1.5; color: #f3f1ee; background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; margin-top: 6px;">
+                🍹 Voucher Bebidas: <b id="masterExDrinksPreview" style="color:var(--green);">$0</b><br>
+                💵 Abonó: <b id="masterExAbonadoPreview" style="color:var(--amber);">$0 (0%)</b><br>
+                🚪 Resta en Puerta: <b id="masterExSaldoPreview" style="color:var(--red);">$0 (0%)</b>
+              </div>
+            </div>
+          </div>
+
           <div class="master-actions">
             <button class="btn-master" data-status="libre">LIBRE (BORRAR)</button>
             <button class="btn-master" data-status="disputa">PENDIENTE (AMARILLO)</button>
@@ -1296,6 +1332,16 @@
       masterNameInput.value = current?.nombre || "";
       masterNoteInput.value = current?.masterNote || "";
 
+      // Inicializar módulo de excepción para Admin / Asistente
+      const isEx = !!(current?.esExcepcion || current?.excepcion);
+      document.getElementById("masterIsExcepcion").checked = isEx;
+      document.getElementById("masterExcepcionFields").style.display = isEx ? "block" : "none";
+      document.getElementById("masterExPersonas").value = current?.cantidadPersonas || 4;
+      document.getElementById("masterExTotal").value = current?.precioTotal || current?.montoTotal || "";
+      document.getElementById("masterExDrinksPct").value = (current?.porcentajeConsumo !== undefined && current?.porcentajeConsumo !== null) ? current.porcentajeConsumo : "";
+      document.getElementById("masterExSena").value = current?.montoSenado || "";
+      updateMasterExPreview();
+
       // Highlight current status in buttons
       document.querySelectorAll(".btn-master").forEach(btn => {
         const isActive = (current && current.status === btn.dataset.status) || (!current && btn.dataset.status === 'libre');
@@ -1321,6 +1367,29 @@
   function cerrarModal(){
     overlay.classList.remove("open");
     mesaActual = null;
+  }
+
+  function updateMasterExPreview() {
+    const totalEl = document.getElementById("masterExTotal");
+    const drinksPctEl = document.getElementById("masterExDrinksPct");
+    const senaEl = document.getElementById("masterExSena");
+    if (!totalEl) return;
+
+    const total = parseInt(totalEl.value) || 0;
+    const drinksPct = parseInt(drinksPctEl.value) || 0;
+    const sena = parseInt(senaEl.value) || 0;
+    const drinksVal = Math.round((total * drinksPct) / 100);
+    const saldo = Math.max(0, total - sena);
+    const pctAbonado = total > 0 ? Math.round((sena / total) * 100) : 0;
+    const pctSaldo = total > 0 ? Math.max(0, 100 - pctAbonado) : 0;
+
+    const elDrinks = document.getElementById("masterExDrinksPreview");
+    const elAbonado = document.getElementById("masterExAbonadoPreview");
+    const elSaldo = document.getElementById("masterExSaldoPreview");
+
+    if (elDrinks) elDrinks.textContent = "$" + drinksVal.toLocaleString('es-AR') + " (" + drinksPct + "%)";
+    if (elAbonado) elAbonado.textContent = "$" + sena.toLocaleString('es-AR') + " (" + pctAbonado + "%)";
+    if (elSaldo) elSaldo.textContent = "$" + saldo.toLocaleString('es-AR') + " (" + pctSaldo + "%)";
   }
 
   // Eventos para selector de cantidad de personas
@@ -1574,6 +1643,20 @@
       tabPublicFecha2.addEventListener("click", () => switchPublicEvent('fecha2'));
     }
 
+    // Listeners para módulo de excepción maestro
+    const chkEx = document.getElementById("masterIsExcepcion");
+    if (chkEx) {
+      chkEx.addEventListener("change", (e) => {
+        const fields = document.getElementById("masterExcepcionFields");
+        if (fields) fields.style.display = e.target.checked ? "block" : "none";
+        updateMasterExPreview();
+      });
+    }
+    ["masterExTotal", "masterExDrinksPct", "masterExSena", "masterExPersonas"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("input", updateMasterExPreview);
+    });
+
     // Master Action Buttons
     document.querySelectorAll(".btn-master").forEach(btn => {
       btn.addEventListener("click", async () => {
@@ -1587,6 +1670,42 @@
           if (newStatus === "libre") {
             await firebaseDb.collection(targetCol).doc(mesaActual).delete();
           } else {
+            const isEx = !!document.getElementById("masterIsExcepcion")?.checked;
+            let exPayload = {};
+            if (isEx) {
+              const exPersonas = parseInt(document.getElementById("masterExPersonas")?.value) || 4;
+              const exTotal = parseInt(document.getElementById("masterExTotal")?.value) || 0;
+              const exDrinksPct = parseInt(document.getElementById("masterExDrinksPct")?.value) || 0;
+              const exDrinksVal = Math.round((exTotal * exDrinksPct) / 100);
+              const exSena = parseInt(document.getElementById("masterExSena")?.value) || 0;
+              const exSaldo = Math.max(0, exTotal - exSena);
+              const exPctAbonado = exTotal > 0 ? Math.round((exSena / exTotal) * 100) : 0;
+              const exPctSaldo = exTotal > 0 ? Math.max(0, 100 - exPctAbonado) : 0;
+              const currentEmail = auth?.currentUser?.email || (userRole === "assistant" ? "asistente" : "admin");
+              const responsable = (userRole === "assistant" ? `Asistente (${currentEmail})` : `Admin (${currentEmail})`);
+
+              exPayload = {
+                esExcepcion: true,
+                excepcion: true,
+                responsableExcepcion: responsable,
+                cantidadPersonas: exPersonas,
+                precioTotal: exTotal,
+                montoTotal: exTotal,
+                porcentajeConsumo: exDrinksPct,
+                montoConsumoCredito: exDrinksVal,
+                montoConsumicion: exDrinksVal,
+                montoSenado: exSena,
+                saldoPuerta: exSaldo,
+                porcentajeAbonado: exPctAbonado,
+                porcentajeSaldo: exPctSaldo
+              };
+            } else {
+              exPayload = {
+                esExcepcion: false,
+                excepcion: false
+              };
+            }
+
             await firebaseDb.collection(targetCol).doc(mesaActual).set({
               status: newStatus,
               nombre: masterName || (userRole === "assistant" ? "Asignado por Asistente" : "Asignado por Admin"),
@@ -1594,7 +1713,8 @@
               contacto: estado[mesaActual]?.contacto || "0000000000",
               ts: estado[mesaActual]?.ts || Date.now(),
               expiresAt: newStatus === "disputa" ? Date.now() + DISPUTE_MS : null,
-              masterAction: true
+              masterAction: true,
+              ...exPayload
             }, { merge: true });
           }
           showToast("Estado actualizado.");

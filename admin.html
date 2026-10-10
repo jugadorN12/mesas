@@ -835,6 +835,21 @@
           </div>
         `;
 
+        if (r.esExcepcion || r.excepcion) {
+          const resp = r.responsableExcepcion || 'Admin/Asistente';
+          const tot = r.precioTotal || r.montoTotal || 0;
+          const bebi = r.montoConsumicion || r.montoConsumoCredito || 0;
+          const sen = r.montoSenado || 0;
+          const sal = Math.max(0, tot - sen);
+          detailHtml += `
+            <div style="margin-top:6px; padding:6px 10px; background:rgba(255,189,62,0.1); border:1px solid rgba(255,189,62,0.3); border-radius:8px; font-size:11.5px; line-height:1.4;">
+              <span style="color:var(--amber); font-weight:800;">⚡ VENTA CON EXCEPCIÓN (${escapeHtml(resp)})</span><br>
+              Bebidas: <b>${r.porcentajeConsumo || 0}%</b> ($${bebi.toLocaleString('es-AR')}) | Total: <b>$${tot.toLocaleString('es-AR')}</b><br>
+              Abonó: <b>${r.porcentajeAbonado || (tot > 0 ? Math.round((sen/tot)*100) : 0)}% ($${sen.toLocaleString('es-AR')})</b> | Resta pagar: <b style="color:var(--red);">${r.porcentajeSaldo || (tot > 0 ? Math.max(0, 100 - Math.round((sen/tot)*100)) : 0)}% ($${sal.toLocaleString('es-AR')})</b>
+            </div>
+          `;
+        }
+
         if (isIngresada) {
           detailHtml = `<b class="ingresada-text">${escapeHtml(r.nombre||'Sin nombre')} (${r.cantidadPersonas || 4} pers)</b>`;
           if (r.precioTotal) {
@@ -863,7 +878,10 @@
           if (r.cobroTransferencia > 0) detailHtml += `<div style="color:var(--blue)">• TRANSF/QR: $${r.cobroTransferencia.toLocaleString()}</div>`;
           detailHtml += `</div>`;
 
-          if (r.excepcion) detailHtml += `<br><span class="excepcion-badge">EXCEPCIÓN: Pago Total $${r.montoTotal?.toLocaleString('es-AR')} | Bebidas $${r.montoConsumicion?.toLocaleString('es-AR')}</span>`;
+          if (r.esExcepcion || r.excepcion) {
+            const resp = r.responsableExcepcion || 'Admin/Asistente';
+            detailHtml += `<div style="margin-top:6px;"><span class="excepcion-badge">⚡ EXCEPCIÓN (${escapeHtml(resp)}): Total $${(r.montoTotal||r.precioTotal||0).toLocaleString('es-AR')} | Bebidas ${r.porcentajeConsumo||0}% ($${(r.montoConsumicion||r.montoConsumoCredito||0).toLocaleString('es-AR')}) | Seña: $${(r.montoSenado||0).toLocaleString('es-AR')}</span></div>`;
+          }
         }
 
         node.innerHTML = `
