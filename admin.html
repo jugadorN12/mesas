@@ -985,14 +985,14 @@
                 </div>
                 <div class="ex-field-col">
                   <label>Precio p/Persona ($)</label>
-                  <input type="number" class="ex-input ex-input-precio-persona" data-id="${mesa}" placeholder="Ej: 25000" value="${exPrecioPersona || ''}" oninput="onExPrecioPersonaInput('${mesa}')">
+                  <input type="number" class="ex-input ex-input-precio-persona" data-id="${mesa}" placeholder="Ej: 20000" value="${exPrecioPersona || ''}" oninput="recalcExMesa('${mesa}')">
                 </div>
               </div>
 
               <div class="ex-field-row">
                 <div class="ex-field-col">
                   <label>Total Acordado ($)</label>
-                  <input type="number" class="ex-input ex-input-total" data-id="${mesa}" placeholder="Ej: 100000" value="${exTotal || ''}" oninput="onExTotalInput('${mesa}')">
+                  <input type="number" class="ex-input ex-input-total" data-id="${mesa}" placeholder="Ej: 100000" value="${exTotal || ''}" oninput="recalcExMesa('${mesa}')">
                 </div>
                 <div class="ex-field-col">
                   <label>En Bebidas (% o $ directo)</label>
@@ -1136,45 +1136,11 @@
       recalcExMesa(mesaId);
     };
 
-    window.onExPrecioPersonaInput = function(mesaId) {
-      const pInput = document.querySelector(`.ex-input-precio-persona[data-id="${mesaId}"]`);
-      const personasIn = document.querySelector(`.ex-input-personas[data-id="${mesaId}"]`);
-      const totalIn = document.querySelector(`.ex-input-total[data-id="${mesaId}"]`);
-      if (!pInput || !personasIn || !totalIn) return;
-
-      const precioP = parseInt(pInput.value) || 0;
-      const personas = parseInt(personasIn.value) || 1;
-      if (precioP > 0) {
-        totalIn.value = precioP * personas;
-      }
-      recalcExMesa(mesaId);
-    };
-
-    window.onExTotalInput = function(mesaId) {
-      const pInput = document.querySelector(`.ex-input-precio-persona[data-id="${mesaId}"]`);
-      const personasIn = document.querySelector(`.ex-input-personas[data-id="${mesaId}"]`);
-      const totalIn = document.querySelector(`.ex-input-total[data-id="${mesaId}"]`);
-      if (!pInput || !personasIn || !totalIn) return;
-
-      const total = parseInt(totalIn.value) || 0;
-      const personas = parseInt(personasIn.value) || 1;
-      if (total > 0 && personas > 0) {
-        pInput.value = Math.round(total / personas);
-      }
-      recalcExMesa(mesaId);
-    };
-
     window.changeExPeople = function(mesaId, delta) {
       const input = document.querySelector(`.ex-input-personas[data-id="${mesaId}"]`);
-      const pInput = document.querySelector(`.ex-input-precio-persona[data-id="${mesaId}"]`);
-      const totalIn = document.querySelector(`.ex-input-total[data-id="${mesaId}"]`);
       if (input) {
         let val = Math.max(1, (parseInt(input.value) || 4) + delta);
         input.value = val;
-        const precioP = parseInt(pInput ? pInput.value : 0) || 0;
-        if (precioP > 0 && totalIn) {
-          totalIn.value = precioP * val;
-        }
         recalcExMesa(mesaId);
       }
     };
@@ -1270,8 +1236,9 @@
       try {
         let payload = {};
         if (isChecked) {
-          const email = auth?.currentUser?.email || (isMaster ? 'admin' : 'asistente');
-          const responsable = (isMaster ? `Admin (${email})` : `Asistente (${email})`);
+          const email = auth?.currentUser?.email || (currentUserRole === 'admin' ? 'admin' : 'asistente');
+          const isUserAdmin = currentUserRole === 'admin' || (email && email.toLowerCase().includes('admin'));
+          const responsable = (isUserAdmin ? `Admin (${email})` : `Asistente (${email})`);
 
           payload = {
             esExcepcion: true,

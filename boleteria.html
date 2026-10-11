@@ -404,6 +404,8 @@
   let exPactadaDrinksPct = 80;
   let exPactadaSena = 0;
   let exResponsable = '';
+  let exBasePersonas = 4;
+  let exBaseTotal = 0;
 
   auth.onAuthStateChanged(async (user) => {
     if (user) {
@@ -726,17 +728,19 @@
       
       if (hasPactadaEx) {
         isException = true;
-        const exTotalVal = r.precioTotal || r.montoTotal || 0;
+        exBasePersonas = (r.cantidadPersonas !== undefined && r.cantidadPersonas !== null) ? parseInt(r.cantidadPersonas) : 4;
+        currentPeople = exBasePersonas;
+        exBaseTotal = r.precioTotal || r.montoTotal || 0;
         exPactadaPrecioPersona = (r.precioPorPersona !== undefined && r.precioPorPersona !== null && r.precioPorPersona > 0)
           ? parseInt(r.precioPorPersona)
-          : (exTotalVal && currentPeople > 0 ? Math.round(exTotalVal / currentPeople) : 0);
+          : (exBaseTotal && exBasePersonas > 0 ? Math.round(exBaseTotal / exBasePersonas) : 20000);
         exPactadaDrinksPct = (r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) ? parseInt(r.porcentajeConsumo) : 80;
         exPactadaSena = (r.montoSenado !== undefined && r.montoSenado !== null) ? parseInt(r.montoSenado) : 0;
         exResponsable = r.responsableExcepcion || 'Admin / Asistente';
 
         if (document.getElementById('exPrecioPersona')) document.getElementById('exPrecioPersona').value = exPactadaPrecioPersona || '';
-        if (document.getElementById('exTotal')) document.getElementById('exTotal').value = exTotalVal;
-        const initialDrinks = (r.montoConsumicion !== undefined && r.montoConsumicion !== null) ? r.montoConsumicion : (r.montoConsumoCredito || Math.round((exTotalVal * exPactadaDrinksPct) / 100));
+        if (document.getElementById('exTotal')) document.getElementById('exTotal').value = exBaseTotal;
+        const initialDrinks = (r.montoConsumicion !== undefined && r.montoConsumicion !== null) ? r.montoConsumicion : (r.montoConsumoCredito || Math.round((exBaseTotal * exPactadaDrinksPct) / 100));
         if (document.getElementById('exDrinks')) document.getElementById('exDrinks').value = initialDrinks;
 
         if (exBadge) exBadge.style.display = 'block';
@@ -744,6 +748,8 @@
         document.getElementById('toggleException').textContent = "MODIFICAR VALORES MANUALMENTE";
       } else {
         isException = false;
+        exBasePersonas = 4;
+        exBaseTotal = 0;
         exPactadaPrecioPersona = 0;
         exPactadaDrinksPct = getTodayPromo().pct;
         exPactadaSena = (r && r.montoSenado !== undefined && r.montoSenado !== null) ? parseInt(r.montoSenado) : 0;
@@ -778,19 +784,26 @@
     updateCalc();
   }
 
-  function renderModalExDetails(total, drinks, paid, unitPrice) {
+  function renderModalExDetails(total, drinks, paid, unitPrice, baseHeadcount, baseTotal) {
     const exDetails = document.getElementById('modalExcepcionDetails');
     if (!exDetails) return;
     const r = estado[currentMesa] || {};
     const saldo = Math.max(0, total - paid);
     const pctAbonado = total > 0 ? Math.round((paid / total) * 100) : 0;
     const pctSaldo = total > 0 ? Math.max(0, 100 - pctAbonado) : 0;
-    const unitPriceStr = unitPrice > 0 ? ` <span style="color:var(--muted); font-size:11px;">($${unitPrice.toLocaleString('es-AR')} c/u)</span>` : '';
+
+    let peopleDetailStr = '';
+    if (currentPeople <= baseHeadcount) {
+      peopleDetailStr = `${currentPeople} pers (Base: hasta ${baseHeadcount} pers)`;
+    } else {
+      const extras = currentPeople - baseHeadcount;
+      peopleDetailStr = `${currentPeople} pers (${baseHeadcount} base + ${extras} extra${extras > 1 ? 's' : ''} a $${unitPrice.toLocaleString('es-AR')} c/u)`;
+    }
 
     exDetails.innerHTML = `
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 12px; margin-top:4px; font-size:12px;">
         <div>👤 <b>Autorizado por:</b> <span style="color:var(--white);">${escapeHtml(exResponsable || 'Admin / Asistente')}</span></div>
-        <div>👥 <b>Ingresan:</b> <span style="color:var(--blue); font-weight:bold;">${currentPeople} personas</span>${unitPriceStr}</div>
+        <div>👥 <b>Ingresan:</b> <span style="color:var(--blue); font-weight:bold;">${peopleDetailStr}</span></div>
         <div>🍹 <b>En Bebidas:</b> <span style="color:var(--green); font-weight:bold;">+$${drinks.toLocaleString('es-AR')} (${exPactadaDrinksPct}%)</span></div>
         <div>💵 <b>Abonó:</b> <span style="color:var(--amber); font-weight:bold;">$${paid.toLocaleString('es-AR')} (${pctAbonado}%)</span></div>
       </div>
@@ -813,9 +826,18 @@
     if (isException) {
       const manualUnitPrice = parseInt(document.getElementById('exPrecioPersona')?.value) || 0;
       const unitPrice = exPactadaPrecioPersona > 0 ? exPactadaPrecioPersona : manualUnitPrice;
+      const baseHeadcount = exBasePersonas > 0 ? exBasePersonas : 4;
+      const baseTotal = exBaseTotal > 0 ? exBaseTotal : (parseInt(document.getElementById('exTotal')?.value) || 0);
 
-      if (unitPrice > 0) {
-        total = currentPeople * unitPrice;
+      if (baseTotal > 0) {
+        if (currentPeople <= baseHeadcount) {
+          // Si vienen menos o igual a la base autorizada, la mesa mantiene su total acordado
+          total = baseTotal;
+        } else {
+          // Si vienen mas personas, cada persona extra suma el precio unitario
+          const extras = currentPeople - baseHeadcount;
+          total = baseTotal + (extras * unitPrice);
+        }
         const drinksPct = exPactadaDrinksPct > 0 ? exPactadaDrinksPct : 80;
         drinks = Math.round((total * drinksPct) / 100);
 
@@ -830,7 +852,7 @@
         if (labelDrinks) labelDrinks.textContent = drinksPct !== null ? `En Bebidas (${drinksPct}%)` : "En Bebidas (Manual)";
       }
 
-      renderModalExDetails(total, drinks, paid, unitPrice);
+      renderModalExDetails(total, drinks, paid, unitPrice, baseHeadcount, baseTotal);
     } else {
       const basePrice = pricingConfig.precioBaseMesa || 120000;
       const extraPrice = pricingConfig.precioPersonaExtra || 25000;
