@@ -111,13 +111,19 @@
     position:fixed; inset:0; z-index:50;
     background:rgba(4,4,6,0.85); backdrop-filter:blur(6px);
     display:none; align-items:center; justify-content:center; padding:20px;
+    overflow-y:auto;
   }
   .overlay.open{ display:flex; }
   .sheet{
     width:100%; max-width:440px; background:var(--panel-2);
     border:1px solid var(--grey-line); border-radius:24px;
     padding:32px 24px; box-shadow:0 20px 60px rgba(0,0,0,0.6);
+    max-height: 90vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
+  .sheet::-webkit-scrollbar{ width:6px; }
+  .sheet::-webkit-scrollbar-thumb{ background:var(--grey-line); border-radius:4px; }
   .sheet h2{ font-family:'Bebas Neue',sans-serif; font-size:32px; margin:0 0 4px; letter-spacing:1px; }
   .sheet-sub{ color:var(--grey); font-size:14px; margin-bottom:24px; }
 
@@ -800,11 +806,13 @@
       peopleDetailStr = `${currentPeople} pers (${baseHeadcount} base + ${extras} extra${extras > 1 ? 's' : ''} a $${unitPrice.toLocaleString('es-AR')} c/u)`;
     }
 
+    const actualDrinksPct = (total > 0 && drinks > 0) ? Math.round((drinks / total) * 100) : exPactadaDrinksPct;
+
     exDetails.innerHTML = `
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 12px; margin-top:4px; font-size:12px;">
         <div>👤 <b>Autorizado por:</b> <span style="color:var(--white);">${escapeHtml(exResponsable || 'Admin / Asistente')}</span></div>
         <div>👥 <b>Ingresan:</b> <span style="color:var(--blue); font-weight:bold;">${peopleDetailStr}</span></div>
-        <div>🍹 <b>En Bebidas:</b> <span style="color:var(--green); font-weight:bold;">+$${drinks.toLocaleString('es-AR')} (${exPactadaDrinksPct}%)</span></div>
+        <div>🍹 <b>En Bebidas:</b> <span style="color:var(--green); font-weight:bold;">+$${drinks.toLocaleString('es-AR')} (${actualDrinksPct}%)</span></div>
         <div>💵 <b>Abonó:</b> <span style="color:var(--amber); font-weight:bold;">$${paid.toLocaleString('es-AR')} (${pctAbonado}%)</span></div>
       </div>
       <div style="margin-top:8px; padding-top:6px; border-top:1px solid rgba(255,189,62,0.3); font-size:12.5px;">
@@ -824,35 +832,17 @@
     const labelDrinks = document.getElementById('labelDrinks');
 
     if (isException) {
-      const manualUnitPrice = parseInt(document.getElementById('exPrecioPersona')?.value) || 0;
-      const unitPrice = exPactadaPrecioPersona > 0 ? exPactadaPrecioPersona : manualUnitPrice;
+      const unitPrice = parseInt(document.getElementById('exPrecioPersona')?.value) || (exPactadaPrecioPersona > 0 ? exPactadaPrecioPersona : 0);
       const baseHeadcount = exBasePersonas > 0 ? exBasePersonas : 4;
-      const baseTotal = exBaseTotal > 0 ? exBaseTotal : (parseInt(document.getElementById('exTotal')?.value) || 0);
+      total = parseInt(document.getElementById('exTotal')?.value) || 0;
+      drinks = parseInt(document.getElementById('exDrinks')?.value) || 0;
 
-      if (baseTotal > 0) {
-        if (currentPeople <= baseHeadcount) {
-          // Si vienen menos o igual a la base autorizada, la mesa mantiene su total acordado
-          total = baseTotal;
-        } else {
-          // Si vienen mas personas, cada persona extra suma el precio unitario
-          const extras = currentPeople - baseHeadcount;
-          total = baseTotal + (extras * unitPrice);
-        }
-        const drinksPct = exPactadaDrinksPct > 0 ? exPactadaDrinksPct : 80;
-        drinks = Math.round((total * drinksPct) / 100);
+      const drinksPct = (total > 0 && drinks > 0)
+        ? Math.min(100, Math.round((drinks / total) * 100))
+        : (exPactadaDrinksPct > 0 ? exPactadaDrinksPct : null);
+      if (labelDrinks) labelDrinks.textContent = drinksPct !== null ? `En Bebidas (${drinksPct}%)` : "En Bebidas";
 
-        if (document.getElementById('exTotal')) document.getElementById('exTotal').value = total;
-        if (document.getElementById('exDrinks')) document.getElementById('exDrinks').value = drinks;
-        if (document.getElementById('exPrecioPersona')) document.getElementById('exPrecioPersona').value = unitPrice;
-        if (labelDrinks) labelDrinks.textContent = `En Bebidas (${drinksPct}%)`;
-      } else {
-        total = parseInt(document.getElementById('exTotal')?.value) || 0;
-        drinks = parseInt(document.getElementById('exDrinks')?.value) || 0;
-        const drinksPct = (r && r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) ? r.porcentajeConsumo : null;
-        if (labelDrinks) labelDrinks.textContent = drinksPct !== null ? `En Bebidas (${drinksPct}%)` : "En Bebidas (Manual)";
-      }
-
-      renderModalExDetails(total, drinks, paid, unitPrice, baseHeadcount, baseTotal);
+      renderModalExDetails(total, drinks, paid, unitPrice, baseHeadcount, total);
     } else {
       const basePrice = pricingConfig.precioBaseMesa || 120000;
       const extraPrice = pricingConfig.precioPersonaExtra || 25000;
@@ -895,13 +885,6 @@
   });
 
   document.getElementById('exTotal')?.addEventListener('input', () => {
-    const val = parseInt(document.getElementById('exTotal').value) || 0;
-    if (currentPeople > 0 && val > 0) {
-      exPactadaPrecioPersona = Math.round(val / currentPeople);
-      if (document.getElementById('exPrecioPersona')) {
-        document.getElementById('exPrecioPersona').value = exPactadaPrecioPersona;
-      }
-    }
     updateCalc();
   });
 
@@ -918,6 +901,18 @@
     isException = !isException;
     document.getElementById('exceptionForm').style.display = isException ? 'block' : 'none';
     document.getElementById('toggleException').textContent = isException ? "VOLVER A CÁLCULO AUTOMÁTICO" : "¿ES UNA EXCEPCIÓN? (Precio manual)";
+    if (isException) {
+      const curTot = parseInt(document.getElementById('valTotal')?.textContent.replace(/\D/g,'')) || 0;
+      const curDrk = parseInt(document.getElementById('valDrinks')?.textContent.replace(/\D/g,'')) || 0;
+      const exTotEl = document.getElementById('exTotal');
+      const exDrkEl = document.getElementById('exDrinks');
+      const exPrcEl = document.getElementById('exPrecioPersona');
+      if (exTotEl && !exTotEl.value && curTot > 0) exTotEl.value = curTot;
+      if (exDrkEl && !exDrkEl.value && curDrk > 0) exDrkEl.value = curDrk;
+      if (exPrcEl && !exPrcEl.value && currentPeople > 0 && curTot > 0) {
+        exPrcEl.value = Math.round(curTot / currentPeople);
+      }
+    }
     updateCalc();
   });
 
