@@ -296,6 +296,433 @@
     .pricing-grid input.sena-highlight {
       color: var(--amber);
     }
+
+    /* ==========================================================================
+       Estilos de la Calculadora de Mesas
+       ========================================================================== */
+    .calc-card {
+      margin: 22px 0 28px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 22px;
+    }
+    .calc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .calc-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+    }
+    .calc-subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 4px 0 0;
+    }
+    .calc-people-selector {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .calc-people-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+    .calc-stepper {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .calc-btn-step {
+      width: 54px;
+      height: 54px;
+      border-radius: 12px;
+      background: #202028;
+      border: 1px solid var(--line);
+      color: #ffffff;
+      font-size: 26px;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .calc-btn-step:hover {
+      background: #2a2a35;
+      border-color: var(--gold);
+      transform: translateY(-1px);
+    }
+    .calc-btn-step:active {
+      transform: scale(0.95);
+      background: #353545;
+    }
+    .calc-btn-step:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      border-color: var(--line);
+      transform: none;
+    }
+    .calc-people-display {
+      min-width: 110px;
+      text-align: center;
+    }
+    .calc-people-num {
+      font-size: 40px;
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .calc-people-text {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    /* Tarjetas de pago lado a lado */
+    .calc-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    @media(max-width: 680px) {
+      .calc-cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .calc-pay-card {
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease;
+    }
+    .calc-pay-card:hover {
+      transform: translateY(-2px);
+    }
+    .calc-card-cash {
+      background: linear-gradient(180deg, rgba(46, 230, 166, 0.08) 0%, rgba(16, 22, 20, 0.95) 100%);
+      border: 1.5px solid #2ee6a6;
+      box-shadow: 0 4px 20px rgba(46, 230, 166, 0.1);
+    }
+    .calc-card-transf {
+      background: linear-gradient(180deg, rgba(88, 166, 255, 0.08) 0%, rgba(16, 18, 25, 0.95) 100%);
+      border: 1.5px solid #58a6ff;
+      box-shadow: 0 4px 20px rgba(88, 166, 255, 0.1);
+    }
+
+    .calc-pay-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .calc-pay-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 99px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-cash {
+      background: rgba(46, 230, 166, 0.2);
+      color: #2ee6a6;
+      border: 1px solid #2ee6a6;
+    }
+    .badge-transf {
+      background: rgba(88, 166, 255, 0.2);
+      color: #58a6ff;
+      border: 1px solid #58a6ff;
+    }
+    .calc-pay-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+      margin: 0;
+    }
+
+    .calc-row-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      font-size: 14px;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.07);
+    }
+    .calc-row-item:last-of-type {
+      border-bottom: none;
+    }
+    .calc-row-label {
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .calc-row-val {
+      font-weight: 700;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Monto principal destacado */
+    .calc-highlight-box {
+      margin: 14px 0 12px;
+      padding: 14px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .highlight-cash {
+      background: rgba(46, 230, 166, 0.12);
+      border: 1px solid rgba(46, 230, 166, 0.4);
+    }
+    .highlight-transf {
+      background: rgba(88, 166, 255, 0.12);
+      border: 1px solid rgba(88, 166, 255, 0.4);
+    }
+    .calc-highlight-label {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .highlight-cash .calc-highlight-label { color: #2ee6a6; }
+    .highlight-transf .calc-highlight-label { color: #58a6ff; }
+    .calc-highlight-amount {
+      font-size: 32px;
+      font-weight: 900;
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+    .highlight-cash .calc-highlight-amount { color: #2ee6a6; }
+    .highlight-transf .calc-highlight-amount { color: #58a6ff; }
+
+    /* Tag de consumo / beneficio en bebidas */
+    .calc-consumo-tag {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .calc-consumo-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--amber);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .calc-consumo-value {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Regla explicativa */
+    .calc-rule-line {
+      font-size: 13px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.03);
+      padding: 10px 14px;
+      border-radius: 8px;
+      border-left: 3px solid var(--gold);
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    /* Barra de botones de acción */
+    .calc-actions-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .btn-calc-whatsapp {
+      background: #25d366;
+      color: #000 !important;
+      font-weight: 800;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-calc-whatsapp:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+    .btn-calc-whatsapp:active {
+      transform: translateY(0);
+    }
+    .btn-calc-table {
+      background: #22222d;
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-weight: 700;
+      padding: 11px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-calc-table:hover {
+      background: #2e2e3c;
+      border-color: var(--muted);
+    }
+    .btn-calc-config-toggle {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-weight: 600;
+      padding: 11px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      margin-left: auto;
+      transition: all 0.2s;
+    }
+    .btn-calc-config-toggle:hover {
+      color: var(--text);
+      border-color: var(--muted);
+    }
+
+    /* Notificación de copiado */
+    .calc-toast {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #2ee6a6;
+      margin-left: 8px;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .calc-toast.show {
+      opacity: 1;
+    }
+
+    /* Tabla completa colapsable */
+    .calc-table-wrap {
+      margin-top: 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow-x: auto;
+      background: rgba(0, 0, 0, 0.35);
+    }
+    .calc-full-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      text-align: left;
+    }
+    .calc-full-table th {
+      background: #181822;
+      color: var(--muted);
+      padding: 10px 12px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    .calc-full-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      cursor: pointer;
+    }
+    .calc-full-table tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .calc-full-table tr.calc-row-active td {
+      background: rgba(246, 183, 60, 0.14) !important;
+      color: #fff;
+      font-weight: 800;
+      border-top: 1px solid var(--gold);
+      border-bottom: 1px solid var(--gold);
+    }
+    .calc-full-table tr.calc-row-active td:first-child {
+      border-left: 3px solid var(--gold);
+    }
+
+    /* Panel de configuración de precios de la calculadora */
+    .calc-config-panel {
+      margin-top: 20px;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+    .calc-config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .calc-config-grid label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+    .calc-config-grid input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0d0d12;
+      color: var(--text);
+      padding: 9px 11px;
+      font-weight: 700;
+      font-size: 14px;
+      box-sizing: border-box;
+      outline: none;
+    }
+    .calc-config-grid input:focus {
+      border-color: var(--gold);
+    }
+    .calc-config-grid input:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
@@ -313,7 +740,7 @@
     </form>
   </section>
   <main class="wrap" id="adminApp" hidden>
-    <header class="head"><div class="brand">CUBANO<b>BAR</b> <span id="adminRoleLabel" class="admin-role-badge"></span></div><div class="toolbar"><button id="refresh" class="btn-solid btn-actualizar">Actualizar</button><button id="saveAllSenas" class="btn-solid btn-guardar" style="display:none;">GUARDAR CAMBIOS</button><button id="btnArqueo" class="btn-solid btn-arqueo">VER ARQUEO</button><button id="printStatus" class="btn-solid btn-imprimir" type="button">Imprimir estado</button><a class="link btn-outline" href="cubano-bar-mesas.html">Ver mapa</a><a id="linkBoleteria" class="link btn-outline btn-outline-blue" href="boleteria.html">Mapa Boletería</a><button id="resetAll" class="btn-outline btn-outline-red" type="button">Resetear mesas</button><button class="btn-outline" id="logout">Salir</button></div></header>
+    <header class="head"><div class="brand">CUBANO<b>BAR</b> <span id="adminRoleLabel" class="admin-role-badge"></span></div><div class="toolbar"><button id="refresh" class="btn-solid btn-actualizar">Actualizar</button><button id="saveAllSenas" class="btn-solid btn-guardar" style="display:none;">GUARDAR CAMBIOS</button><button id="btnArqueo" class="btn-solid btn-arqueo">VER ARQUEO</button><button id="btnScrollCalc" class="btn-solid" style="background:#8b5cf6;" type="button">CALCULADORA</button><button id="printStatus" class="btn-solid btn-imprimir" type="button">Imprimir estado</button><a class="link btn-outline" href="cubano-bar-mesas.html">Ver mapa</a><a id="linkBoleteria" class="link btn-outline btn-outline-blue" href="boleteria.html">Mapa Boletería</a><button id="resetAll" class="btn-outline btn-outline-red" type="button">Resetear mesas</button><button class="btn-outline" id="logout">Salir</button></div></header>
 
     <!-- Selector Maestro de Evento / Fecha -->
     <section class="event-selector-card">
@@ -357,6 +784,185 @@
       <div class="stat"><strong id="approvedCount">0</strong><span>Vendidas</span></div>
       <div class="stat"><strong id="ingresadaCount">0</strong><span>Dentro</span></div>
       <div class="stat"><strong id="peopleTotalCount">0</strong><span>Total Personas</span></div>
+    </section>
+
+    <!-- ==========================================================================
+         SECCIÓN CALCULADORA DE MESAS
+         ========================================================================== -->
+    <section class="calc-card" id="calcMesasSection">
+      <div class="calc-header">
+        <div>
+          <h2 class="calc-title">🧮 Calculadora de mesas</h2>
+          <p class="calc-subtitle">Calculá al instante el precio, la seña, el saldo en puerta y el beneficio en bebidas según las personas y la forma de pago.</p>
+        </div>
+      </div>
+
+      <!-- Selector de personas -->
+      <div class="calc-people-selector">
+        <span class="calc-people-label">Cantidad de personas en la mesa</span>
+        <div class="calc-stepper">
+          <button type="button" id="calcBtnMinus" class="calc-btn-step" aria-label="Menos personas">−</button>
+          <div class="calc-people-display">
+            <div id="calcPeopleNum" class="calc-people-num">5</div>
+            <div id="calcPeopleText" class="calc-people-text">personas</div>
+          </div>
+          <button type="button" id="calcBtnPlus" class="calc-btn-step" aria-label="Más personas">+</button>
+        </div>
+      </div>
+
+      <!-- Aviso de error o validación si se ingresa un valor incorrecto -->
+      <div id="calcAlertMsg" style="display:none; margin-bottom:14px; padding:10px 14px; border-radius:8px; background:rgba(255,45,61,0.15); border:1px solid var(--red); color:#ffadb2; font-size:13px; font-weight:bold;"></div>
+
+      <!-- Dos tarjetas de pago lado a lado -->
+      <div class="calc-cards-grid">
+        <!-- Tarjeta Efectivo -->
+        <div class="calc-pay-card calc-card-cash">
+          <div>
+            <div class="calc-pay-header">
+              <span class="calc-pay-badge badge-cash">Forma de pago 1</span>
+              <h3 class="calc-pay-title">💵 Efectivo (con seña)</h3>
+            </div>
+            <div class="calc-row-item">
+              <span class="calc-row-label">Precio de la mesa:</span>
+              <span id="cashRowPrecio" class="calc-row-val">$100.000</span>
+            </div>
+            <div class="calc-row-item">
+              <span class="calc-row-label">Seña por transferencia:</span>
+              <span id="cashRowSena" class="calc-row-val">$20.000</span>
+            </div>
+          </div>
+
+          <div>
+            <!-- Monto principal destacado -->
+            <div class="calc-highlight-box highlight-cash">
+              <div class="calc-highlight-label">Resto en la puerta (efectivo)</div>
+              <div id="cashHighlightMonto" class="calc-highlight-amount">$80.000</div>
+            </div>
+
+            <!-- Beneficio en bebidas -->
+            <div class="calc-consumo-tag">
+              <span class="calc-consumo-label">🍹 Beneficio en bebidas:</span>
+              <span id="cashConsumoVal" class="calc-consumo-value">$80.000</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta Transferencia -->
+        <div class="calc-pay-card calc-card-transf">
+          <div>
+            <div class="calc-pay-header">
+              <span class="calc-pay-badge badge-transf">Forma de pago 2</span>
+              <h3 class="calc-pay-title">💳 Transferencia (todo adelantado)</h3>
+            </div>
+            <div class="calc-row-item">
+              <span class="calc-row-label">Precio de la mesa:</span>
+              <span id="transfRowPrecio" class="calc-row-val">$100.000</span>
+            </div>
+            <div class="calc-row-item">
+              <span class="calc-row-label" id="transfRowRecargoLabel">Recargo por transferencia (10%):</span>
+              <span id="transfRowRecargo" class="calc-row-val">+$10.000</span>
+            </div>
+          </div>
+
+          <div>
+            <!-- Monto principal destacado -->
+            <div class="calc-highlight-box highlight-transf">
+              <div class="calc-highlight-label">Total a transferir</div>
+              <div id="transfHighlightMonto" class="calc-highlight-amount">$110.000</div>
+            </div>
+
+            <!-- Beneficio en bebidas -->
+            <div class="calc-consumo-tag">
+              <span class="calc-consumo-label">🍹 Beneficio en bebidas:</span>
+              <span id="transfConsumoVal" class="calc-consumo-value">$80.000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Línea chica explicativa dinámica -->
+      <div id="calcRuleLine" class="calc-rule-line">
+        Hasta 5 personas $100.000. Desde la sexta, +$20.000 por persona.
+      </div>
+
+      <!-- Acciones: Copiar WhatsApp, Ver tabla y Configuración -->
+      <div class="calc-actions-bar">
+        <button type="button" id="btnCalcCopyWa" class="btn-calc-whatsapp">
+          <span>📲 Copiar resumen</span>
+        </button>
+        <button type="button" id="btnCalcToggleTable" class="btn-calc-table">
+          📊 Ver tabla completa
+        </button>
+        <button type="button" id="btnCalcToggleConfig" class="btn-calc-config-toggle">
+          ⚙️ Configuración de precios
+        </button>
+        <span id="calcCopyToast" class="calc-toast">✅ ¡Resumen copiado para WhatsApp!</span>
+      </div>
+
+      <!-- Tabla completa (oculta por defecto) -->
+      <div id="calcTableWrap" class="calc-table-wrap" style="display:none;">
+        <table class="calc-full-table">
+          <thead>
+            <tr>
+              <th>Personas</th>
+              <th>Precio mesa</th>
+              <th>Efectivo: seña</th>
+              <th>Efectivo: en puerta</th>
+              <th>🍹 Consumo</th>
+              <th>Transferencia: recargo</th>
+              <th>Transferencia: total</th>
+            </tr>
+          </thead>
+          <tbody id="calcTableBody">
+            <!-- Filas generadas dinámicamente -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Bloque de Configuración de precios (oculto por defecto) -->
+      <div id="calcConfigPanel" class="calc-config-panel" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:8px;">
+          <h4 style="margin:0; font-size:15px; color:var(--gold);">⚙️ Configuración de precios de la calculadora</h4>
+          <span id="calcRoleNotice" style="font-size:11px; color:var(--muted);">Solo administradores pueden modificar</span>
+        </div>
+        <p style="margin:0 0 14px; font-size:12.5px; color:var(--muted);">
+          Estos valores alimentan la calculadora en vivo y se guardan de forma permanente.
+        </p>
+
+        <div class="calc-config-grid">
+          <div>
+            <label for="calcCfgPrecioBase">Precio base de la mesa ($)</label>
+            <input type="number" id="calcCfgPrecioBase" min="1" step="1000" value="100000">
+          </div>
+          <div>
+            <label for="calcCfgCapBase">Personas incluidas en base</label>
+            <input type="number" id="calcCfgCapBase" min="1" max="50" step="1" value="5">
+          </div>
+          <div>
+            <label for="calcCfgExtraPersona">Valor de cada persona extra ($)</label>
+            <input type="number" id="calcCfgExtraPersona" min="0" step="1000" value="20000">
+          </div>
+          <div>
+            <label for="calcCfgSena">Monto de la seña ($)</label>
+            <input type="number" id="calcCfgSena" min="0" step="1000" value="20000">
+          </div>
+          <div>
+            <label for="calcCfgPctRecargo">% Recargo por transferencia</label>
+            <input type="number" id="calcCfgPctRecargo" min="0" max="100" step="0.5" value="10">
+          </div>
+          <div>
+            <label for="calcCfgMaxPersonas">Cantidad máxima de personas</label>
+            <input type="number" id="calcCfgMaxPersonas" min="1" max="100" step="1" value="10">
+          </div>
+        </div>
+
+        <div style="margin-top:14px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <button type="button" id="btnSaveCalcConfig" class="btn-solid btn-guardar" style="padding:9px 18px;">
+            Guardar configuración
+          </button>
+          <span id="calcConfigStatus" style="font-size:13px; font-weight:bold;"></span>
+        </div>
+      </div>
     </section>
 
     <!-- Arqueo Panel -->
@@ -942,6 +1548,23 @@
                 }
               });
 
+              // Permisos de edición para la Calculadora de Mesas
+              const isCalcAdmin = isMaster;
+              ['calcCfgPrecioBase', 'calcCfgCapBase', 'calcCfgExtraPersona', 'calcCfgSena', 'calcCfgPctRecargo', 'calcCfgMaxPersonas'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.disabled = !isCalcAdmin;
+              });
+              const btnSaveCalc = document.getElementById('btnSaveCalcConfig');
+              if (btnSaveCalc) {
+                btnSaveCalc.style.display = isCalcAdmin ? 'inline-block' : 'none';
+              }
+              const noticeEl = document.getElementById('calcRoleNotice');
+              if (noticeEl) {
+                noticeEl.textContent = isCalcAdmin 
+                  ? 'Administrador: podés modificar los valores' 
+                  : 'Modo solo lectura (solo administradores pueden editar)';
+              }
+
               renderPricingTable();
               render(); // Dibujar la lista de reservas
             } else {
@@ -1483,6 +2106,396 @@
       });
       if (document.getElementById('arqueoPanel').style.display === 'block') renderArqueo();
     });
+
+    // ==========================================================================
+    // LÓGICA CALCULADORA DE MESAS
+    // ==========================================================================
+    const CALC_DEFAULT_CONFIG = {
+      precioBase: 100000,
+      capacidadBase: 5,
+      precioPersonaExtra: 20000,
+      montoSena: 20000,
+      pctRecargoTransferencia: 10,
+      maxPersonas: 10
+    };
+
+    let calcConfig = { ...CALC_DEFAULT_CONFIG };
+    let calcCurrentPeople = 5;
+
+    // Formateador argentino oficial: $100.000 sin decimales
+    const calcMoneyFmt = new Intl.NumberFormat('es-AR', {
+      maximumFractionDigits: 0
+    });
+
+    function calcFormatMoney(amount) {
+      const rounded = Math.round(Number(amount) || 0);
+      return '$' + calcMoneyFmt.format(rounded);
+    }
+
+    /**
+     * Función pura y centralizada de cálculo de precios de mesa.
+     * Recibe la configuración y la cantidad de personas.
+     * Devuelve todos los montos calculados o un mensaje de error si los datos no son válidos.
+     */
+    function calcularPreciosMesa(config, cantPersonas) {
+      const p = Number(cantPersonas);
+      if (!cantPersonas || isNaN(p) || p <= 0) {
+        return {
+          valido: false,
+          errorMsg: 'Por favor, ingresá una cantidad de personas válida (mínimo 1).'
+        };
+      }
+
+      const max = Math.round(Number(config.maxPersonas) || 10);
+      if (p > max) {
+        return {
+          valido: false,
+          errorMsg: `La cantidad máxima configurada es de ${max} personas por mesa.`
+        };
+      }
+
+      const base = Math.round(Number(config.precioBase) || 100000);
+      const capBase = Math.round(Number(config.capacidadBase) || 5);
+      const extraPorPersona = Math.round(Number(config.precioPersonaExtra) || 20000);
+      const sena = Math.round(Number(config.montoSena) || 20000);
+      const pctRecargo = Number(config.pctRecargoTransferencia) || 0;
+
+      // Fórmula oficial: si personas <= capBase -> base. Si > capBase -> base + (personas - capBase) * extra
+      let precioMesa = base;
+      if (p > capBase) {
+        precioMesa = base + ((p - capBase) * extraPorPersona);
+      }
+
+      // Resto en puerta y consumo (precio mesa menos la seña)
+      const enPuerta = Math.max(0, precioMesa - sena);
+      const consumo = Math.max(0, precioMesa - sena);
+
+      // Recargo por transferencia: precio * (pct / 100) redondeado al peso más cercano
+      const recargoTransf = Math.round((precioMesa * pctRecargo) / 100);
+
+      // Total a transferir: precio + recargo (coincide exactamente con la suma visual)
+      const totalTransferencia = precioMesa + recargoTransf;
+
+      return {
+        valido: true,
+        personas: p,
+        precioMesa,
+        sena,
+        enPuerta,
+        consumo,
+        pctRecargo,
+        recargoTransf,
+        totalTransferencia
+      };
+    }
+
+    /**
+     * Construye la línea explicativa dinámica con las reglas vigentes.
+     */
+    function obtenerTextoRegla(config) {
+      const capBase = Math.round(Number(config.capacidadBase) || 5);
+      const basePrice = Math.round(Number(config.precioBase) || 100000);
+      const extraPrice = Math.round(Number(config.precioPersonaExtra) || 20000);
+
+      const ordinales = {
+        1: 'primera', 2: 'segunda', 3: 'tercera', 4: 'cuarta', 5: 'quinta',
+        6: 'sexta', 7: 'séptima', 8: 'octava', 9: 'novena', 10: 'décima'
+      };
+      const siguiente = capBase + 1;
+      const palabra = ordinales[siguiente] ? `la ${ordinales[siguiente]}` : `la persona ${siguiente}`;
+      return `Hasta ${capBase} personas ${calcFormatMoney(basePrice)}. Desde ${palabra}, +${calcFormatMoney(extraPrice)} por persona.`;
+    }
+
+    /**
+     * Dibuja los valores calculados en la interfaz en tiempo real.
+     */
+    function renderCalc() {
+      const alertMsgEl = document.getElementById('calcAlertMsg');
+      const minusBtn = document.getElementById('calcBtnMinus');
+      const plusBtn = document.getElementById('calcBtnPlus');
+      const maxPersonas = Math.round(Number(calcConfig.maxPersonas) || 10);
+
+      if (calcCurrentPeople > maxPersonas) {
+        calcCurrentPeople = maxPersonas;
+      }
+      if (calcCurrentPeople < 1) {
+        calcCurrentPeople = 1;
+      }
+
+      document.getElementById('calcPeopleNum').textContent = calcCurrentPeople;
+      document.getElementById('calcPeopleText').textContent = calcCurrentPeople === 1 ? 'persona' : 'personas';
+
+      minusBtn.disabled = (calcCurrentPeople <= 1);
+      plusBtn.disabled = (calcCurrentPeople >= maxPersonas);
+
+      const res = calcularPreciosMesa(calcConfig, calcCurrentPeople);
+
+      if (!res.valido) {
+        alertMsgEl.textContent = res.errorMsg;
+        alertMsgEl.style.display = 'block';
+        return;
+      } else {
+        alertMsgEl.style.display = 'none';
+      }
+
+      // Tarjeta Efectivo
+      document.getElementById('cashRowPrecio').textContent = calcFormatMoney(res.precioMesa);
+      document.getElementById('cashRowSena').textContent = calcFormatMoney(res.sena);
+      document.getElementById('cashHighlightMonto').textContent = calcFormatMoney(res.enPuerta);
+      document.getElementById('cashConsumoVal').textContent = calcFormatMoney(res.consumo);
+
+      // Tarjeta Transferencia
+      document.getElementById('transfRowPrecio').textContent = calcFormatMoney(res.precioMesa);
+      document.getElementById('transfRowRecargoLabel').textContent = `Recargo por transferencia (${res.pctRecargo}%):`;
+      document.getElementById('transfRowRecargo').textContent = `+${calcFormatMoney(res.recargoTransf)}`;
+      document.getElementById('transfHighlightMonto').textContent = calcFormatMoney(res.totalTransferencia);
+      document.getElementById('transfConsumoVal').textContent = calcFormatMoney(res.consumo);
+
+      // Línea de regla dinámica
+      document.getElementById('calcRuleLine').textContent = obtenerTextoRegla(calcConfig);
+
+      // Si la tabla completa está abierta, volver a dibujarla para marcar la fila activa
+      const tableWrap = document.getElementById('calcTableWrap');
+      if (tableWrap && tableWrap.style.display !== 'none') {
+        renderCalcTable();
+      }
+    }
+
+    /**
+     * Dibuja la tabla completa comparativa de 1 al máximo configurado.
+     */
+    function renderCalcTable() {
+      const tbody = document.getElementById('calcTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      const max = Math.round(Number(calcConfig.maxPersonas) || 10);
+
+      for (let p = 1; p <= max; p++) {
+        const item = calcularPreciosMesa(calcConfig, p);
+        if (!item.valido) continue;
+
+        const tr = document.createElement('tr');
+        if (p === calcCurrentPeople) {
+          tr.className = 'calc-row-active';
+        }
+
+        tr.innerHTML = `
+          <td><strong>${item.personas} ${item.personas === 1 ? 'persona' : 'personas'}</strong></td>
+          <td>${calcFormatMoney(item.precioMesa)}</td>
+          <td>${calcFormatMoney(item.sena)}</td>
+          <td style="color:#2ee6a6; font-weight:800;">${calcFormatMoney(item.enPuerta)}</td>
+          <td style="color:var(--gold); font-weight:700;">${calcFormatMoney(item.consumo)}</td>
+          <td style="color:var(--muted);">${calcFormatMoney(item.recargoTransf)}</td>
+          <td style="color:#58a6ff; font-weight:800;">${calcFormatMoney(item.totalTransferencia)}</td>
+        `;
+
+        tr.addEventListener('click', () => {
+          calcCurrentPeople = p;
+          renderCalc();
+        });
+
+        tbody.appendChild(tr);
+      }
+    }
+
+    /**
+     * Copia al portapapeles el texto del resumen listo para WhatsApp.
+     */
+    function copiarResumenCalc() {
+      const res = calcularPreciosMesa(calcConfig, calcCurrentPeople);
+      if (!res.valido) {
+        alert('No se puede generar el resumen con la cantidad actual.');
+        return;
+      }
+
+      const texto = `Mesa para ${res.personas} personas. Efectivo: seña ${calcFormatMoney(res.sena)} por transferencia y ${calcFormatMoney(res.enPuerta)} en la puerta. Transferencia: ${calcFormatMoney(res.totalTransferencia)} todo adelantado. Beneficio en bebidas: ${calcFormatMoney(res.consumo)}.`;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(texto).then(mostrarFeedbackCopiado).catch(() => fallbackCopiar(texto));
+      } else {
+        fallbackCopiar(texto);
+      }
+    }
+
+    function fallbackCopiar(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        mostrarFeedbackCopiado();
+      } catch (_) {
+        prompt('Copia este texto para WhatsApp:', text);
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function mostrarFeedbackCopiado() {
+      const toast = document.getElementById('calcCopyToast');
+      if (toast) {
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+      }
+    }
+
+    /**
+     * Llena los campos del bloque de configuración.
+     */
+    function poblarInputsCalcConfig(cfg) {
+      document.getElementById('calcCfgPrecioBase').value = cfg.precioBase;
+      document.getElementById('calcCfgCapBase').value = cfg.capacidadBase;
+      document.getElementById('calcCfgExtraPersona').value = cfg.precioPersonaExtra;
+      document.getElementById('calcCfgSena').value = cfg.montoSena;
+      document.getElementById('calcCfgPctRecargo').value = cfg.pctRecargoTransferencia;
+      document.getElementById('calcCfgMaxPersonas').value = cfg.maxPersonas;
+    }
+
+    // Escucha en tiempo real de la configuración en Firestore (colección config / documento calculadora_mesas)
+    db.collection('config').doc('calculadora_mesas').onSnapshot(doc => {
+      if (doc.exists) {
+        const data = doc.data();
+        calcConfig = {
+          precioBase: data.precioBase !== undefined ? Number(data.precioBase) : CALC_DEFAULT_CONFIG.precioBase,
+          capacidadBase: data.capacidadBase !== undefined ? Number(data.capacidadBase) : CALC_DEFAULT_CONFIG.capacidadBase,
+          precioPersonaExtra: data.precioPersonaExtra !== undefined ? Number(data.precioPersonaExtra) : CALC_DEFAULT_CONFIG.precioPersonaExtra,
+          montoSena: data.montoSena !== undefined ? Number(data.montoSena) : CALC_DEFAULT_CONFIG.montoSena,
+          pctRecargoTransferencia: data.pctRecargoTransferencia !== undefined ? Number(data.pctRecargoTransferencia) : CALC_DEFAULT_CONFIG.pctRecargoTransferencia,
+          maxPersonas: data.maxPersonas !== undefined ? Number(data.maxPersonas) : CALC_DEFAULT_CONFIG.maxPersonas
+        };
+      } else {
+        calcConfig = { ...CALC_DEFAULT_CONFIG };
+      }
+      poblarInputsCalcConfig(calcConfig);
+      renderCalc();
+    });
+
+    // Guardado de configuración en Firestore
+    document.getElementById('btnSaveCalcConfig').addEventListener('click', async () => {
+      const statusEl = document.getElementById('calcConfigStatus');
+      const btn = document.getElementById('btnSaveCalcConfig');
+
+      if (currentUserRole !== 'admin') {
+        statusEl.style.color = 'var(--red)';
+        statusEl.textContent = '❌ Solo los administradores pueden modificar la configuración.';
+        return;
+      }
+
+      const precioBase = Number(document.getElementById('calcCfgPrecioBase').value);
+      const capacidadBase = Number(document.getElementById('calcCfgCapBase').value);
+      const precioPersonaExtra = Number(document.getElementById('calcCfgExtraPersona').value);
+      const montoSena = Number(document.getElementById('calcCfgSena').value);
+      const pctRecargoTransferencia = Number(document.getElementById('calcCfgPctRecargo').value);
+      const maxPersonas = Number(document.getElementById('calcCfgMaxPersonas').value);
+
+      // Validaciones de seguridad
+      if (isNaN(precioBase) || precioBase <= 0) {
+        statusEl.style.color = 'var(--red)';
+        statusEl.textContent = '❌ El precio base debe ser un número positivo.';
+        return;
+      }
+      if (isNaN(capacidadBase) || capacidadBase < 1 || !Number.isInteger(capacidadBase)) {
+        statusEl.style.color = 'var(--red)';
+        statusEl.textContent = '❌ La cantidad de personas base debe ser un entero mayor o igual a 1.';
+        return;
+      }
+      if (isNaN(precioPersonaExtra) || precioPersonaExtra < 0) {
+        statusEl.style.color = 'var(--red)';
+        statusEl.textContent = '❌ El valor de persona extra no puede ser negativo.';
+        return;
+      }
+      if (isNaN(montoSena) || montoSena < 0) {
+        statusEl.style.color = 'var(--red)';
+        statusEl.textContent = '❌ La seña no puede ser negativa.';
+        return;
+      }
+      if (isNaN(pctRecargoTransferencia) || pctRecargoTransferencia < 0 || pctRecargoTransferencia > 100) {
+        statusEl.style.color = 'var(--red)';
+        statusEl.textContent = '❌ El recargo debe estar entre 0% y 100%.';
+        return;
+      }
+      if (isNaN(maxPersonas) || maxPersonas < capacidadBase || !Number.isInteger(maxPersonas)) {
+        statusEl.style.color = 'var(--red)';
+        statusEl.textContent = `❌ El máximo de personas debe ser un entero igual o mayor a la capacidad base (${capacidadBase}).`;
+        return;
+      }
+
+      btn.disabled = true;
+      statusEl.style.color = 'var(--muted)';
+      statusEl.textContent = 'Guardando configuración...';
+
+      const payload = {
+        precioBase: Math.round(precioBase),
+        capacidadBase: Math.round(capacidadBase),
+        precioPersonaExtra: Math.round(precioPersonaExtra),
+        montoSena: Math.round(montoSena),
+        pctRecargoTransferencia: Number(pctRecargoTransferencia.toFixed(2)),
+        maxPersonas: Math.round(maxPersonas),
+        updatedAt: Date.now(),
+        updatedBy: auth.currentUser ? auth.currentUser.email : 'admin'
+      };
+
+      try {
+        await db.collection('config').doc('calculadora_mesas').set(payload, { merge: true });
+        statusEl.style.color = 'var(--green)';
+        statusEl.textContent = '✅ Configuración de precios guardada correctamente.';
+        setTimeout(() => { statusEl.textContent = ''; }, 4000);
+      } catch (err) {
+        statusEl.style.color = 'var(--red)';
+        statusEl.textContent = '❌ Error al guardar: ' + err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // Event listeners de la calculadora
+    document.getElementById('calcBtnMinus').addEventListener('click', () => {
+      if (calcCurrentPeople > 1) {
+        calcCurrentPeople--;
+        renderCalc();
+      }
+    });
+
+    document.getElementById('calcBtnPlus').addEventListener('click', () => {
+      const max = Math.round(Number(calcConfig.maxPersonas) || 10);
+      if (calcCurrentPeople < max) {
+        calcCurrentPeople++;
+        renderCalc();
+      }
+    });
+
+    document.getElementById('btnCalcCopyWa').addEventListener('click', copiarResumenCalc);
+
+    document.getElementById('btnCalcToggleTable').addEventListener('click', () => {
+      const wrap = document.getElementById('calcTableWrap');
+      const btn = document.getElementById('btnCalcToggleTable');
+      const isHidden = (wrap.style.display === 'none' || !wrap.style.display);
+      wrap.style.display = isHidden ? 'block' : 'none';
+      btn.textContent = isHidden ? '📊 Ocultar tabla completa' : '📊 Ver tabla completa';
+      if (isHidden) {
+        renderCalcTable();
+      }
+    });
+
+    document.getElementById('btnCalcToggleConfig').addEventListener('click', () => {
+      const panel = document.getElementById('calcConfigPanel');
+      panel.style.display = (panel.style.display === 'none' || !panel.style.display) ? 'block' : 'none';
+    });
+
+    const btnScrollCalcEl = document.getElementById('btnScrollCalc');
+    if (btnScrollCalcEl) {
+      btnScrollCalcEl.addEventListener('click', () => {
+        const sec = document.getElementById('calcMesasSection');
+        if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+
+    // Inicializar visualización de la calculadora
+    poblarInputsCalcConfig(calcConfig);
+    renderCalc();
   </script>
 </body>
 </html>
