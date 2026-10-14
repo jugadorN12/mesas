@@ -16,7 +16,7 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow read: if true;
+      allow read: if request.auth != null && (request.auth.token.email == userId || hasRole('admin'));
       allow write: if hasRole('admin');
     }
 
