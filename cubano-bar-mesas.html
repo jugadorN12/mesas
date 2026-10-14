@@ -597,6 +597,92 @@
     color: var(--amber);
     font-weight: 800;
   }
+
+  /* --- Banner de Invitación de Instalación PWA --- */
+  .pwa-install-banner {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 440px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(16, 16, 20, 0.95);
+    border: 1px solid rgba(255, 45, 61, 0.4);
+    border-radius: 16px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.85), 0 0 24px rgba(255,45,61,0.25);
+    backdrop-filter: blur(12px);
+    animation: pwaSlideUp 0.4s ease;
+  }
+  @keyframes pwaSlideUp {
+    from { transform: translate(-50%, 40px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+  }
+  .pwa-install-banner.hidden {
+    display: none !important;
+  }
+  .pwa-install-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+  .pwa-install-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  }
+  .pwa-install-info strong {
+    display: block;
+    font-size: 13.5px;
+    color: var(--white);
+    line-height: 1.2;
+    font-weight: 700;
+  }
+  .pwa-install-info small {
+    display: block;
+    font-size: 11px;
+    color: var(--grey);
+    margin-top: 3px;
+  }
+  .pwa-install-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .pwa-btn-install {
+    padding: 9px 16px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, var(--red), #d61324);
+    color: var(--white);
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255,45,61,0.4);
+    transition: transform 0.15s ease;
+  }
+  .pwa-btn-install:active {
+    transform: scale(0.96);
+  }
+  .pwa-btn-dismiss {
+    background: transparent;
+    border: none;
+    color: var(--grey);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 6px;
+  }
 </style>
 </head>
 <body>
@@ -1825,6 +1911,74 @@
       });
     });
   }
+
+  // Lógica de invitación a instalar PWA
+  let deferredInstallPrompt;
+  const pwaBanner = document.getElementById('pwaInstallBanner');
+  const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+  const pwaDismissBtn = document.getElementById('pwaDismissBtn');
+  const pwaInstructionText = document.getElementById('pwaInstructionText');
+
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  const isDismissed = sessionStorage.getItem('pwa_prompt_dismissed');
+
+  if (!isStandalone && !isDismissed) {
+    // Para Android / Chrome
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      if (pwaBanner) pwaBanner.classList.remove('hidden');
+    });
+
+    if (pwaInstallBtn) {
+      pwaInstallBtn.addEventListener('click', async () => {
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          const { outcome } = await deferredInstallPrompt.userChoice;
+          if (outcome === 'accepted') {
+            if (pwaBanner) pwaBanner.classList.add('hidden');
+          }
+          deferredInstallPrompt = null;
+        } else {
+          showToast("Tocá el botón Compartir y seleccioná 'Agregar al inicio'");
+        }
+      });
+    }
+
+    if (pwaDismissBtn) {
+      pwaDismissBtn.addEventListener('click', () => {
+        if (pwaBanner) pwaBanner.classList.add('hidden');
+        sessionStorage.setItem('pwa_prompt_dismissed', '1');
+      });
+    }
+
+    // Detectar iOS Safari para mostrarle la guía
+    const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+    if (isIos && !isStandalone) {
+      setTimeout(() => {
+        if (pwaBanner && !sessionStorage.getItem('pwa_prompt_dismissed')) {
+          if (pwaInstructionText) pwaInstructionText.textContent = "Tocá Compartir y 'Agregar al inicio'";
+          if (pwaInstallBtn) pwaInstallBtn.textContent = "¿Cómo?";
+          pwaBanner.classList.remove('hidden');
+        }
+      }, 3000);
+    }
+  }
 </script>
+
+  <!-- Banner flotante para invitación a instalar PWA -->
+  <div id="pwaInstallBanner" class="pwa-install-banner hidden" role="dialog" aria-label="Instalar aplicación">
+    <div class="pwa-install-info">
+      <img src="icon-192.png" alt="Cubano Bar" class="pwa-install-icon">
+      <div>
+        <strong>App Cubano Bar VIP</strong>
+        <small id="pwaInstructionText">Instalá la app para reservar en 1 toque</small>
+      </div>
+    </div>
+    <div class="pwa-install-actions">
+      <button id="pwaInstallBtn" type="button" class="pwa-btn-install">Instalar</button>
+      <button id="pwaDismissBtn" type="button" class="pwa-btn-dismiss" aria-label="Cerrar">✕</button>
+    </div>
+  </div>
 </body>
 </html>
