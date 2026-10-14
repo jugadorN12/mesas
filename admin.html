@@ -827,7 +827,7 @@
               <span id="cashRowPrecio" class="calc-row-val">$100.000</span>
             </div>
             <div class="calc-row-item">
-              <span class="calc-row-label">Seña por transferencia:</span>
+              <span class="calc-row-label">Seña para reservar (transferencia):</span>
               <span id="cashRowSena" class="calc-row-val">$20.000</span>
             </div>
           </div>
@@ -852,11 +852,15 @@
           <div>
             <div class="calc-pay-header">
               <span class="calc-pay-badge badge-transf">Forma de pago 2</span>
-              <h3 class="calc-pay-title">💳 Transferencia (todo adelantado)</h3>
+              <h3 class="calc-pay-title">💳 Transferencia (con recargo)</h3>
             </div>
             <div class="calc-row-item">
               <span class="calc-row-label">Precio de la mesa:</span>
               <span id="transfRowPrecio" class="calc-row-val">$100.000</span>
+            </div>
+            <div class="calc-row-item">
+              <span class="calc-row-label">Seña para reservar (transferencia):</span>
+              <span id="transfRowSena" class="calc-row-val">$20.000</span>
             </div>
             <div class="calc-row-item">
               <span class="calc-row-label" id="transfRowRecargoLabel">Recargo por transferencia (10%):</span>
@@ -865,10 +869,11 @@
           </div>
 
           <div>
-            <!-- Monto principal destacado -->
+            <!-- Monto principal destacado: Resto por transferencia -->
             <div class="calc-highlight-box highlight-transf">
-              <div class="calc-highlight-label">Total a transferir</div>
-              <div id="transfHighlightMonto" class="calc-highlight-amount">$110.000</div>
+              <div class="calc-highlight-label">Resto por transferencia</div>
+              <div id="transfHighlightMonto" class="calc-highlight-amount">$90.000</div>
+              <div id="transfTotalTag" style="font-size:12px; color:var(--muted); margin-top:4px; font-weight:700;">Total con recargo: $110.000</div>
             </div>
 
             <!-- Beneficio en bebidas -->
@@ -906,11 +911,11 @@
             <tr>
               <th>Personas</th>
               <th>Precio mesa</th>
-              <th>Efectivo: seña</th>
-              <th>Efectivo: en puerta</th>
+              <th>Seña previa</th>
+              <th>Resto en puerta (efectivo)</th>
               <th>🍹 Consumo</th>
-              <th>Transferencia: recargo</th>
-              <th>Transferencia: total</th>
+              <th>Resto transferencia</th>
+              <th>Total transf. (con recargo)</th>
             </tr>
           </thead>
           <tbody id="calcTableBody">
@@ -2173,8 +2178,11 @@
       // Recargo por transferencia: precio * (pct / 100) redondeado al peso más cercano
       const recargoTransf = Math.round((precioMesa * pctRecargo) / 100);
 
-      // Total a transferir: precio + recargo (coincide exactamente con la suma visual)
+      // Total con recargo de la mesa
       const totalTransferencia = precioMesa + recargoTransf;
+
+      // Resto a transferir (total con recargo menos la seña previa)
+      const restoTransferencia = Math.max(0, totalTransferencia - sena);
 
       return {
         valido: true,
@@ -2185,7 +2193,8 @@
         consumo,
         pctRecargo,
         recargoTransf,
-        totalTransferencia
+        totalTransferencia,
+        restoTransferencia
       };
     }
 
@@ -2246,9 +2255,14 @@
 
       // Tarjeta Transferencia
       document.getElementById('transfRowPrecio').textContent = calcFormatMoney(res.precioMesa);
+      document.getElementById('transfRowSena').textContent = calcFormatMoney(res.sena);
       document.getElementById('transfRowRecargoLabel').textContent = `Recargo por transferencia (${res.pctRecargo}%):`;
       document.getElementById('transfRowRecargo').textContent = `+${calcFormatMoney(res.recargoTransf)}`;
-      document.getElementById('transfHighlightMonto').textContent = calcFormatMoney(res.totalTransferencia);
+      document.getElementById('transfHighlightMonto').textContent = calcFormatMoney(res.restoTransferencia);
+      const transfTotalTag = document.getElementById('transfTotalTag');
+      if (transfTotalTag) {
+        transfTotalTag.textContent = `Total con recargo: ${calcFormatMoney(res.totalTransferencia)}`;
+      }
       document.getElementById('transfConsumoVal').textContent = calcFormatMoney(res.consumo);
 
       // Línea de regla dinámica
@@ -2285,8 +2299,8 @@
           <td>${calcFormatMoney(item.sena)}</td>
           <td style="color:#2ee6a6; font-weight:800;">${calcFormatMoney(item.enPuerta)}</td>
           <td style="color:var(--gold); font-weight:700;">${calcFormatMoney(item.consumo)}</td>
-          <td style="color:var(--muted);">${calcFormatMoney(item.recargoTransf)}</td>
-          <td style="color:#58a6ff; font-weight:800;">${calcFormatMoney(item.totalTransferencia)}</td>
+          <td style="color:#58a6ff; font-weight:800;">${calcFormatMoney(item.restoTransferencia)}</td>
+          <td style="color:var(--muted); font-size:12px;">${calcFormatMoney(item.totalTransferencia)}</td>
         `;
 
         tr.addEventListener('click', () => {
@@ -2308,7 +2322,7 @@
         return;
       }
 
-      const texto = `Mesa para ${res.personas} personas. Efectivo: seña ${calcFormatMoney(res.sena)} por transferencia y ${calcFormatMoney(res.enPuerta)} en la puerta. Transferencia: ${calcFormatMoney(res.totalTransferencia)} todo adelantado. Beneficio en bebidas: ${calcFormatMoney(res.consumo)}.`;
+      const texto = `Mesa para ${res.personas} personas. Seña para reservar: ${calcFormatMoney(res.sena)} por transferencia.\n• Si pagan el resto en efectivo en la puerta: ${calcFormatMoney(res.enPuerta)}\n• Si pagan el resto por transferencia: ${calcFormatMoney(res.restoTransferencia)} (Total con recargo: ${calcFormatMoney(res.totalTransferencia)})\nBeneficio en bebidas: ${calcFormatMoney(res.consumo)}.`;
 
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(texto).then(mostrarFeedbackCopiado).catch(() => fallbackCopiar(texto));
