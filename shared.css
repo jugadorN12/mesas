@@ -1,0 +1,33 @@
+/* ==========================================================================
+   Cubano Bar — Variables y Estilos Compartidos
+   Centraliza la paleta de colores, tipografías y valores base del sistema.
+   ========================================================================== */
+
+:root {
+  /* Fondos y paneles */
+  --bg: #060608;
+  --panel: #101014;
+  --panel-2: #17171d;
+  --card: #15151c;
+  --line: #2a2a35;
+  --grey-line: #2a2a31;
+
+  /* Colores de marca y acentos */
+  --red: #ff2d3d;
+  --red-dim: #7a1018;
+  --red-glow: rgba(255, 45, 61, 0.55);
+  --green: #2ee6a6;
+  --blue: #58a6ff;
+  --amber: #ffbd3e;
+  --gold: #f6b73c;
+
+  /* Textos y neutros */
+  --white: #f3f1ee;
+  --text: #f4f2ef;
+  --grey: #8b8b93;
+  --muted: #8b8b93;
+
+  /* Tipografías base */
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'Inter', Arial, sans-serif;
+}
