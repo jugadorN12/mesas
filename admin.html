@@ -1410,7 +1410,12 @@
     const headingFontInput=document.getElementById('headingFontInput');
     const saveHeading=document.getElementById('saveHeading');
     const headingStatus=document.getElementById('headingStatus');
+    const list=document.getElementById('list');
     const TABLE_ORDER=['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','B','C','D','ULTRA VIP'];
+
+    // Variables de estado para la reserva desde la Calculadora
+    let calcSelectedPayment = null; // 'efectivo' | 'transferencia' | null
+    let calcSelectedMesa = '';
 
     // --- Control de Doble Evento / Fechas Aisladas ---
     const btnAdminFecha1 = document.getElementById('btnAdminFecha1');
@@ -1805,71 +1810,83 @@
       console.log("Auth State Changed. User:", user ? user.email : "none");
 
       if (user) {
+        let isMaster = false;
+        let isAssistant = false;
+
         try {
           const email = user.email.toLowerCase().trim();
           const userDoc = await db.collection("users").doc(email).get();
 
-          if (userDoc.exists) {
-            const role = userDoc.data().role;
-            console.log("User role found:", role);
-            currentUserRole = role;
-
-            const isMaster = (role === 'admin');
-            const isAssistant = (role === 'assistant');
-            const isBoleteria = (role === 'boleteria');
-
-            if (isBoleteria) {
-              window.location.href = "boleteria.html";
-              return;
-            }
-
-            if (isMaster || isAssistant) {
-              loginView.hidden = true;
-              adminApp.hidden = false;
-              document.getElementById('adminRoleLabel').textContent = isMaster ? '(SUPERUSUARIO)' : '(ASISTENTE)';
-
-              // UI Restrictions
-              document.getElementById('resetAll').style.display = isMaster ? 'block' : 'none';
-              document.getElementById('linkBoleteria').style.display = isMaster ? 'block' : 'none';
-              document.querySelector('.capture-card').style.display = isMaster ? 'block' : 'none';
-
-              document.querySelectorAll('.event-card').forEach(card => {
-                if (card.id === 'pricingPromoCard') {
-                  card.style.display = 'block'; // Visible para admin y asistente
-                } else {
-                  card.style.display = isMaster ? 'block' : 'none';
-                }
-              });
-
-              // Permisos de edición para la Calculadora de Mesas
-              const isCalcAdmin = isMaster;
-              ['calcCfgPrecioBase', 'calcCfgCapBase', 'calcCfgExtraPersona', 'calcCfgSena', 'calcCfgPctRecargo', 'calcCfgMaxPersonas'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.disabled = !isCalcAdmin;
-              });
-              const btnSaveCalc = document.getElementById('btnSaveCalcConfig');
-              if (btnSaveCalc) {
-                btnSaveCalc.style.display = isCalcAdmin ? 'inline-block' : 'none';
-              }
-              const noticeEl = document.getElementById('calcRoleNotice');
-              if (noticeEl) {
-                noticeEl.textContent = isCalcAdmin 
-                  ? 'Administrador: podés modificar los valores' 
-                  : 'Modo solo lectura (solo administradores pueden editar)';
-              }
-
-              renderPricingTable();
-              render(); // Dibujar la lista de reservas
-            } else {
-              throw new Error('No tienes permisos de administración.');
-            }
-          } else {
+          if (!userDoc.exists) {
             throw new Error('Usuario no registrado en la base de datos de roles.');
+          }
+
+          const role = userDoc.data().role;
+          console.log("User role found:", role);
+          currentUserRole = role;
+
+          isMaster = (role === 'admin');
+          isAssistant = (role === 'assistant');
+          const isBoleteria = (role === 'boleteria');
+
+          if (isBoleteria) {
+            window.location.href = "boleteria.html";
+            return;
+          }
+
+          if (!isMaster && !isAssistant) {
+            throw new Error('No tienes permisos de administración.');
           }
         } catch(e) {
           console.error("Role Error:", e);
           loginError.textContent = e.message;
           setTimeout(() => auth.signOut(), 3000);
+          return;
+        }
+
+        // Usuario validado con rol autorizado: mostrar panel y renderizar interfaz
+        try {
+          loginView.hidden = true;
+          adminApp.hidden = false;
+          document.getElementById('adminRoleLabel').textContent = isMaster ? '(SUPERUSUARIO)' : '(ASISTENTE)';
+
+          // Restricciones de interfaz según rol
+          const resetAllEl = document.getElementById('resetAll');
+          if (resetAllEl) resetAllEl.style.display = isMaster ? 'block' : 'none';
+          const linkBolEl = document.getElementById('linkBoleteria');
+          if (linkBolEl) linkBolEl.style.display = isMaster ? 'block' : 'none';
+          const captureCardEl = document.querySelector('.capture-card');
+          if (captureCardEl) captureCardEl.style.display = isMaster ? 'block' : 'none';
+
+          document.querySelectorAll('.event-card').forEach(card => {
+            if (card.id === 'pricingPromoCard') {
+              card.style.display = 'block'; // Visible para admin y asistente
+            } else {
+              card.style.display = isMaster ? 'block' : 'none';
+            }
+          });
+
+          // Permisos de edición para la Calculadora de Mesas
+          const isCalcAdmin = isMaster;
+          ['calcCfgPrecioBase', 'calcCfgCapBase', 'calcCfgExtraPersona', 'calcCfgSena', 'calcCfgPctRecargo', 'calcCfgMaxPersonas'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.disabled = !isCalcAdmin;
+          });
+          const btnSaveCalc = document.getElementById('btnSaveCalcConfig');
+          if (btnSaveCalc) {
+            btnSaveCalc.style.display = isCalcAdmin ? 'inline-block' : 'none';
+          }
+          const noticeEl = document.getElementById('calcRoleNotice');
+          if (noticeEl) {
+            noticeEl.textContent = isCalcAdmin 
+              ? 'Administrador: podés modificar los valores' 
+              : 'Modo solo lectura (solo administradores pueden editar)';
+          }
+
+          renderPricingTable();
+          render(); // Dibujar la lista de reservas
+        } catch(uiErr) {
+          console.error("UI Render Warning (no expulsa la sesión):", uiErr);
         }
       } else {
         loginView.hidden = false;
@@ -2799,8 +2816,6 @@
     // ==========================================================================
     // LÓGICA DE RESERVA DIRECTA DESDE LA CALCULADORA
     // ==========================================================================
-    let calcSelectedPayment = null; // 'efectivo' | 'transferencia' | null
-    let calcSelectedMesa = '';
 
     /**
      * Alterna o selecciona la forma de pago (Efectivo o Transferencia)
