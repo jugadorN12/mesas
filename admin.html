@@ -3,6 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#09090d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Cubano Admin">
+  <link rel="manifest" href="manifest-admin.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <title>Cubano Bar | Administracion de mesas</title>
   <link rel="stylesheet" href="shared.css">
   <style>
@@ -722,6 +728,95 @@
     .calc-config-grid input:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+
+    /* --- Banner de Invitación de Instalación PWA (Admin) --- */
+    .pwa-install-banner {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 440px;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(16, 16, 20, 0.95);
+      border: 1px solid rgba(255, 45, 61, 0.4);
+      border-radius: 16px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.85), 0 0 24px rgba(255,45,61,0.25);
+      backdrop-filter: blur(12px);
+      animation: pwaSlideUp 0.4s ease;
+    }
+    @keyframes pwaSlideUp {
+      from { transform: translate(-50%, 40px); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+    .pwa-install-banner.hidden {
+      display: none !important;
+    }
+    .pwa-install-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .pwa-install-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    .pwa-install-info strong {
+      display: block;
+      font-size: 13.5px;
+      color: var(--text);
+      line-height: 1.2;
+      font-weight: 700;
+    }
+    .pwa-install-info small {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+    .pwa-install-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .pwa-btn-install {
+      padding: 9px 16px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, var(--red), #d61324);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pwa-btn-install:hover {
+      filter: brightness(1.15);
+      transform: translateY(-1px);
+    }
+    .pwa-btn-dismiss {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 6px;
+      line-height: 1;
+    }
+    .pwa-btn-dismiss:hover {
+      color: #fff;
     }
   </style>
 </head>
@@ -2510,6 +2605,84 @@
     // Inicializar visualización de la calculadora
     poblarInputsCalcConfig(calcConfig);
     renderCalc();
+
+    // ==========================================================================
+    // INSTALADOR PWA PARA PANEL DE ADMINISTRACIÓN
+    // ==========================================================================
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => {
+          console.log('SW registration note:', err);
+        });
+      });
+    }
+
+    let deferredAdminInstallPrompt;
+    const pwaAdminBanner = document.getElementById('pwaAdminInstallBanner');
+    const pwaAdminInstallBtn = document.getElementById('pwaAdminInstallBtn');
+    const pwaAdminDismissBtn = document.getElementById('pwaAdminDismissBtn');
+    const pwaAdminInstructionText = document.getElementById('pwaAdminInstructionText');
+
+    const isAdminStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    const isAdminDismissed = sessionStorage.getItem('pwa_admin_prompt_dismissed');
+
+    if (!isAdminStandalone && !isAdminDismissed) {
+      // Para Android / Chrome / Edge
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredAdminInstallPrompt = e;
+        if (pwaAdminBanner) pwaAdminBanner.classList.remove('hidden');
+      });
+
+      if (pwaAdminInstallBtn) {
+        pwaAdminInstallBtn.addEventListener('click', async () => {
+          if (deferredAdminInstallPrompt) {
+            deferredAdminInstallPrompt.prompt();
+            const { outcome } = await deferredAdminInstallPrompt.userChoice;
+            if (outcome === 'accepted') {
+              if (pwaAdminBanner) pwaAdminBanner.classList.add('hidden');
+            }
+            deferredAdminInstallPrompt = null;
+          } else {
+            alert("Para instalar en iPhone: tocá el botón Compartir de Safari y seleccioná 'Agregar al inicio'.");
+          }
+        });
+      }
+
+      if (pwaAdminDismissBtn) {
+        pwaAdminDismissBtn.addEventListener('click', () => {
+          if (pwaAdminBanner) pwaAdminBanner.classList.add('hidden');
+          sessionStorage.setItem('pwa_admin_prompt_dismissed', '1');
+        });
+      }
+
+      // Detección para iOS Safari
+      const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+      if (isIos && !isAdminStandalone) {
+        setTimeout(() => {
+          if (pwaAdminBanner && !sessionStorage.getItem('pwa_admin_prompt_dismissed')) {
+            if (pwaAdminInstructionText) pwaAdminInstructionText.textContent = "Tocá Compartir y 'Agregar al inicio'";
+            if (pwaAdminInstallBtn) pwaAdminInstallBtn.textContent = "¿Cómo?";
+            pwaAdminBanner.classList.remove('hidden');
+          }
+        }, 3000);
+      }
+    }
   </script>
+
+  <!-- Banner flotante para invitación a instalar PWA de Administración -->
+  <div id="pwaAdminInstallBanner" class="pwa-install-banner hidden" role="dialog" aria-label="Instalar panel de administración">
+    <div class="pwa-install-info">
+      <img src="icon-192.png" alt="Cubano Admin" class="pwa-install-icon">
+      <div>
+        <strong>App Cubano Admin</strong>
+        <small id="pwaAdminInstructionText">Instalá el panel para gestionar en 1 toque</small>
+      </div>
+    </div>
+    <div class="pwa-install-actions">
+      <button id="pwaAdminInstallBtn" type="button" class="pwa-btn-install">Instalar</button>
+      <button id="pwaAdminDismissBtn" type="button" class="pwa-btn-dismiss" aria-label="Cerrar">✕</button>
+    </div>
+  </div>
 </body>
 </html>

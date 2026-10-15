@@ -3,6 +3,7 @@ const CACHE_NAME = 'cubanobar-v1';
 const STATIC_ASSETS = [
   './shared.css',
   './manifest.json',
+  './manifest-admin.json',
   './icon-192.png',
   './icon-512.png'
 ];
