@@ -818,6 +818,159 @@
     .pwa-btn-dismiss:hover {
       color: #fff;
     }
+
+    /* --- Estilos para Selector de Forma de Pago y Reserva Rápida --- */
+    .calc-pay-card {
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+    }
+    .calc-pay-card.calc-card-selected.calc-card-cash {
+      border: 2px solid #2ee6a6;
+      box-shadow: 0 0 25px rgba(46, 230, 166, 0.4), inset 0 0 15px rgba(46, 230, 166, 0.1);
+    }
+    .calc-pay-card.calc-card-selected.calc-card-transf {
+      border: 2px solid #58a6ff;
+      box-shadow: 0 0 25px rgba(88, 166, 255, 0.4), inset 0 0 15px rgba(88, 166, 255, 0.1);
+    }
+    .calc-pay-check-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0 6px;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      width: fit-content;
+      transition: all 0.2s ease;
+    }
+    .calc-card-selected .calc-pay-check-wrap {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .calc-pay-check-wrap input[type="checkbox"] {
+      transform: scale(1.35);
+      cursor: pointer;
+      accent-color: #2ee6a6;
+    }
+    .calc-card-transf .calc-pay-check-wrap input[type="checkbox"] {
+      accent-color: #58a6ff;
+    }
+    .calc-pay-check-label {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .calc-booking-box {
+      margin-top: 16px;
+      padding: 16px 18px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+    .calc-booking-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+    .calc-booking-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      min-width: 190px;
+    }
+    .calc-booking-field.btn-wrap {
+      flex: 0 0 auto;
+      min-width: 190px;
+    }
+    @media(max-width: 720px) {
+      .calc-booking-field, .calc-booking-field.btn-wrap {
+        width: 100%;
+        min-width: 100%;
+      }
+    }
+    .calc-booking-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .calc-mesa-select {
+      background: #0d0d12;
+      color: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 11px 12px;
+      font-size: 14px;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+      width: 100%;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    .calc-mesa-select:focus {
+      border-color: var(--gold);
+    }
+    .calc-client-input {
+      background: #0d0d12;
+      color: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 11px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+      width: 100%;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    .calc-client-input:focus {
+      border-color: var(--gold);
+    }
+    .btn-calc-confirm {
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 900;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    .btn-calc-confirm:disabled {
+      background: #202028;
+      color: #666;
+      cursor: not-allowed;
+      border: 1px solid var(--line);
+      opacity: 0.7;
+    }
+    .btn-calc-confirm:not(:disabled) {
+      background: linear-gradient(135deg, #0f8f68, #2ee6a6);
+      color: #060608;
+      box-shadow: 0 0 16px rgba(46, 230, 166, 0.45);
+      cursor: pointer;
+    }
+    .btn-calc-confirm:not(:disabled):hover {
+      filter: brightness(1.15);
+      transform: translateY(-1px);
+    }
+    .calc-booking-notice {
+      font-size: 12.5px;
+      color: var(--amber);
+      margin-top: 10px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
@@ -911,12 +1064,16 @@
       <!-- Dos tarjetas de pago lado a lado -->
       <div class="calc-cards-grid">
         <!-- Tarjeta Efectivo -->
-        <div class="calc-pay-card calc-card-cash">
+        <div class="calc-pay-card calc-card-cash" id="calcCardCash" onclick="toggleCalcPayMethod('efectivo')">
           <div>
             <div class="calc-pay-header">
               <span class="calc-pay-badge badge-cash">Forma de pago 1</span>
-              <h3 class="calc-pay-title">💵 Efectivo (con seña)</h3>
+              <div class="calc-pay-check-wrap" onclick="event.stopPropagation();">
+                <input type="checkbox" id="calcPayOptCash" class="calc-pay-chk" onchange="toggleCalcPayMethod('efectivo', this.checked)">
+                <label for="calcPayOptCash">Elegir Efectivo</label>
+              </div>
             </div>
+            <h3 class="calc-pay-title" style="margin-top:4px;">💵 Efectivo (con seña)</h3>
             <div class="calc-row-item">
               <span class="calc-row-label">Precio de la mesa:</span>
               <span id="cashRowPrecio" class="calc-row-val">$100.000</span>
@@ -943,12 +1100,16 @@
         </div>
 
         <!-- Tarjeta Transferencia -->
-        <div class="calc-pay-card calc-card-transf">
+        <div class="calc-pay-card calc-card-transf" id="calcCardTransf" onclick="toggleCalcPayMethod('transferencia')">
           <div>
             <div class="calc-pay-header">
               <span class="calc-pay-badge badge-transf">Forma de pago 2</span>
-              <h3 class="calc-pay-title">💳 Transferencia (con recargo)</h3>
+              <div class="calc-pay-check-wrap" onclick="event.stopPropagation();">
+                <input type="checkbox" id="calcPayOptTransf" class="calc-pay-chk" onchange="toggleCalcPayMethod('transferencia', this.checked)">
+                <label for="calcPayOptTransf">Elegir Transferencia</label>
+              </div>
             </div>
+            <h3 class="calc-pay-title" style="margin-top:4px;">💳 Transferencia (con recargo)</h3>
             <div class="calc-row-item">
               <span class="calc-row-label">Precio de la mesa:</span>
               <span id="transfRowPrecio" class="calc-row-val">$100.000</span>
@@ -997,6 +1158,38 @@
           ⚙️ Configuración de precios
         </button>
         <span id="calcCopyToast" class="calc-toast">✅ ¡Resumen copiado para WhatsApp!</span>
+      </div>
+
+      <!-- Reserva directa desde la calculadora -->
+      <div class="calc-booking-box">
+        <div class="calc-booking-title">
+          <span>🎯 Confirmar y reservar mesa en el mapa</span>
+          <span style="font-size:11.5px; color:var(--muted); font-weight:normal;">Queda reservada inmediatamente en rojo en el mapa público</span>
+        </div>
+        <div class="calc-booking-row">
+          <div style="flex:1; min-width:180px;">
+            <label for="calcSelectMesa" style="display:block; font-size:11px; font-weight:bold; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">
+              Mesa a reservar:
+            </label>
+            <select id="calcSelectMesa" class="calc-mesa-select">
+              <option value="">Cargando mesas...</option>
+            </select>
+          </div>
+          <div style="flex:1; min-width:180px;">
+            <label for="calcClientName" style="display:block; font-size:11px; font-weight:bold; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">
+              Nombre del cliente:
+            </label>
+            <input type="text" id="calcClientName" class="calc-client-input" placeholder="Ej: Juan Pérez">
+          </div>
+          <div style="display:flex; align-items:flex-end;">
+            <button type="button" id="btnCalcConfirmarReserva" class="btn-calc-confirm" disabled>
+              💾 Confirmar Reserva
+            </button>
+          </div>
+        </div>
+        <div id="calcBookingNotice" class="calc-booking-notice">
+          ℹ️ Para confirmar la reserva: seleccioná la forma de pago (Efectivo o Transferencia) arriba y una mesa libre.
+        </div>
       </div>
 
       <!-- Tabla completa (oculta por defecto) -->
@@ -1935,6 +2128,7 @@
         list.appendChild(node);
       });
       if (document.getElementById('arqueoPanel').style.display === 'block') renderArqueo();
+      actualizarSelectorMesasCalc();
     }
 
     // Lógica de cuenta regresiva y auto-limpieza
@@ -2599,6 +2793,248 @@
       btnScrollCalcEl.addEventListener('click', () => {
         const sec = document.getElementById('calcMesasSection');
         if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+
+    // ==========================================================================
+    // LÓGICA DE RESERVA DIRECTA DESDE LA CALCULADORA
+    // ==========================================================================
+    let calcSelectedPayment = null; // 'efectivo' | 'transferencia' | null
+    let calcSelectedMesa = '';
+
+    /**
+     * Alterna o selecciona la forma de pago (Efectivo o Transferencia)
+     * asegurando exclusión mutua y actualización visual de las tarjetas y checkboxes.
+     */
+    window.toggleCalcPayMethod = function(metodo, explicitChecked) {
+      if (explicitChecked !== undefined) {
+        calcSelectedPayment = explicitChecked ? metodo : null;
+      } else {
+        calcSelectedPayment = (calcSelectedPayment === metodo) ? null : metodo;
+      }
+
+      const cardCash = document.getElementById('calcCardCash');
+      const cardTransf = document.getElementById('calcCardTransf');
+      const chkCash = document.getElementById('calcPayOptCash');
+      const chkTransf = document.getElementById('calcPayOptTransf');
+
+      if (cardCash) {
+        if (calcSelectedPayment === 'efectivo') {
+          cardCash.classList.add('calc-card-selected');
+        } else {
+          cardCash.classList.remove('calc-card-selected');
+        }
+      }
+
+      if (cardTransf) {
+        if (calcSelectedPayment === 'transferencia') {
+          cardTransf.classList.add('calc-card-selected');
+        } else {
+          cardTransf.classList.remove('calc-card-selected');
+        }
+      }
+
+      if (chkCash) chkCash.checked = (calcSelectedPayment === 'efectivo');
+      if (chkTransf) chkTransf.checked = (calcSelectedPayment === 'transferencia');
+
+      verificarCondicionesReservaCalc();
+    };
+
+    /**
+     * Llena el selector de mesas con las mesas en orden y su estado en tiempo real.
+     */
+    function actualizarSelectorMesasCalc() {
+      const select = document.getElementById('calcSelectMesa');
+      if (!select) return;
+
+      const previouslySelected = select.value || calcSelectedMesa;
+      select.innerHTML = '<option value="">-- Seleccionar mesa libre --</option>';
+
+      TABLE_ORDER.forEach(mesaId => {
+        const r = sharedData[mesaId];
+        const isSold = r && ['aprobada', 'ocupada', 'vendida', 'ingresada'].includes(r.status);
+        const isPending = r && ['pendiente', 'disputa', 'comprobante_subido', 'pendiente_revision'].includes(r.status);
+
+        const opt = document.createElement('option');
+        opt.value = mesaId;
+
+        if (isSold) {
+          const nombreCliente = r.nombre ? ` (${r.nombre})` : '';
+          opt.textContent = `🔴 Mesa ${mesaId} - VENDIDA${nombreCliente}`;
+          opt.disabled = true;
+          opt.style.color = '#ff6b72';
+        } else if (isPending) {
+          opt.textContent = `🟡 Mesa ${mesaId} - En disputa`;
+          opt.disabled = true;
+          opt.style.color = '#ffbe3b';
+        } else {
+          opt.textContent = `🟢 Mesa ${mesaId} - Libre`;
+          opt.style.color = '#2ee6a6';
+          opt.style.fontWeight = 'bold';
+        }
+
+        select.appendChild(opt);
+      });
+
+      // Si la mesa que estaba seleccionada sigue disponible, conservarla
+      if (previouslySelected && select.querySelector(`option[value="${previouslySelected}"]:not([disabled])`)) {
+        select.value = previouslySelected;
+        calcSelectedMesa = previouslySelected;
+      } else {
+        if (previouslySelected && calcSelectedMesa === previouslySelected) {
+          // La mesa se ocupó mientras el usuario miraba la pantalla
+          calcSelectedMesa = '';
+        }
+      }
+
+      verificarCondicionesReservaCalc();
+    }
+
+    /**
+     * Valida que se cumplan las dos condiciones obligatorias:
+     * 1) Forma de pago seleccionada (efectivo o transferencia).
+     * 2) Mesa libre seleccionada en el dropdown.
+     * Solo habilita el botón si ambas se cumplen.
+     */
+    function verificarCondicionesReservaCalc() {
+      const select = document.getElementById('calcSelectMesa');
+      const btnConfirmar = document.getElementById('btnCalcConfirmarReserva');
+      const notice = document.getElementById('calcBookingNotice');
+      if (!select || !btnConfirmar || !notice) return;
+
+      const mesaElegida = select.value;
+      calcSelectedMesa = mesaElegida;
+
+      const hayMetodo = (calcSelectedPayment === 'efectivo' || calcSelectedPayment === 'transferencia');
+      const hayMesa = !!mesaElegida;
+
+      if (hayMetodo && hayMesa) {
+        btnConfirmar.disabled = false;
+        const nombreMetodo = calcSelectedPayment === 'efectivo' ? '💵 Efectivo' : '💳 Transferencia';
+        notice.style.color = '#2ee6a6';
+        notice.textContent = `✅ Listo para confirmar: Mesa ${mesaElegida} con forma de pago ${nombreMetodo}. Al tocar el botón quedará reservada en el mapa.`;
+      } else {
+        btnConfirmar.disabled = true;
+        notice.style.color = 'var(--muted)';
+        if (!hayMetodo && !hayMesa) {
+          notice.textContent = 'ℹ️ Para confirmar la reserva: seleccioná la forma de pago (Efectivo o Transferencia) arriba y una mesa libre.';
+        } else if (!hayMetodo) {
+          notice.textContent = `⚠️ Seleccionaste la Mesa ${mesaElegida}. Ahora elegí la forma de pago arriba (Efectivo o Transferencia).`;
+        } else {
+          const nombreMetodo = calcSelectedPayment === 'efectivo' ? 'Efectivo' : 'Transferencia';
+          notice.textContent = `⚠️ Elegiste ${nombreMetodo}. Ahora seleccioná una mesa libre en el desplegable.`;
+        }
+      }
+    }
+
+    // Event listener en el selector de mesas
+    const selectMesaEl = document.getElementById('calcSelectMesa');
+    if (selectMesaEl) {
+      selectMesaEl.addEventListener('change', verificarCondicionesReservaCalc);
+    }
+
+    // Event listener para el botón "Confirmar Reserva"
+    const btnCalcConfirmar = document.getElementById('btnCalcConfirmarReserva');
+    if (btnCalcConfirmar) {
+      btnCalcConfirmar.addEventListener('click', async () => {
+        const select = document.getElementById('calcSelectMesa');
+        const inputNombre = document.getElementById('calcClientName');
+        const mesaId = select ? select.value : '';
+        const cliente = inputNombre ? inputNombre.value.trim() : '';
+
+        if (!calcSelectedPayment) {
+          alert('Por favor seleccioná la forma de pago (Efectivo o Transferencia).');
+          return;
+        }
+
+        if (!mesaId) {
+          alert('Por favor seleccioná una mesa libre en el menú desplegable.');
+          return;
+        }
+
+        // Doble verificación: comprobar que la mesa no haya sido tomada recién
+        const reservaExistente = sharedData[mesaId];
+        if (reservaExistente && ['aprobada', 'ocupada', 'vendida', 'ingresada'].includes(reservaExistente.status)) {
+          alert(`⚠️ La Mesa ${mesaId} ya figura como reservada o vendida. Por favor elegí otra.`);
+          actualizarSelectorMesasCalc();
+          return;
+        }
+
+        const res = calcularPreciosMesa(calcConfig, calcCurrentPeople);
+        if (!res.valido) {
+          alert('La cantidad de personas actual no es válida para calcular la reserva.');
+          return;
+        }
+
+        const textoPago = calcSelectedPayment === 'efectivo' ? 'EFECTIVO' : 'TRANSFERENCIA';
+        const saldoPuerta = calcSelectedPayment === 'efectivo' ? res.enPuerta : res.restoTransferencia;
+        const totalFinal = calcSelectedPayment === 'efectivo' ? res.precioMesa : res.totalTransferencia;
+
+        const confirmMsg = `¿Confirmar reserva inmediata de la MESA ${mesaId}?\n\n` +
+          `• Personas: ${res.personas}\n` +
+          `• Cliente: ${cliente || 'Sin nombre especificado'}\n` +
+          `• Forma de pago: ${textoPago}\n` +
+          `• Seña abonada: ${calcFormatMoney(res.sena)}\n` +
+          `• Saldo en puerta: ${calcFormatMoney(saldoPuerta)}\n` +
+          `• Total: ${calcFormatMoney(totalFinal)}\n` +
+          `• Beneficio en bebidas: ${calcFormatMoney(res.consumo)}\n\n` +
+          `La mesa cambiará a ROJO (reservada) inmediatamente en el mapa.`;
+
+        if (!confirm(confirmMsg)) return;
+
+        btnCalcConfirmar.disabled = true;
+        btnCalcConfirmar.textContent = '⏳ Guardando...';
+
+        const col = getActiveCollection();
+        const userEmail = (auth.currentUser && auth.currentUser.email) ? auth.currentUser.email : 'admin';
+        const vendedorLabel = (currentUserRole === 'admin' ? `Admin (${userEmail})` : `Asistente (${userEmail})`);
+
+        const payload = {
+          status: 'aprobada',
+          nombre: cliente || `Cliente Mesa ${mesaId}`,
+          contacto: '',
+          cantidadPersonas: res.personas,
+          formaPago: calcSelectedPayment, // 'efectivo' | 'transferencia'
+          precioTotal: res.precioMesa,
+          montoTotal: totalFinal,
+          montoSenado: res.sena,
+          saldoPuerta: saldoPuerta,
+          montoConsumoCredito: res.consumo,
+          montoConsumicion: res.consumo,
+          porcentajeConsumo: res.precioMesa > 0 ? Math.round((res.consumo / res.precioMesa) * 100) : 80,
+          recargoTransferencia: (calcSelectedPayment === 'transferencia') ? res.recargoTransf : 0,
+          pctRecargo: (calcSelectedPayment === 'transferencia') ? res.pctRecargo : 0,
+          vendedor: vendedorLabel,
+          approvedBy: userEmail,
+          approvedAt: Date.now(),
+          ts: Date.now(),
+          origen: 'calculadora_admin'
+        };
+
+        try {
+          await db.collection(col).doc(mesaId).set(payload, { merge: true });
+          alert(`✅ ¡Mesa ${mesaId} reservada con éxito!\nYa figura como reservada en el mapa público.`);
+
+          // Resetear selecciones
+          if (inputNombre) inputNombre.value = '';
+          calcSelectedPayment = null;
+          calcSelectedMesa = '';
+          const cardCash = document.getElementById('calcCardCash');
+          const cardTransf = document.getElementById('calcCardTransf');
+          const chkCash = document.getElementById('calcPayOptCash');
+          const chkTransf = document.getElementById('calcPayOptTransf');
+          if (cardCash) cardCash.classList.remove('calc-card-selected');
+          if (cardTransf) cardTransf.classList.remove('calc-card-selected');
+          if (chkCash) chkCash.checked = false;
+          if (chkTransf) chkTransf.checked = false;
+
+          actualizarSelectorMesasCalc();
+        } catch (err) {
+          alert('❌ Error al guardar la reserva en la base de datos: ' + err.message);
+        } finally {
+          btnCalcConfirmar.textContent = '💾 Confirmar Reserva';
+          verificarCondicionesReservaCalc();
+        }
       });
     }
 
