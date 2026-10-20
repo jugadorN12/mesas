@@ -17,9 +17,18 @@
     "ignore": [
       "firebase.json",
       ".firebaserc",
+      "firestore.rules",
+      "functions/**",
       "**/.*",
       "**/node_modules/**",
-      "*.bak"
+      "*.bat",
+      "*.cmd",
+      "*.ps1",
+      "*.sh",
+      "*.md",
+      "*.log",
+      "*.bak",
+      "seed_local.js"
     ],
     "cleanUrls": true
   },
