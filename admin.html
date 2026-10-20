@@ -1302,6 +1302,20 @@
       <button id="removeEventLogo" type="button" class="delete">Quitar logo</button>
       <div class="event-status" id="eventLogoStatus"></div>
     </section>
+    <section class="event-card" id="eventBgCard">
+      <h2>Fondo temático del mapa</h2>
+      <p>Pegá la URL pública de la imagen (ej.: desde Cloudinary) para usar como fondo interactivo detrás del plano en la fecha seleccionada.</p>
+      <div class="event-controls">
+        <label style="flex:2;">URL pública del fondo<input id="eventBgUrlInput" type="url" placeholder="https://res.cloudinary.com/..."></label>
+        <button id="saveEventBg" type="button">Guardar fondo</button>
+      </div>
+      <div style="display:flex; gap:12px; align-items:center; margin-top:10px;">
+        <button id="removeEventBg" type="button" class="delete" style="width:auto; margin-top:0;">Quitar fondo</button>
+        <div id="eventBgPreview" style="display:none; width:60px; height:60px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background-size:cover; background-position:center; background-repeat:no-repeat; box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>
+        <span id="eventBgPreviewLabel" style="font-size:12px; color:var(--grey); display:none;">Vista previa</span>
+      </div>
+      <div class="event-status" id="eventBgStatus"></div>
+    </section>
     <section class="event-card">
       <h2>Encabezado de ULTRA VIP</h2>
       <p>Personalizá el texto, la fecha, el tamaño y la tipografía del encabezado.</p>
@@ -1377,7 +1391,7 @@
     const auth=firebase.auth();
 
     if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-      db.useEmulator("localhost", 8080);
+      db.useEmulator("localhost", 8085);
       auth.useEmulator("http://localhost:9099");
     }
 
@@ -1404,6 +1418,12 @@
     const saveEventLogo=document.getElementById('saveEventLogo');
     const removeEventLogo=document.getElementById('removeEventLogo');
     const eventLogoStatus=document.getElementById('eventLogoStatus');
+    const eventBgUrlInput=document.getElementById('eventBgUrlInput');
+    const saveEventBg=document.getElementById('saveEventBg');
+    const removeEventBg=document.getElementById('removeEventBg');
+    const eventBgStatus=document.getElementById('eventBgStatus');
+    const eventBgPreview=document.getElementById('eventBgPreview');
+    const eventBgPreviewLabel=document.getElementById('eventBgPreviewLabel');
     const headingTextInput=document.getElementById('headingTextInput');
     const headingDateInput=document.getElementById('headingDateInput');
     const headingSizeInput=document.getElementById('headingSizeInput');
@@ -1439,9 +1459,29 @@
       return currentAdminEvent === 'fecha1' ? 'ultraVip' : 'ultraVip_fecha2';
     }
 
+    function updateBgPreview(url) {
+      if (!eventBgPreview) return;
+      if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+        eventBgPreview.style.backgroundImage = `url("${url}")`;
+        eventBgPreview.style.display = 'block';
+        if (eventBgPreviewLabel) eventBgPreviewLabel.style.display = 'inline';
+      } else {
+        eventBgPreview.style.backgroundImage = 'none';
+        eventBgPreview.style.display = 'none';
+        if (eventBgPreviewLabel) eventBgPreviewLabel.style.display = 'none';
+      }
+    }
+    if (eventBgUrlInput) {
+      eventBgUrlInput.addEventListener('input', () => {
+        updateBgPreview(eventBgUrlInput.value.trim());
+      });
+    }
+
     function populateConfigInputs(data) {
       eventNameInput.value = data?.eventName || '';
       eventLogoUrlInput.value = data?.logoUrl || '';
+      eventBgUrlInput.value = data?.bgUrl || '';
+      updateBgPreview(data?.bgUrl || '');
       headingTextInput.value = data?.headingText || (currentAdminEvent === 'fecha1' ? 'DOMINGO 11' : 'SÁBADO 10');
       headingDateInput.value = data?.eventDate !== undefined ? data.eventDate : 'OCT';
       headingSizeInput.value = data?.headingSize || 17;
@@ -1669,6 +1709,51 @@
         await db.collection('config').doc(targetDoc).set({logoUrl:'',eventName:'',updatedAt:Date.now()},{merge:true});
         eventLogoStatus.textContent='Logo de ' + targetName + ' quitado del mapa.';
       }catch(_){eventLogoStatus.textContent='No se pudo quitar el logo.';}
+    });
+
+    saveEventBg.addEventListener('click', async () => {
+      const bgUrl = eventBgUrlInput.value.trim();
+      const targetDoc = getActiveConfigDoc();
+      const targetName = currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2';
+      if (!bgUrl) {
+        eventBgStatus.textContent = 'Pegá la URL pública de la imagen de fondo.';
+        return;
+      }
+      if (!bgUrl.startsWith('http://') && !bgUrl.startsWith('https://')) {
+        eventBgStatus.textContent = 'La URL debe comenzar con https:// o http://';
+        return;
+      }
+      saveEventBg.disabled = true;
+      eventBgStatus.textContent = 'Guardando fondo...';
+      try {
+        await db.collection('config').doc(targetDoc).set({
+          bgUrl,
+          updatedAt: Date.now(),
+          updatedBy: auth.currentUser?.email || 'admin'
+        }, { merge: true });
+        updateBgPreview(bgUrl);
+        eventBgStatus.textContent = 'Fondo de ' + targetName + ' guardado correctamente.';
+      } catch (error) {
+        console.error(error);
+        eventBgStatus.textContent = 'No se pudo guardar el fondo: ' + error.message;
+      }
+      saveEventBg.disabled = false;
+    });
+
+    removeEventBg.addEventListener('click', async () => {
+      const targetDoc = getActiveConfigDoc();
+      const targetName = currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2';
+      try {
+        await db.collection('config').doc(targetDoc).set({
+          bgUrl: '',
+          updatedAt: Date.now()
+        }, { merge: true });
+        eventBgUrlInput.value = '';
+        updateBgPreview('');
+        eventBgStatus.textContent = 'Fondo de ' + targetName + ' quitado del mapa.';
+      } catch (error) {
+        eventBgStatus.textContent = 'No se pudo quitar el fondo: ' + error.message;
+      }
     });
 
     // --- Lógica de Configuración de Precios y % de Consumo por Día ---

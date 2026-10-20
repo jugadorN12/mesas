@@ -4,3 +4,5 @@ functions/node_modules/
 *.local
 .idea/planningMode.xml
 *.bak
+.emulator_data/
+*-debug.log

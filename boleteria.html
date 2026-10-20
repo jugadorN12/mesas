@@ -84,7 +84,12 @@
     position:relative; width:100%; border-radius:18px; overflow:hidden;
     border:1px solid rgba(255,255,255,0.16); background:#09090c;
   }
-  .map-frame img{ display:block; width:100%; height:auto; }
+  .map-bg-layer{
+    position:absolute; inset:0; z-index:0;
+    background-size:cover; background-position:center; background-repeat:no-repeat;
+    pointer-events:none; transition:background-image 0.4s ease;
+  }
+  .map-frame img{ position:relative; z-index:1; display:block; width:100%; height:auto; pointer-events:none; }
 
   .ultra-vip-overlay{
     position:absolute; left:52%; top:11.5%; z-index:3; width:34%; padding:0; border:0; background:transparent;
@@ -228,8 +233,9 @@
 
   <div class="map-wrap">
     <div class="map-frame" id="plano-mesas">
+      <div id="mapBgLayer" class="map-bg-layer"></div>
       <button class="ultra-vip-overlay" id="ultraVipBtn">RESERVAR</button>
-      <img src="Gemini_Generated_Image_pxpekipxpekipxpe.jpg" alt="Mapa de mesas">
+      <img src="Gemini_Generated_Image_pxpekipxpekipxpe.png" alt="Mapa de mesas" id="mapImg">
     </div>
   </div>
 </div>
@@ -402,7 +408,7 @@
   const auth = firebase.auth();
 
   if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-    db.useEmulator("localhost", 8080);
+    db.useEmulator("localhost", 8085);
     auth.useEmulator("http://localhost:9099");
   }
 
@@ -604,6 +610,11 @@
         const cfg = (nuevoEvento === 'fecha1') ? config1 : config2;
         const fechaStr = (cfg.headingText || (nuevoEvento === 'fecha1' ? 'DOMINGO 11' : 'SÁBADO 10')) + (cfg.eventDate ? ' ' + cfg.eventDate : '');
         title.textContent = 'EVENTO: ' + fechaStr;
+
+        const bgLayer = document.getElementById('mapBgLayer');
+        if (bgLayer) {
+          bgLayer.style.backgroundImage = cfg.bgUrl ? `url("${cfg.bgUrl}")` : 'none';
+        }
       }
 
       if (currentBolEvent !== nuevoEvento || !bolReservasUnsub) {
