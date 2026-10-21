@@ -1024,17 +1024,36 @@
 
     if (isException) {
       paid = exPactadaSena;
-      const unitPrice = parseInt(document.getElementById('exPrecioPersona')?.value) || (exPactadaPrecioPersona > 0 ? exPactadaPrecioPersona : 0);
+      const unitPrice = parseInt(document.getElementById('exPrecioPersona')?.value) || (exPactadaPrecioPersona > 0 ? exPactadaPrecioPersona : (exBaseTotal && exBasePersonas > 0 ? Math.round(exBaseTotal / exBasePersonas) : 25000));
       const baseHeadcount = exBasePersonas > 0 ? exBasePersonas : 4;
-      total = parseInt(document.getElementById('exTotal')?.value) || 0;
-      drinks = parseInt(document.getElementById('exDrinks')?.value) || 0;
+      const baseTotal = exBaseTotal > 0 ? exBaseTotal : (parseInt(document.getElementById('exTotal')?.value) || 120000);
+
+      const isManualFormOpen = (document.getElementById('exceptionForm')?.style.display === 'block');
+
+      if (isManualFormOpen) {
+        // Si el usuario tiene abierto el formulario manual y editó campos a mano, respetar inputs
+        total = parseInt(document.getElementById('exTotal')?.value) || baseTotal;
+        drinks = parseInt(document.getElementById('exDrinks')?.value) || 0;
+      } else {
+        // Cálculo dinámico automático: si vienen más personas que la base pactada, sumar precio por persona extra
+        const extraPeople = Math.max(0, currentPeople - baseHeadcount);
+        total = baseTotal + (extraPeople * unitPrice);
+        const drinksPctToUse = (exPactadaDrinksPct > 0 ? exPactadaDrinksPct : 80);
+        drinks = Math.round((total * drinksPctToUse) / 100);
+
+        // Mantener sincronizados los campos del formulario manual por si luego lo abren
+        const exTotEl = document.getElementById('exTotal');
+        const exDrkEl = document.getElementById('exDrinks');
+        if (exTotEl) exTotEl.value = total;
+        if (exDrkEl) exDrkEl.value = drinks;
+      }
 
       const drinksPct = (total > 0 && drinks > 0)
         ? Math.min(100, Math.round((drinks / total) * 100))
         : (exPactadaDrinksPct > 0 ? exPactadaDrinksPct : null);
       if (labelDrinks) labelDrinks.textContent = drinksPct !== null ? `En Bebidas (${drinksPct}%)` : "En Bebidas";
 
-      renderModalExDetails(total, drinks, paid, unitPrice, baseHeadcount, total);
+      renderModalExDetails(total, drinks, paid, unitPrice, baseHeadcount, baseTotal);
       balance = Math.max(0, total - paid);
     } else if (isCalcReservation) {
       const calcRes = calcularPreciosMesa(calcConfig, currentPeople);
