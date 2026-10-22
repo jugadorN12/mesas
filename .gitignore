@@ -6,3 +6,4 @@ functions/node_modules/
 *.bak
 .emulator_data/
 *-debug.log
+scratch/

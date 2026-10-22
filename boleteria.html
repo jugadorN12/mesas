@@ -107,6 +107,7 @@
     color:var(--white); font-family:'Bebas Neue',sans-serif; font-size:clamp(12px, 2.6vw, 16px);
     cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; z-index: 10;
   }
+  .table-btn.terraza-btn{ font-size:clamp(9.5px, 2.1vw, 13px); }
   .table-btn.pending{ background:linear-gradient(145deg, #ffcf58, #b66a08 55%, #613000); }
   .table-btn.approved{ background:linear-gradient(145deg, #ff5b66, #d20e21 55%, #70000a); }
   .table-btn.ingresada{ background:linear-gradient(145deg, #58a6ff, #0a56ad 55%, #002e61); }
@@ -177,6 +178,40 @@
   }
   .btn-tool:hover { background: rgba(255,255,255,0.05); border-color: var(--muted); }
 
+  /* Selector de Sector en Boletería */
+  .sector-tabs-wrap{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    width:100%;
+    box-sizing:border-box;
+    margin:0 0 12px 0;
+    background:rgba(255,255,255,0.04);
+    padding:4px;
+    border-radius:10px;
+    border:1px solid var(--grey-line);
+  }
+  .sector-tab-btn{
+    flex:1;
+    border:1px solid transparent;
+    background:transparent;
+    color:var(--grey);
+    font-weight:700;
+    font-size:13px;
+    padding:8px 12px;
+    border-radius:7px;
+    cursor:pointer;
+    transition:all 0.2s ease;
+    white-space:nowrap;
+    text-align:center;
+  }
+  .sector-tab-btn.active{
+    background:var(--red);
+    color:#fff;
+    box-shadow:0 2px 10px rgba(255,45,61,0.3);
+  }
+
   .close-btn{
     width:100%; padding:12px; background:transparent; border:1px solid var(--grey-line);
     color:var(--grey); border-radius:12px; margin-top:12px; cursor:pointer; font-weight:600;
@@ -232,6 +267,10 @@
   </div>
 
   <div class="map-wrap">
+    <div class="sector-tabs-wrap" id="sectorTabsWrap">
+      <button type="button" id="tabSectorSalon" class="sector-tab-btn active">🏢 MAIN STAGE</button>
+      <button type="button" id="tabSectorTerraza" class="sector-tab-btn">🌙 TERRACE SOUL</button>
+    </div>
     <div class="map-frame" id="plano-mesas">
       <div id="mapBgLayer" class="map-bg-layer"></div>
       <button class="ultra-vip-overlay" id="ultraVipBtn">RESERVAR</button>
@@ -412,16 +451,76 @@
     auth.useEmulator("http://localhost:9099");
   }
 
-  const TABLES = [
-    { id:"19", x:59.1, y:18.0 }, { id:"18", x:79.8, y:17.3 }, { id:"17", x:79.9, y:24.1 },
-    { id:"16", x:66.0, y:26.6 }, { id:"15", x:80.3, y:30.5 }, { id:"D",  x:52.1, y:35.1 },
-    { id:"14", x:80.2, y:37.3 }, { id:"13", x:22.9, y:38.0 }, { id:"12", x:32.4, y:37.9 },
-    { id:"11", x:42.7, y:38.0 }, { id:"10", x:63.4, y:38.4 }, { id:"9",  x:80.6, y:44.3 },
-    { id:"C",  x:57.9, y:45.5 }, { id:"8",  x:80.7, y:50.9 }, { id:"7",  x:81.8, y:58.2 },
-    { id:"B",  x:58.2, y:61.1 }, { id:"6",  x:81.8, y:65.7 }, { id:"4",  x:58.2, y:68.0 },
-    { id:"3",  x:58.2, y:74.0 }, { id:"20", x:70.8, y:74.1 }, { id:"5",  x:81.9, y:73.7 },
-    { id:"1",  x:58.5, y:80.5 }, { id:"2",  x:81.9, y:81.7 }
+  const TABLES_SALON = [
+    { id:"19", num:"19", x:59.1, y:18.0 }, { id:"18", num:"18", x:79.8, y:17.3 }, { id:"17", num:"17", x:79.9, y:24.1 },
+    { id:"16", num:"16", x:66.0, y:26.6 }, { id:"15", num:"15", x:80.3, y:30.5 }, { id:"D",  num:"D",  x:52.1, y:35.1 },
+    { id:"14", num:"14", x:80.2, y:37.3 }, { id:"13", num:"13", x:22.9, y:38.0 }, { id:"12", num:"12", x:32.4, y:37.9 },
+    { id:"11", num:"11", x:42.7, y:38.0 }, { id:"10", num:"10", x:63.4, y:38.4 }, { id:"9",  num:"9",  x:80.6, y:44.3 },
+    { id:"C",  num:"C",  x:57.9, y:45.5 }, { id:"8",  num:"8",  x:80.7, y:50.9 }, { id:"7",  num:"7",  x:81.8, y:58.2 },
+    { id:"B",  num:"B",  x:58.2, y:61.1 }, { id:"6",  num:"6",  x:81.8, y:65.7 }, { id:"4",  num:"4",  x:58.2, y:68.0 },
+    { id:"3",  num:"3",  x:58.2, y:74.0 }, { id:"20", num:"20", x:70.8, y:74.1 }, { id:"5",  num:"5",  x:81.9, y:73.7 },
+    { id:"1",  num:"1",  x:58.5, y:80.5 }, { id:"2",  num:"2",  x:81.9, y:81.7 }
   ];
+
+  const TABLES_TERRAZA = [
+    { id:"T-3",  num:"3",  x:10.9, y:35.4 },
+    { id:"T-4",  num:"4",  x:18.9, y:34.6 },
+    { id:"T-5",  num:"5",  x:26.8, y:34.6 },
+    { id:"T-6",  num:"6",  x:49.8, y:36.9 },
+    { id:"T-7",  num:"7",  x:37.7, y:41.9 },
+    { id:"T-A",  num:"A",  x:23.9, y:45.9 },
+    { id:"T-B",  num:"B",  x:36.8, y:45.9 },
+    { id:"T-C",  num:"C",  x:50.0, y:45.9 },
+    { id:"T-D",  num:"D",  x:36.8, y:52.5 },
+    { id:"T-E",  num:"E",  x:50.1, y:52.5 },
+    { id:"T-2",  num:"2",  x:11.4, y:43.4 },
+    { id:"T-1",  num:"1",  x:11.7, y:50.9 },
+    { id:"T-8",  num:"8",  x:19.0, y:52.8 },
+    { id:"T-16", num:"16", x:73.0, y:34.2 },
+    { id:"T-17", num:"17", x:77.9, y:40.6 },
+    { id:"T-18", num:"18", x:77.9, y:45.9 },
+    { id:"T-19", num:"19", x:77.9, y:50.9 },
+    { id:"T-15", num:"15", x:90.6, y:41.4 },
+    { id:"T-9",  num:"9",  x:30.3, y:64.8 },
+    { id:"T-10", num:"10", x:39.7, y:64.8 },
+    { id:"T-11", num:"11", x:48.7, y:64.8 },
+    { id:"T-12", num:"12", x:57.7, y:64.8 },
+    { id:"T-13", num:"13", x:81.7, y:64.8 },
+    { id:"T-14", num:"14", x:90.0, y:64.8 }
+  ];
+
+  let currentSector = 'salon';
+
+  function getActiveSectorTables() {
+    return currentSector === 'terraza' ? TABLES_TERRAZA : TABLES_SALON;
+  }
+
+  function setSector(sector) {
+    if (currentSector === sector) return;
+    currentSector = sector;
+
+    const tabSalon = document.getElementById("tabSectorSalon");
+    const tabTerraza = document.getElementById("tabSectorTerraza");
+    if (tabSalon) tabSalon.classList.toggle("active", sector === "salon");
+    if (tabTerraza) tabTerraza.classList.toggle("active", sector === "terraza");
+
+    const mapImgEl = document.getElementById("mapImg");
+    const ultraVipBtn = document.getElementById("ultraVipBtn");
+    const mapBgLayerEl = document.getElementById("mapBgLayer");
+
+    if (sector === "terraza") {
+      if (mapImgEl) mapImgEl.src = "terraza.jpeg";
+      if (ultraVipBtn) ultraVipBtn.style.display = "none";
+      if (mapBgLayerEl) mapBgLayerEl.style.display = "none";
+    } else {
+      if (mapImgEl) mapImgEl.src = "Gemini_Generated_Image_pxpekipxpekipxpe.png";
+      if (ultraVipBtn) ultraVipBtn.style.display = "";
+      if (mapBgLayerEl) mapBgLayerEl.style.display = "";
+    }
+
+    renderMesas();
+    actualizarUltraVip();
+  }
 
   let estado = {};
   let currentMesa = null;
@@ -613,7 +712,21 @@
 
         const bgLayer = document.getElementById('mapBgLayer');
         if (bgLayer) {
-          bgLayer.style.backgroundImage = cfg.bgUrl ? `url("${cfg.bgUrl}")` : 'none';
+          bgLayer.style.backgroundImage = (cfg.bgUrl && currentSector !== 'terraza') ? `url("${cfg.bgUrl}")` : 'none';
+        }
+
+        const sectorTabsWrap = document.getElementById("sectorTabsWrap");
+        const sectorMode = cfg.sectoresHabilitados || 'ambos';
+        if (sectorTabsWrap) {
+          if (sectorMode === 'main_stage') {
+            sectorTabsWrap.style.display = "none";
+            if (currentSector !== 'salon') setSector('salon');
+          } else if (sectorMode === 'terrace_soul') {
+            sectorTabsWrap.style.display = "none";
+            if (currentSector !== 'terraza') setSector('terraza');
+          } else {
+            sectorTabsWrap.style.display = "flex";
+          }
         }
       }
 
@@ -677,9 +790,10 @@
     const container = document.getElementById("plano-mesas");
     container.querySelectorAll(".table-btn").forEach(b => b.remove());
     const mapWidth = container.offsetWidth;
-    const btnSize = mapWidth * 0.078;
+    const isTerraza = currentSector === 'terraza';
+    const btnSize = mapWidth * (isTerraza ? 0.056 : 0.078);
 
-    TABLES.forEach(t => {
+    getActiveSectorTables().forEach(t => {
       const r = estado[t.id];
       const isActive = r && (r.status !== "disputa" || (Number.isFinite(r.expiresAt) && r.expiresAt > Date.now()));
       const isIngresada = isActive && r.status === "ingresada";
@@ -687,12 +801,12 @@
       const isPending = isActive && ["disputa", "pendiente", "comprobante_subido", "pendiente_revision"].includes(r.status);
 
       const btn = document.createElement("button");
-      btn.className = "table-btn" + (isIngresada ? " ingresada" : isApproved ? " approved" : isPending ? " pending" : "");
+      btn.className = "table-btn" + (isTerraza ? " terraza-btn" : "") + (isIngresada ? " ingresada" : isApproved ? " approved" : isPending ? " pending" : "");
       btn.style.left = t.x + "%";
       btn.style.top = t.y + "%";
       btn.style.width = btnSize + "px";
       btn.style.height = btnSize + "px";
-      btn.innerHTML = '<span class="table-label">' + t.id + '</span>';
+      btn.innerHTML = '<span class="table-label">' + (t.num || t.id) + '</span>';
       btn.onclick = () => handleTableClick(t.id);
       container.appendChild(btn);
     });
@@ -700,6 +814,12 @@
 
   function actualizarUltraVip() {
     const btn = document.getElementById("ultraVipBtn");
+    if (currentSector === 'terraza') {
+      if (btn) btn.style.display = "none";
+      return;
+    }
+    if (btn) btn.style.display = "";
+
     const r = estado["ULTRA VIP"];
     const isActive = r && (r.status !== "disputa" || (Number.isFinite(r.expiresAt) && r.expiresAt > Date.now()));
     const isIngresada = isActive && r.status === "ingresada";
@@ -778,7 +898,8 @@
 
     title.style.display = 'block';
     sub.style.display = 'block';
-    title.textContent = "MESA " + id;
+    const isTerrazaMesa = id.startsWith('T-');
+    title.textContent = isTerrazaMesa ? ('MESA ' + id.replace('T-', '') + ' · TERRACE SOUL') : (id === 'ULTRA VIP' ? 'ULTRA VIP · MAIN STAGE' : ('MESA ' + id + ' · MAIN STAGE'));
     isException = false;
     document.getElementById('exceptionForm').style.display = 'none';
     document.getElementById('toggleException').textContent = "¿ES UNA EXCEPCIÓN? (Precio manual)";
@@ -1406,6 +1527,9 @@
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2500);
   }
+
+  document.getElementById('tabSectorSalon')?.addEventListener('click', () => setSector('salon'));
+  document.getElementById('tabSectorTerraza')?.addEventListener('click', () => setSector('terraza'));
 </script>
 </body>
 </html>

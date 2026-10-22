@@ -11,7 +11,10 @@ const db = getFirestore();
 const DISPUTE_MS = 15 * 60 * 1000;
 const RATE_LIMIT_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 2;
-const MESA_IDS = new Set(["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "B", "C", "D", "ULTRA VIP"]);
+const MESA_IDS = new Set([
+  "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "B", "C", "D", "ULTRA VIP",
+  "T-1", "T-2", "T-3", "T-4", "T-5", "T-6", "T-7", "T-8", "T-9", "T-10", "T-11", "T-12", "T-13", "T-14", "T-15", "T-16", "T-17", "T-18", "T-19", "T-A", "T-B", "T-C", "T-D", "T-E"
+]);
 const twilioAccountSid = defineSecret("TWILIO_ACCOUNT_SID");
 const twilioAuthToken = defineSecret("TWILIO_AUTH_TOKEN");
 const twilioWhatsappFrom = defineSecret("TWILIO_WHATSAPP_FROM");

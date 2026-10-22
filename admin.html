@@ -254,6 +254,27 @@
       background: #333;
       color: #aaa;
     }
+    .sector-filter-btn {
+      padding: 7px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      transition: all 0.2s ease;
+    }
+    .sector-filter-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+    .sector-filter-btn.active {
+      background: linear-gradient(135deg, var(--gold) 0%, #b8860b 100%);
+      color: #000;
+      border-color: var(--gold);
+      box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+    }
     .active-event-banner {
       margin-bottom: 22px;
       padding: 12px 18px;
@@ -1327,11 +1348,33 @@
         <button id="saveHeading" type="button">Guardar</button>
       </div>
       <div class="event-status" id="headingStatus"></div>
+    <section class="event-card" id="sectoresCard">
+      <h2>Sectores habilitados para esta fecha</h2>
+      <p>Elegí qué áreas del bar están activas para reservas en la fecha seleccionada.</p>
+      <div class="event-controls" style="align-items:flex-end;">
+        <label style="flex:2;">
+          Modo de sectores
+          <select id="selectSectoresMode" style="background:#0d0d12; color:#fff; border:1px solid var(--line); border-radius:8px; padding:11px 12px; font-size:14px; font-weight:700; width:100%; box-sizing:border-box;">
+            <option value="ambos">🟢 Ambos sectores (MAIN STAGE + TERRACE SOUL)</option>
+            <option value="main_stage">🏢 Solo MAIN STAGE (Salón)</option>
+            <option value="terrace_soul">🌙 Solo TERRACE SOUL (Terraza)</option>
+          </select>
+        </label>
+        <button id="saveSectoresMode" type="button" style="white-space:nowrap;">Guardar sectores</button>
+      </div>
+      <div class="event-status" id="sectoresModeStatus"></div>
     </section>
 
-
-
     <section class="print-report" id="printReport" aria-hidden="true"></section>
+
+    <!-- Barra de filtro por sector para la lista de reservas -->
+    <div id="sectorFilterBar" style="display:flex; gap:10px; margin: 26px 0 14px; flex-wrap:wrap; align-items:center;">
+      <span style="font-size:12.5px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Filtrar reservas por sector:</span>
+      <button type="button" class="sector-filter-btn active" data-filter="todos" id="btnFilterTodos">Todos</button>
+      <button type="button" class="sector-filter-btn" data-filter="main_stage" id="btnFilterMain">🏢 MAIN STAGE</button>
+      <button type="button" class="sector-filter-btn" data-filter="terrace_soul" id="btnFilterTerrace">🌙 TERRACE SOUL</button>
+    </div>
+
     <section class="card" id="list"></section>
   </main>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -1383,7 +1426,10 @@
     const saveHeading=document.getElementById('saveHeading');
     const headingStatus=document.getElementById('headingStatus');
     const list=document.getElementById('list');
-    const TABLE_ORDER=['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','B','C','D','ULTRA VIP'];
+    const TABLE_ORDER=[
+      '1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','B','C','D','ULTRA VIP',
+      'T-1','T-2','T-3','T-4','T-5','T-6','T-7','T-8','T-9','T-10','T-11','T-12','T-13','T-14','T-15','T-16','T-17','T-18','T-19','T-A','T-B','T-C','T-D','T-E'
+    ];
 
     // Variables de estado para la reserva desde la Calculadora
     let calcSelectedPayment = null; // 'efectivo' | 'transferencia' | null
@@ -1438,6 +1484,10 @@
       headingDateInput.value = data?.eventDate !== undefined ? data.eventDate : 'OCT';
       headingSizeInput.value = data?.headingSize || 17;
       headingFontInput.value = data?.headingFont || "'Bebas Neue', sans-serif";
+      const selSectores = document.getElementById('selectSectoresMode');
+      if (selSectores) {
+        selSectores.value = data?.sectoresHabilitados || 'ambos';
+      }
     }
 
     function listenReservas() {
@@ -1622,7 +1672,8 @@
       const eventTag = currentAdminEvent === 'fecha1' ? 'FECHA 1' : 'FECHA 2';
       const rows=TABLE_ORDER.map(mesa=>{
         const reserva=data[mesa],state=printStatusLabel(reserva);
-        return '<tr><td>'+escapeHtml(mesa)+'</td><td>'+escapeHtml(reserva?.nombre||'-')+'</td><td class="print-status '+state.className+'">'+state.label+'</td><td class="print-amount">&nbsp;</td><td>'+(reserva?.ts?formatDate(reserva.ts):'-')+'</td></tr>';
+        const mesaLabel = mesa.startsWith('T-') ? (mesa.replace('T-', '') + ' (TERRACE SOUL)') : (mesa + ' (MAIN STAGE)');
+        return '<tr><td>'+escapeHtml(mesaLabel)+'</td><td>'+escapeHtml(reserva?.nombre||'-')+'</td><td class="print-status '+state.className+'">'+state.label+'</td><td class="print-amount">&nbsp;</td><td>'+(reserva?.ts?formatDate(reserva.ts):'-')+'</td></tr>';
       }).join('');
       printReport.innerHTML='<h1>CUBANO BAR - Estado de mesas ('+eventTag+')</h1><p><strong>Evento:</strong> '+escapeHtml(eventName)+(eventDate?' | <strong>Fecha:</strong> '+escapeHtml(eventDate):'')+'</p><p>Impreso: '+new Date().toLocaleString('es-AR')+'</p><table class="print-table"><thead><tr><th>Mesa</th><th>Nombre / reserva</th><th>Estado</th><th>Monto</th><th>Fecha y hora</th></tr></thead><tbody>'+rows+'</tbody></table>';
     }
@@ -1707,6 +1758,40 @@
         eventBgStatus.textContent = 'No se pudo quitar el fondo: ' + error.message;
       }
     });
+
+    const selectSectoresMode = document.getElementById('selectSectoresMode');
+    const saveSectoresMode = document.getElementById('saveSectoresMode');
+    const sectoresModeStatus = document.getElementById('sectoresModeStatus');
+
+    if (saveSectoresMode) {
+      saveSectoresMode.addEventListener('click', async () => {
+        const targetDoc = getActiveConfigDoc();
+        const targetName = currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2';
+        const modo = selectSectoresMode ? selectSectoresMode.value : 'ambos';
+        saveSectoresMode.disabled = true;
+        if (sectoresModeStatus) sectoresModeStatus.textContent = 'Guardando sectores...';
+        try {
+          await db.collection('config').doc(targetDoc).set({
+            sectoresHabilitados: modo,
+            updatedAt: Date.now(),
+            updatedBy: auth.currentUser?.email || 'admin'
+          }, { merge: true });
+          if (sectoresModeStatus) {
+            sectoresModeStatus.textContent = 'Sectores de ' + targetName + ' guardados correctamente.';
+            setTimeout(() => { if (sectoresModeStatus) sectoresModeStatus.textContent = ''; }, 3500);
+          }
+        } catch (err) {
+          if (sectoresModeStatus) sectoresModeStatus.textContent = 'Error: ' + err.message;
+        }
+        saveSectoresMode.disabled = false;
+      });
+    }
+
+    if (selectSectoresMode) {
+      selectSectoresMode.addEventListener('change', () => {
+        if (saveSectoresMode) saveSectoresMode.click();
+      });
+    }
 
     let currentUserRole = null;
     auth.onAuthStateChanged(async (user) => {
@@ -1843,8 +1928,39 @@
         setTimeout(() => captureStatus.textContent = '', 3000);
       },6500);
     });
+    let currentSectorFilter = 'todos'; // 'todos' | 'main_stage' | 'terrace_soul'
+
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.sector-filter-btn');
+      if (btn) {
+        document.querySelectorAll('.sector-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentSectorFilter = btn.dataset.filter || 'todos';
+        render();
+      }
+    });
+
     function render(){
-      const data=load(),items=Object.entries(data).sort((a,b)=>(b[1].ts||0)-(a[1].ts||0));
+      const data=load();
+      const allItems=Object.entries(data).sort((a,b)=>(b[1].ts||0)-(a[1].ts||0));
+
+      const countMain = allItems.filter(([m]) => !m.startsWith('T-')).length;
+      const countTerrace = allItems.filter(([m]) => m.startsWith('T-')).length;
+
+      const btnTodos = document.getElementById('btnFilterTodos');
+      const btnMain = document.getElementById('btnFilterMain');
+      const btnTerrace = document.getElementById('btnFilterTerrace');
+      if (btnTodos) btnTodos.textContent = `Todos (${allItems.length})`;
+      if (btnMain) btnMain.textContent = `🏢 MAIN STAGE (${countMain})`;
+      if (btnTerrace) btnTerrace.textContent = `🌙 TERRACE SOUL (${countTerrace})`;
+
+      let items = allItems;
+      if (currentSectorFilter === 'main_stage') {
+        items = allItems.filter(([m]) => !m.startsWith('T-'));
+      } else if (currentSectorFilter === 'terrace_soul') {
+        items = allItems.filter(([m]) => m.startsWith('T-'));
+      }
+
       const pending=items.filter(([,r])=>['pendiente','disputa','comprobante_subido','pendiente_revision'].includes(r.status)).length;
       const approved=items.filter(([,r])=>['aprobada','ocupada','vendida','ingresada'].includes(r.status)).length;
       const ingresadas=items.filter(([,r])=>r.status==='ingresada').length;
@@ -1858,7 +1974,7 @@
       // Ocultar botón de guardar si no hay items
       saveAllSenas.style.display = items.length ? 'block' : 'none';
 
-      list.innerHTML=items.length?'':'<div class="empty">Todavia no hay solicitudes de reserva.</div>';
+      list.innerHTML=items.length?'':'<div class="empty">No hay solicitudes de reserva en este sector.</div>';
       items.forEach(([mesa,r])=>{
         const isApproved = ['aprobada','ocupada','vendida'].includes(r.status);
         const isIngresada = r.status==='ingresada';
@@ -2009,8 +2125,13 @@
           }
         }
 
+        const isTerrazaMesa = mesa.startsWith('T-');
+        const mesaDisplay = isTerrazaMesa
+          ? `<span style="font-size:20px; font-weight:800; line-height:1;">${mesa.replace('T-', '')}</span><small style="display:block; font-size:9.5px; color:var(--amber); letter-spacing:0.5px; margin-top:2px; font-weight:800;">TERRACE SOUL</small>`
+          : `<span style="font-size:20px; font-weight:800; line-height:1;">${mesa}</span><small style="display:block; font-size:9.5px; color:var(--grey); letter-spacing:0.5px; margin-top:2px; font-weight:800;">MAIN STAGE</small>`;
+
         node.innerHTML = `
-          <div class="mesa">${mesa}</div>
+          <div class="mesa">${mesaDisplay}</div>
           <div class="detail">
             ${detailHtml}
             <small>${formatDate(r.ts)}</small><br>
@@ -2754,17 +2875,20 @@
         const opt = document.createElement('option');
         opt.value = mesaId;
 
+        const isTerraza = mesaId.startsWith('T-');
+        const mesaName = isTerraza ? `Mesa ${mesaId.replace('T-', '')} (TERRACE SOUL)` : (mesaId === 'ULTRA VIP' ? 'ULTRA VIP' : `Mesa ${mesaId} (MAIN STAGE)`);
+
         if (isSold) {
           const nombreCliente = r.nombre ? ` (${r.nombre})` : '';
-          opt.textContent = `🔴 Mesa ${mesaId} - VENDIDA${nombreCliente}`;
+          opt.textContent = `🔴 ${mesaName} - VENDIDA${nombreCliente}`;
           opt.disabled = true;
           opt.style.color = '#ff6b72';
         } else if (isPending) {
-          opt.textContent = `🟡 Mesa ${mesaId} - En disputa`;
+          opt.textContent = `🟡 ${mesaName} - En disputa`;
           opt.disabled = true;
           opt.style.color = '#ffbe3b';
         } else {
-          opt.textContent = `🟢 Mesa ${mesaId} - Libre`;
+          opt.textContent = `🟢 ${mesaName} - Libre`;
           opt.style.color = '#2ee6a6';
           opt.style.fontWeight = 'bold';
         }

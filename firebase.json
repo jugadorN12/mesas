@@ -28,7 +28,8 @@
       "*.md",
       "*.log",
       "*.bak",
-      "seed_local.js"
+      "seed_local.js",
+      "scratch/**"
     ],
     "cleanUrls": true
   },
