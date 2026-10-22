@@ -990,12 +990,19 @@
     const pctAbonado = total > 0 ? Math.round((paid / total) * 100) : 0;
     const pctSaldo = total > 0 ? Math.max(0, 100 - pctAbonado) : 0;
 
+    const MIN_PEOPLE_FLOOR = 4;
     let peopleDetailStr = '';
-    if (currentPeople <= baseHeadcount) {
-      peopleDetailStr = `${currentPeople} pers (Base: hasta ${baseHeadcount} pers)`;
+    if (currentPeople < MIN_PEOPLE_FLOOR) {
+      const precioPorCabezaEfectivo = Math.round(total / currentPeople);
+      peopleDetailStr = `${currentPeople} pers (Piso mín. ${MIN_PEOPLE_FLOOR} pers: $${total.toLocaleString('es-AR')} — $${precioPorCabezaEfectivo.toLocaleString('es-AR')} c/u)`;
+    } else if (currentPeople < baseHeadcount) {
+      const menos = baseHeadcount - currentPeople;
+      peopleDetailStr = `${currentPeople} pers (${baseHeadcount} pactadas, ${menos} menos a -$${unitPrice.toLocaleString('es-AR')} c/u)`;
+    } else if (currentPeople === baseHeadcount) {
+      peopleDetailStr = `${currentPeople} pers (Pactadas: ${baseHeadcount} pers a $${unitPrice.toLocaleString('es-AR')} c/u)`;
     } else {
       const extras = currentPeople - baseHeadcount;
-      peopleDetailStr = `${currentPeople} pers (${baseHeadcount} base + ${extras} extra${extras > 1 ? 's' : ''} a $${unitPrice.toLocaleString('es-AR')} c/u)`;
+      peopleDetailStr = `${currentPeople} pers (${baseHeadcount} base + ${extras} extra${extras > 1 ? 's' : ''} a +$${unitPrice.toLocaleString('es-AR')} c/u)`;
     }
 
     const actualDrinksPct = (total > 0 && drinks > 0) ? Math.round((drinks / total) * 100) : exPactadaDrinksPct;
@@ -1035,9 +1042,14 @@
         total = parseInt(document.getElementById('exTotal')?.value) || baseTotal;
         drinks = parseInt(document.getElementById('exDrinks')?.value) || 0;
       } else {
-        // Cálculo dinámico automático: si vienen más personas que la base pactada, sumar precio por persona extra
-        const extraPeople = Math.max(0, currentPeople - baseHeadcount);
-        total = baseTotal + (extraPeople * unitPrice);
+        // Cálculo dinámico automático:
+        // El total se ajusta sumando o restando según la cantidad de personas.
+        // Regla: el total no puede bajar del valor equivalente a 4 personas como mínimo.
+        // Si vienen menos de 4 (ej. 3, 2, 1), se cobra el piso mínimo de 4 personas.
+        const MIN_PEOPLE_FLOOR = 4;
+        const effectivePeople = Math.max(MIN_PEOPLE_FLOOR, currentPeople);
+        const diffPeople = effectivePeople - baseHeadcount;
+        total = Math.max(paid, baseTotal + (diffPeople * unitPrice));
         const drinksPctToUse = (exPactadaDrinksPct > 0 ? exPactadaDrinksPct : 80);
         drinks = Math.round((total * drinksPctToUse) / 100);
 
