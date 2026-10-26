@@ -1018,12 +1018,17 @@
         <button type="button" id="btnAdminFecha1" class="btn-event-selector" style="padding: 9px 20px; border-radius: 8px; font-weight: 800; font-size: 13.5px; cursor: pointer; border: 2px solid var(--gold); background: var(--gold); color: #000; transition: all .2s;">📅 FECHA 1 (Principal)</button>
         <button type="button" id="btnAdminFecha2" class="btn-event-selector" style="padding: 9px 20px; border-radius: 8px; font-weight: 800; font-size: 13.5px; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); background: transparent; color: #fff; transition: all .2s;">📅 FECHA 2 (Segunda)</button>
       </div>
-      <div class="control-box">
-        <input type="checkbox" id="toggleDobleFecha" style="transform: scale(1.3); cursor: pointer;">
-        <label for="toggleDobleFecha" class="control-box-label" style="cursor: pointer;">
-          Activar solapa doble fecha en el mapa público
+      <div class="control-box" style="gap: 10px;">
+        <label for="selectModoFechas" class="control-box-label" style="cursor: pointer; font-weight: bold; color: var(--gold);">
+          👁️ Visibilidad en el mapa público:
         </label>
-        <span id="dobleFechaBadge" class="doble-fecha-badge">DESACTIVADA</span>
+        <select id="selectModoFechas" class="control-box-select" style="font-weight: 600; min-width: 280px;">
+          <option value="fecha1">Solo Fecha 1 (Principal)</option>
+          <option value="fecha2">Solo Fecha 2 (Segunda)</option>
+          <option value="ambas_1_2">Ambas: Fecha 1 primero, Fecha 2 después</option>
+          <option value="ambas_2_1">Ambas: Fecha 2 primero, Fecha 1 después</option>
+        </select>
+        <span id="dobleFechaBadge" class="doble-fecha-badge">SOLO FECHA 1</span>
       </div>
       <div id="boleteriaControlWrap" class="control-box">
         <label for="selectBoleteriaMode" class="control-box-label gold">
@@ -1440,7 +1445,7 @@
     // --- Control de Doble Evento / Fechas Aisladas ---
     const btnAdminFecha1 = document.getElementById('btnAdminFecha1');
     const btnAdminFecha2 = document.getElementById('btnAdminFecha2');
-    const toggleDobleFecha = document.getElementById('toggleDobleFecha');
+    const selectModoFechas = document.getElementById('selectModoFechas');
     const dobleFechaBadge = document.getElementById('dobleFechaBadge');
     const selectBoleteriaMode = document.getElementById('selectBoleteriaMode');
     const activeEventTitle = document.getElementById('activeEventTitle');
@@ -1542,17 +1547,21 @@
     btnAdminFecha1.addEventListener('click', () => switchAdminEvent('fecha1'));
     btnAdminFecha2.addEventListener('click', () => switchAdminEvent('fecha2'));
 
-    toggleDobleFecha.addEventListener('change', async () => {
-      try {
-        await db.collection('config').doc('ultraVip').set({
-          dobleFechaActiva: toggleDobleFecha.checked,
-          updatedAt: Date.now()
-        }, { merge: true });
-      } catch (err) {
-        alert('Error al cambiar estado de doble fecha: ' + err.message);
-        toggleDobleFecha.checked = !toggleDobleFecha.checked;
-      }
-    });
+    if (selectModoFechas) {
+      selectModoFechas.addEventListener('change', async () => {
+        const nuevoModo = selectModoFechas.value;
+        const esDoble = nuevoModo.startsWith('ambas');
+        try {
+          await db.collection('config').doc('ultraVip').set({
+            modoFechas: nuevoModo,
+            dobleFechaActiva: esDoble,
+            updatedAt: Date.now()
+          }, { merge: true });
+        } catch (err) {
+          alert('Error al cambiar modo de fechas: ' + err.message);
+        }
+      });
+    }
 
     if (selectBoleteriaMode) {
       selectBoleteriaMode.addEventListener('change', async () => {
@@ -1570,23 +1579,38 @@
     db.collection('config').doc('ultraVip').onSnapshot(doc => {
       if (doc.exists) {
         configData1 = doc.data();
-        const dobleActiva = !!configData1.dobleFechaActiva;
-        toggleDobleFecha.checked = dobleActiva;
-        dobleFechaBadge.textContent = dobleActiva ? 'ACTIVADA' : 'DESACTIVADA';
-        dobleFechaBadge.style.background = dobleActiva ? 'var(--blue)' : '#333';
-        dobleFechaBadge.style.color = '#fff';
+        let modo = configData1.modoFechas;
+        if (!modo) {
+          modo = configData1.dobleFechaActiva ? 'ambas_1_2' : 'fecha1';
+        }
+        if (selectModoFechas) {
+          selectModoFechas.value = modo;
+        }
 
-        // Si doble fecha está desactivada, ocultar Fecha 2 y control de turno de Boletería
+        if (dobleFechaBadge) {
+          if (modo === 'fecha2') {
+            dobleFechaBadge.textContent = 'SOLO FECHA 2';
+            dobleFechaBadge.style.background = '#8b5cf6';
+          } else if (modo === 'ambas_1_2') {
+            dobleFechaBadge.textContent = 'AMBAS (F1 → F2)';
+            dobleFechaBadge.style.background = 'var(--blue)';
+          } else if (modo === 'ambas_2_1') {
+            dobleFechaBadge.textContent = 'AMBAS (F2 → F1)';
+            dobleFechaBadge.style.background = 'var(--blue)';
+          } else {
+            dobleFechaBadge.textContent = 'SOLO FECHA 1';
+            dobleFechaBadge.style.background = '#333';
+          }
+          dobleFechaBadge.style.color = '#fff';
+        }
+
+        // En el admin, siempre permitimos ver y cambiar entre Fecha 1 y Fecha 2
         if (btnAdminFecha2) {
-          btnAdminFecha2.style.display = dobleActiva ? 'inline-block' : 'none';
+          btnAdminFecha2.style.display = 'inline-block';
         }
         const bolWrap = document.getElementById('boleteriaControlWrap');
         if (bolWrap) {
-          bolWrap.style.display = dobleActiva ? 'flex' : 'none';
-        }
-
-        if (!dobleActiva && currentAdminEvent === 'fecha2') {
-          switchAdminEvent('fecha1');
+          bolWrap.style.display = modo.startsWith('ambas') ? 'flex' : 'none';
         }
 
         if (selectBoleteriaMode) {

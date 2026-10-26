@@ -675,7 +675,9 @@
     };
 
     function calcularEventoBoleteria() {
-      if (!config1.dobleFechaActiva) return 'fecha1';
+      const modo = config1.modoFechas || (config1.dobleFechaActiva ? 'ambas_1_2' : 'fecha1');
+      if (modo === 'fecha1') return 'fecha1';
+      if (modo === 'fecha2') return 'fecha2';
 
       if (config1.boleteriaOverride === 'fecha1') return 'fecha1';
       if (config1.boleteriaOverride === 'fecha2') return 'fecha2';

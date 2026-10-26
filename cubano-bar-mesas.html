@@ -1396,7 +1396,28 @@
   let userRole = null;
   let isMaster = false;
 
+  let userHasChosenEvent = false;
+
   function aplicarConfiguracionActiva(){
+    const modo = configFecha1.modoFechas || (configFecha1.dobleFechaActiva ? 'ambas_1_2' : 'fecha1');
+    const esDoble = modo.startsWith('ambas');
+
+    if (esDoble) {
+      if (!userHasChosenEvent) {
+        const defaultKey = (modo === 'ambas_2_1') ? 'fecha2' : 'fecha1';
+        if (currentEventKey !== defaultKey) {
+          currentEventKey = defaultKey;
+          escucharReservas();
+        }
+      }
+    } else {
+      const targetKey = (modo === 'fecha2') ? 'fecha2' : 'fecha1';
+      if (currentEventKey !== targetKey) {
+        currentEventKey = targetKey;
+        escucharReservas();
+      }
+    }
+
     const cfg = currentEventKey === 'fecha1' ? configFecha1 : configFecha2;
     eventLogoOverlay.src = cfg.logoUrl || "";
     eventLogoOverlay.alt = cfg.eventName ? "Logo de " + cfg.eventName : "Logo del evento ULTRA VIP";
@@ -1431,10 +1452,10 @@
       }
     }
 
-    const dobleActiva = !!configFecha1.dobleFechaActiva;
-    if(dobleActiva){
+    if(esDoble){
       singleHeadingWrap.style.display = "none";
       eventTabsWrap.style.display = "inline-flex";
+      eventTabsWrap.style.flexDirection = (modo === 'ambas_2_1') ? 'row-reverse' : 'row';
 
       tabPublicFecha1Title.textContent = configFecha1.headingText || "DOMINGO 11";
       tabPublicFecha1Date.textContent = configFecha1.eventDate !== undefined ? configFecha1.eventDate : "OCT";
@@ -1444,22 +1465,18 @@
       tabPublicFecha1.classList.toggle('active', currentEventKey === 'fecha1');
       tabPublicFecha2.classList.toggle('active', currentEventKey === 'fecha2');
     }else{
-      if(currentEventKey !== 'fecha1'){
-        currentEventKey = 'fecha1';
-        escucharReservas();
-      }
       singleHeadingWrap.style.display = "block";
       eventTabsWrap.style.display = "none";
 
-      ultraVipHeading.childNodes[0].textContent = configFecha1.headingText || "ULTRA VIP";
-      ultraVipHeading.style.fontSize = configFecha1.headingSize ? configFecha1.headingSize + "px" : "17px";
-      ultraVipHeading.style.fontFamily = configFecha1.headingFont || "'Bebas Neue', sans-serif";
+      ultraVipHeading.childNodes[0].textContent = cfg.headingText || (currentEventKey === 'fecha1' ? "ULTRA VIP" : "SEGUNDA FECHA");
+      ultraVipHeading.style.fontSize = cfg.headingSize ? cfg.headingSize + "px" : "17px";
+      ultraVipHeading.style.fontFamily = cfg.headingFont || "'Bebas Neue', sans-serif";
       const dateNode = ultraVipHeading.querySelector('.event-date');
       if(dateNode) dateNode.remove();
-      if(configFecha1.eventDate){
+      if(cfg.eventDate){
         const date = document.createElement('span');
         date.className = 'event-date';
-        date.textContent = configFecha1.eventDate;
+        date.textContent = cfg.eventDate;
         ultraVipHeading.appendChild(date);
       }
     }
@@ -1482,6 +1499,7 @@
   }
 
   function switchPublicEvent(key){
+    userHasChosenEvent = true;
     if(currentEventKey === key) return;
     currentEventKey = key;
     if(overlay && overlay.classList.contains("open")) {
