@@ -224,16 +224,17 @@
     /* --- Terrace Soul Overlays Interactivos --- */
   .map-frame .terrace-logo-overlay{
     position:absolute;
-    left:7%;
-    top:1.2%;
-    width:86% !important;
-    height:17.5% !important;
-    max-width:86%;
-    max-height:17.5%;
+    left:50%;
+    transform:translateX(-50%);
+    top:1.5%;
+    width:68% !important;
+    height:19% !important;
+    max-width:68%;
+    max-height:19%;
     z-index:5;
     display:none;
     object-fit:contain;
-    object-position:center;
+    object-position:bottom center;
     pointer-events:none;
     filter:drop-shadow(0 4px 10px rgba(0,0,0,0.85));
   }

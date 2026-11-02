@@ -1,5 +1,5 @@
 // Service Worker para Cubano Bar (PWA)
-const CACHE_NAME = 'cubanobar-v5';
+const CACHE_NAME = 'cubanobar-v6';
 const STATIC_ASSETS = [
   './shared.css',
   './manifest.json',
