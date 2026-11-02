@@ -1372,6 +1372,55 @@
       <div class="event-status" id="sectoresModeStatus"></div>
     </section>
 
+        <!-- Configuración Exclusiva de TERRACE SOUL -->
+    <div style="margin: 32px 0 16px; border-top: 1px dashed rgba(255,189,62,0.3); padding-top: 22px;">
+      <h3 style="color: var(--gold); font-size: 15px; letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 4px; display:flex; align-items:center; gap:8px;">
+        <span>🌙</span> SECTOR TERRACE SOUL (Al aire libre)
+      </h3>
+      <p style="font-size: 12.5px; color: var(--muted); margin: 0;">Personalizá el logo, fondo temático y fecha independientes para la terraza en esta fecha.</p>
+    </div>
+
+    <section class="event-card" id="terraceLogoCard">
+      <h2>Logo del evento en TERRACE SOUL</h2>
+      <p>Pegá la URL pública del logo que aparecerá arriba en el mapa de la terraza (alojado en Cloudinary).</p>
+      <div class="event-controls">
+        <label>Nombre del evento terraza<input id="terraceEventNameInput" type="text" maxlength="50" placeholder="Ej.: Sunset Soul"></label>
+        <label style="flex:2;">URL pública del logo terraza<input id="terraceLogoUrlInput" type="url" placeholder="https://res.cloudinary.com/..."></label>
+        <button id="saveTerraceLogo" type="button">Guardar logo terraza</button>
+      </div>
+      <div style="display:flex; gap:12px; align-items:center; margin-top:10px;">
+        <button id="removeTerraceLogo" type="button" class="delete" style="width:auto; margin-top:0;">Quitar logo terraza</button>
+        <div id="terraceLogoPreview" style="display:none; width:60px; height:60px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background-size:contain; background-position:center; background-repeat:no-repeat; box-shadow:0 2px 6px rgba(0,0,0,0.5); background-color: rgba(0,0,0,0.4);"></div>
+        <span id="terraceLogoPreviewLabel" style="font-size:12px; color:var(--grey); display:none;">Vista previa</span>
+      </div>
+      <div class="event-status" id="terraceLogoStatus"></div>
+    </section>
+
+    <section class="event-card" id="terraceBgCard">
+      <h2>Fondo temático de TERRACE SOUL</h2>
+      <p>Pegá la URL pública de la imagen (ej.: Cloudinary) para usar como fondo interactivo detrás de las mesas de terraza.</p>
+      <div class="event-controls">
+        <label style="flex:2;">URL pública del fondo terraza<input id="terraceBgUrlInput" type="url" placeholder="https://res.cloudinary.com/..."></label>
+        <button id="saveTerraceBg" type="button">Guardar fondo terraza</button>
+      </div>
+      <div style="display:flex; gap:12px; align-items:center; margin-top:10px;">
+        <button id="removeTerraceBg" type="button" class="delete" style="width:auto; margin-top:0;">Quitar fondo terraza</button>
+        <div id="terraceBgPreview" style="display:none; width:60px; height:60px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background-size:cover; background-position:center; background-repeat:no-repeat; box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>
+        <span id="terraceBgPreviewLabel" style="font-size:12px; color:var(--grey); display:none;">Vista previa</span>
+      </div>
+      <div class="event-status" id="terraceBgStatus"></div>
+    </section>
+
+    <section class="event-card" id="terraceDateCard">
+      <h2>Fecha visible en el mapa de TERRACE SOUL</h2>
+      <p>Texto o fecha que se verá en el recuadro inferior debajo de las mesas (si lo dejás vacío, se toma la fecha del evento).</p>
+      <div class="event-controls">
+        <label style="flex:2;">Fecha o texto a mostrar en terraza<input id="terraceDateInput" type="text" maxlength="30" placeholder="Ej.: SÁBADO 15 NOV"></label>
+        <button id="saveTerraceDate" type="button">Guardar fecha terraza</button>
+      </div>
+      <div class="event-status" id="terraceDateStatus"></div>
+    </section>
+
     <section class="print-report" id="printReport" aria-hidden="true"></section>
 
     <!-- Barra de filtro por sector para la lista de reservas -->
@@ -1462,6 +1511,42 @@
 
     function getActiveConfigDoc() {
       return currentAdminEvent === 'fecha1' ? 'ultraVip' : 'ultraVip_fecha2';
+    }
+
+    function updateTerraceLogoPreview(url) {
+      if (!terraceLogoPreview) return;
+      if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+        terraceLogoPreview.style.backgroundImage = `url("${url}")`;
+        terraceLogoPreview.style.display = 'block';
+        if (terraceLogoPreviewLabel) terraceLogoPreviewLabel.style.display = 'inline';
+      } else {
+        terraceLogoPreview.style.backgroundImage = 'none';
+        terraceLogoPreview.style.display = 'none';
+        if (terraceLogoPreviewLabel) terraceLogoPreviewLabel.style.display = 'none';
+      }
+    }
+    if (terraceLogoUrlInput) {
+      terraceLogoUrlInput.addEventListener('input', () => {
+        updateTerraceLogoPreview(terraceLogoUrlInput.value.trim());
+      });
+    }
+
+    function updateTerraceBgPreview(url) {
+      if (!terraceBgPreview) return;
+      if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+        terraceBgPreview.style.backgroundImage = `url("${url}")`;
+        terraceBgPreview.style.display = 'block';
+        if (terraceBgPreviewLabel) terraceBgPreviewLabel.style.display = 'inline';
+      } else {
+        terraceBgPreview.style.backgroundImage = 'none';
+        terraceBgPreview.style.display = 'none';
+        if (terraceBgPreviewLabel) terraceBgPreviewLabel.style.display = 'none';
+      }
+    }
+    if (terraceBgUrlInput) {
+      terraceBgUrlInput.addEventListener('input', () => {
+        updateTerraceBgPreview(terraceBgUrlInput.value.trim());
+      });
     }
 
     function updateBgPreview(url) {

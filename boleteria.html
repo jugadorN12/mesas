@@ -508,14 +508,31 @@
     const ultraVipBtn = document.getElementById("ultraVipBtn");
     const mapBgLayerEl = document.getElementById("mapBgLayer");
 
+    const cfg = (currentBolEvent === 'fecha1') ? config1 : config2;
     if (sector === "terraza") {
-      if (mapImgEl) mapImgEl.src = "terraza.jpeg";
+      if (mapImgEl) mapImgEl.src = "terraza.png";
       if (ultraVipBtn) ultraVipBtn.style.display = "none";
-      if (mapBgLayerEl) mapBgLayerEl.style.display = "none";
+      if (mapBgLayerEl) {
+        const bg = cfg.terraceBgUrl || cfg.bgUrl;
+        if (bg) {
+          mapBgLayerEl.style.backgroundImage = `url("${bg}")`;
+          mapBgLayerEl.style.display = "";
+        } else {
+          mapBgLayerEl.style.backgroundImage = "none";
+          mapBgLayerEl.style.display = "none";
+        }
+      }
     } else {
       if (mapImgEl) mapImgEl.src = "Gemini_Generated_Image_pxpekipxpekipxpe.png";
       if (ultraVipBtn) ultraVipBtn.style.display = "";
-      if (mapBgLayerEl) mapBgLayerEl.style.display = "";
+      if (mapBgLayerEl) {
+        if (cfg.bgUrl) {
+          mapBgLayerEl.style.backgroundImage = `url("${cfg.bgUrl}")`;
+          mapBgLayerEl.style.display = "";
+        } else {
+          mapBgLayerEl.style.backgroundImage = "none";
+        }
+      }
     }
 
     renderMesas();
@@ -714,7 +731,13 @@
 
         const bgLayer = document.getElementById('mapBgLayer');
         if (bgLayer) {
-          bgLayer.style.backgroundImage = (cfg.bgUrl && currentSector !== 'terraza') ? `url("${cfg.bgUrl}")` : 'none';
+          const bg = currentSector === 'terraza' ? (cfg.terraceBgUrl || cfg.bgUrl) : cfg.bgUrl;
+          if (bg) {
+            bgLayer.style.backgroundImage = `url("${bg}")`;
+            bgLayer.style.display = "";
+          } else {
+            bgLayer.style.backgroundImage = "none";
+          }
         }
 
         const sectorTabsWrap = document.getElementById("sectorTabsWrap");
