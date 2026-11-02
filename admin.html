@@ -1462,6 +1462,22 @@
     const ingresadaCount = document.getElementById('ingresadaCount');
     const peopleTotalCount = document.getElementById('peopleTotalCount');
     const printReport=document.getElementById('printReport');
+    const terraceEventNameInput=document.getElementById('terraceEventNameInput');
+    const terraceLogoUrlInput=document.getElementById('terraceLogoUrlInput');
+    const saveTerraceLogo=document.getElementById('saveTerraceLogo');
+    const removeTerraceLogo=document.getElementById('removeTerraceLogo');
+    const terraceLogoStatus=document.getElementById('terraceLogoStatus');
+    const terraceLogoPreview=document.getElementById('terraceLogoPreview');
+    const terraceLogoPreviewLabel=document.getElementById('terraceLogoPreviewLabel');
+    const terraceBgUrlInput=document.getElementById('terraceBgUrlInput');
+    const saveTerraceBg=document.getElementById('saveTerraceBg');
+    const removeTerraceBg=document.getElementById('removeTerraceBg');
+    const terraceBgStatus=document.getElementById('terraceBgStatus');
+    const terraceBgPreview=document.getElementById('terraceBgPreview');
+    const terraceBgPreviewLabel=document.getElementById('terraceBgPreviewLabel');
+    const terraceDateInput=document.getElementById('terraceDateInput');
+    const saveTerraceDate=document.getElementById('saveTerraceDate');
+    const terraceDateStatus=document.getElementById('terraceDateStatus');
     const captureMap=document.getElementById('captureMap');
     const captureStatus=document.getElementById('captureStatus');
     const eventNameInput=document.getElementById('eventNameInput');
@@ -1580,6 +1596,12 @@
       if (selSectores) {
         selSectores.value = data?.sectoresHabilitados || 'ambos';
       }
+      if (terraceEventNameInput) terraceEventNameInput.value = data?.terraceEventName || '';
+      if (terraceLogoUrlInput) terraceLogoUrlInput.value = data?.terraceLogoUrl || '';
+      updateTerraceLogoPreview(data?.terraceLogoUrl || '');
+      if (terraceBgUrlInput) terraceBgUrlInput.value = data?.terraceBgUrl || '';
+      updateTerraceBgPreview(data?.terraceBgUrl || '');
+      if (terraceDateInput) terraceDateInput.value = data?.terraceDate || '';
     }
 
     function listenReservas() {
@@ -1901,6 +1923,124 @@
     if (selectSectoresMode) {
       selectSectoresMode.addEventListener('change', () => {
         if (saveSectoresMode) saveSectoresMode.click();
+      });
+    }
+
+        // --- Handlers de Configuración Terrace Soul ---
+    if (saveTerraceLogo) {
+      saveTerraceLogo.addEventListener('click', async () => {
+        const logoUrl = terraceLogoUrlInput ? terraceLogoUrlInput.value.trim() : '';
+        const targetDoc = getActiveConfigDoc();
+        const targetName = currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2';
+        if (!logoUrl) {
+          if (terraceLogoStatus) terraceLogoStatus.textContent = 'Pegá la URL pública del logo de terraza.';
+          return;
+        }
+        saveTerraceLogo.disabled = true;
+        if (terraceLogoStatus) terraceLogoStatus.textContent = 'Guardando logo terraza...';
+        try {
+          await db.collection('config').doc(targetDoc).set({
+            terraceEventName: terraceEventNameInput ? terraceEventNameInput.value.trim() : '',
+            terraceLogoUrl: logoUrl,
+            updatedAt: Date.now(),
+            updatedBy: auth.currentUser?.email || 'admin'
+          }, { merge: true });
+          updateTerraceLogoPreview(logoUrl);
+          if (terraceLogoStatus) terraceLogoStatus.textContent = 'Logo de Terrace Soul (' + targetName + ') publicado correctamente.';
+        } catch (err) {
+          if (terraceLogoStatus) terraceLogoStatus.textContent = 'Error: ' + err.message;
+        }
+        saveTerraceLogo.disabled = false;
+      });
+    }
+
+    if (removeTerraceLogo) {
+      removeTerraceLogo.addEventListener('click', async () => {
+        const targetDoc = getActiveConfigDoc();
+        const targetName = currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2';
+        try {
+          await db.collection('config').doc(targetDoc).set({
+            terraceLogoUrl: '',
+            terraceEventName: '',
+            updatedAt: Date.now()
+          }, { merge: true });
+          if (terraceLogoUrlInput) terraceLogoUrlInput.value = '';
+          updateTerraceLogoPreview('');
+          if (terraceLogoStatus) terraceLogoStatus.textContent = 'Logo de Terrace Soul (' + targetName + ') quitado.';
+        } catch (err) {
+          if (terraceLogoStatus) terraceLogoStatus.textContent = 'Error: ' + err.message;
+        }
+      });
+    }
+
+    if (saveTerraceBg) {
+      saveTerraceBg.addEventListener('click', async () => {
+        const bgUrl = terraceBgUrlInput ? terraceBgUrlInput.value.trim() : '';
+        const targetDoc = getActiveConfigDoc();
+        const targetName = currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2';
+        if (!bgUrl) {
+          if (terraceBgStatus) terraceBgStatus.textContent = 'Pegá la URL pública del fondo de terraza.';
+          return;
+        }
+        if (!bgUrl.startsWith('http://') && !bgUrl.startsWith('https://')) {
+          if (terraceBgStatus) terraceBgStatus.textContent = 'La URL debe comenzar con https:// o http://';
+          return;
+        }
+        saveTerraceBg.disabled = true;
+        if (terraceBgStatus) terraceBgStatus.textContent = 'Guardando fondo terraza...';
+        try {
+          await db.collection('config').doc(targetDoc).set({
+            terraceBgUrl: bgUrl,
+            updatedAt: Date.now(),
+            updatedBy: auth.currentUser?.email || 'admin'
+          }, { merge: true });
+          updateTerraceBgPreview(bgUrl);
+          if (terraceBgStatus) terraceBgStatus.textContent = 'Fondo de Terrace Soul (' + targetName + ') guardado correctamente.';
+        } catch (err) {
+          if (terraceBgStatus) terraceBgStatus.textContent = 'Error: ' + err.message;
+        }
+        saveTerraceBg.disabled = false;
+      });
+    }
+
+    if (removeTerraceBg) {
+      removeTerraceBg.addEventListener('click', async () => {
+        const targetDoc = getActiveConfigDoc();
+        const targetName = currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2';
+        try {
+          await db.collection('config').doc(targetDoc).set({
+            terraceBgUrl: '',
+            updatedAt: Date.now()
+          }, { merge: true });
+          if (terraceBgUrlInput) terraceBgUrlInput.value = '';
+          updateTerraceBgPreview('');
+          if (terraceBgStatus) terraceBgStatus.textContent = 'Fondo de Terrace Soul (' + targetName + ') quitado.';
+        } catch (err) {
+          if (terraceBgStatus) terraceBgStatus.textContent = 'Error: ' + err.message;
+        }
+      });
+    }
+
+    if (saveTerraceDate) {
+      saveTerraceDate.addEventListener('click', async () => {
+        const targetDoc = getActiveConfigDoc();
+        const targetName = currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2';
+        saveTerraceDate.disabled = true;
+        if (terraceDateStatus) terraceDateStatus.textContent = 'Guardando fecha terraza...';
+        try {
+          await db.collection('config').doc(targetDoc).set({
+            terraceDate: terraceDateInput ? terraceDateInput.value.trim() : '',
+            updatedAt: Date.now(),
+            updatedBy: auth.currentUser?.email || 'admin'
+          }, { merge: true });
+          if (terraceDateStatus) {
+            terraceDateStatus.textContent = 'Fecha de Terrace Soul (' + targetName + ') guardada.';
+            setTimeout(() => { if (terraceDateStatus) terraceDateStatus.textContent = ''; }, 3500);
+          }
+        } catch (err) {
+          if (terraceDateStatus) terraceDateStatus.textContent = 'Error: ' + err.message;
+        }
+        saveTerraceDate.disabled = false;
       });
     }
 
