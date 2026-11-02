@@ -222,25 +222,19 @@
     border-color: #ff5555 !important;
   }
     /* --- Terrace Soul Overlays Interactivos --- */
-  .terrace-logo-overlay{
+  .map-frame .terrace-logo-overlay{
     position:absolute;
     left:7%;
     top:1.2%;
-    width:86%;
-    height:17.5%;
-    z-index:2;
+    width:86% !important;
+    height:17.5% !important;
+    max-width:86%;
+    max-height:17.5%;
+    z-index:5;
     display:none;
-    align-items:center;
-    justify-content:center;
-    pointer-events:none;
-  }
-  .terrace-logo-overlay img{
-    max-width:100%;
-    max-height:100%;
-    width:auto;
-    height:auto;
     object-fit:contain;
     object-position:center;
+    pointer-events:none;
     filter:drop-shadow(0 4px 10px rgba(0,0,0,0.85));
   }
   .terrace-date-badge{
@@ -252,7 +246,7 @@
     min-width:38%;
     max-width:70%;
     height:5.8%;
-    z-index:2;
+    z-index:5;
     display:none;
     align-items:center;
     justify-content:center;
@@ -863,9 +857,7 @@
       <button class="ultra-vip-overlay" id="ultraVipReserveBtn" type="button" aria-label="Reservar en ULTRA VIP">RESERVAR</button>
       <img class="event-logo-overlay" id="eventLogoOverlay" alt="Logo del evento ULTRA VIP">
       <!-- Overlay Logo exclusivo Terrace Soul (recuadro amarillo) -->
-      <div id="terraceLogoOverlay" class="terrace-logo-overlay" style="display:none;" aria-hidden="true">
-        <img id="terraceLogoImg" alt="Logo evento Terrace Soul">
-      </div>
+      <img id="terraceLogoOverlay" class="terrace-logo-overlay" alt="Logo evento Terrace Soul">
       <!-- Badge Fecha exclusiva Terrace Soul (recuadro verde) -->
       <div id="terraceDateBadge" class="terrace-date-badge" style="display:none;" aria-label="Fecha del evento"></div>
       <div id="mapBgLayer" class="map-bg-layer"></div>
@@ -1278,13 +1270,13 @@
       }
 
       // Logo exclusivo de terraza
-      if (terraceLogoOverlay && terraceLogoImg) {
+      if (terraceLogoOverlay) {
         if (cfg.terraceLogoUrl) {
-          terraceLogoImg.src = cfg.terraceLogoUrl;
-          terraceLogoImg.alt = cfg.terraceEventName ? ("Logo de " + cfg.terraceEventName) : "Logo Terrace Soul";
-          terraceLogoOverlay.style.display = "flex";
+          terraceLogoOverlay.src = cfg.terraceLogoUrl;
+          terraceLogoOverlay.alt = cfg.terraceEventName ? ("Logo de " + cfg.terraceEventName) : "Logo Terrace Soul";
+          terraceLogoOverlay.style.display = "block";
         } else {
-          terraceLogoImg.src = "";
+          terraceLogoOverlay.src = "";
           terraceLogoOverlay.style.display = "none";
         }
       }
@@ -1532,13 +1524,13 @@
       if (eventLogoOverlay) eventLogoOverlay.style.display = "none";
       if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "none";
 
-      if (terraceLogoOverlay && terraceLogoImg) {
+      if (terraceLogoOverlay) {
         if (cfg.terraceLogoUrl) {
-          terraceLogoImg.src = cfg.terraceLogoUrl;
-          terraceLogoImg.alt = cfg.terraceEventName ? ("Logo de " + cfg.terraceEventName) : "Logo Terrace Soul";
-          terraceLogoOverlay.style.display = "flex";
+          terraceLogoOverlay.src = cfg.terraceLogoUrl;
+          terraceLogoOverlay.alt = cfg.terraceEventName ? ("Logo de " + cfg.terraceEventName) : "Logo Terrace Soul";
+          terraceLogoOverlay.style.display = "block";
         } else {
-          terraceLogoImg.src = "";
+          terraceLogoOverlay.src = "";
           terraceLogoOverlay.style.display = "none";
         }
       }
