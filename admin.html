@@ -1377,7 +1377,11 @@
       <h3 style="color: var(--gold); font-size: 15px; letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 4px; display:flex; align-items:center; gap:8px;">
         <span>🌙</span> SECTOR TERRACE SOUL (Al aire libre)
       </h3>
-      <p style="font-size: 12.5px; color: var(--muted); margin: 0;">Personalizá el logo, fondo temático y fecha independientes para la terraza en esta fecha.</p>
+      <p style="font-size: 12.5px; color: var(--muted); margin: 0 0 12px;">Personalizá el logo, fondo temático y fecha independientes para la terraza en esta fecha.</p>
+      
+      <div style="background: rgba(255, 189, 62, 0.12); border: 1px solid var(--gold); border-radius: 8px; padding: 10px 14px; font-size: 13.5px; font-weight: 700; color: var(--gold); display: flex; align-items: center; gap: 8px;">
+        <span>📌</span> Guardando cambios para: <span id="terraceActiveDateText" style="color:#fff; text-decoration: underline;">FECHA ACTIVA</span>
+      </div>
     </div>
 
     <section class="event-card" id="terraceLogoCard">
@@ -1386,10 +1390,10 @@
       <div class="event-controls">
         <label>Nombre del evento terraza<input id="terraceEventNameInput" type="text" maxlength="50" placeholder="Ej.: Sunset Soul"></label>
         <label style="flex:2;">URL pública del logo terraza<input id="terraceLogoUrlInput" type="url" placeholder="https://res.cloudinary.com/..."></label>
-        <button id="saveTerraceLogo" type="button">Guardar logo terraza</button>
+        <button id="saveTerraceLogo" type="button" onclick="guardarTerraceLogo()">Guardar logo terraza</button>
       </div>
       <div style="display:flex; gap:12px; align-items:center; margin-top:10px;">
-        <button id="removeTerraceLogo" type="button" class="delete" style="width:auto; margin-top:0;">Quitar logo terraza</button>
+        <button id="removeTerraceLogo" type="button" class="delete" style="width:auto; margin-top:0;" onclick="quitarTerraceLogo()">Quitar logo terraza</button>
         <div id="terraceLogoPreview" style="display:none; width:60px; height:60px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background-size:contain; background-position:center; background-repeat:no-repeat; box-shadow:0 2px 6px rgba(0,0,0,0.5); background-color: rgba(0,0,0,0.4);"></div>
         <span id="terraceLogoPreviewLabel" style="font-size:12px; color:var(--grey); display:none;">Vista previa</span>
       </div>
@@ -1401,10 +1405,10 @@
       <p>Pegá la URL pública de la imagen (ej.: Cloudinary) para usar como fondo interactivo detrás de las mesas de terraza.</p>
       <div class="event-controls">
         <label style="flex:2;">URL pública del fondo terraza<input id="terraceBgUrlInput" type="url" placeholder="https://res.cloudinary.com/..."></label>
-        <button id="saveTerraceBg" type="button">Guardar fondo terraza</button>
+        <button id="saveTerraceBg" type="button" onclick="guardarTerraceBg()">Guardar fondo terraza</button>
       </div>
       <div style="display:flex; gap:12px; align-items:center; margin-top:10px;">
-        <button id="removeTerraceBg" type="button" class="delete" style="width:auto; margin-top:0;">Quitar fondo terraza</button>
+        <button id="removeTerraceBg" type="button" class="delete" style="width:auto; margin-top:0;" onclick="quitarTerraceBg()">Quitar fondo terraza</button>
         <div id="terraceBgPreview" style="display:none; width:60px; height:60px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background-size:cover; background-position:center; background-repeat:no-repeat; box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>
         <span id="terraceBgPreviewLabel" style="font-size:12px; color:var(--grey); display:none;">Vista previa</span>
       </div>
@@ -1416,7 +1420,7 @@
       <p>Texto o fecha que se verá en el recuadro inferior debajo de las mesas (si lo dejás vacío, se toma la fecha del evento).</p>
       <div class="event-controls">
         <label style="flex:2;">Fecha o texto a mostrar en terraza<input id="terraceDateInput" type="text" maxlength="30" placeholder="Ej.: SÁBADO 15 NOV"></label>
-        <button id="saveTerraceDate" type="button">Guardar fecha terraza</button>
+        <button id="saveTerraceDate" type="button" onclick="guardarTerraceDate()">Guardar fecha terraza</button>
       </div>
       <div class="event-status" id="terraceDateStatus"></div>
     </section>
@@ -1636,6 +1640,7 @@
         activeEventTitle.textContent = 'FECHA 1 (' + (configData1.headingText || 'DOMINGO 11') + ' ' + (configData1.eventDate || 'OCT') + ')';
         activeCollectionTag.textContent = 'Colección: reservas';
         populateConfigInputs(configData1);
+        updateTerraceActiveBadge();
       } else {
         btnAdminFecha2.style.background = 'var(--gold)';
         btnAdminFecha2.style.color = '#000';
@@ -1646,6 +1651,7 @@
         activeEventTitle.textContent = 'FECHA 2 (' + (configData2.headingText || 'SÁBADO 10') + ' ' + (configData2.eventDate || 'OCT') + ')';
         activeCollectionTag.textContent = 'Colección: reservas_fecha2';
         populateConfigInputs(configData2);
+        updateTerraceActiveBadge();
       }
 
       listenReservas();
@@ -1926,123 +1932,189 @@
       });
     }
 
-        // --- Handlers de Configuración Terrace Soul ---
-    if (saveTerraceLogo) {
-      saveTerraceLogo.addEventListener('click', async () => {
-        const logoUrl = terraceLogoUrlInput ? terraceLogoUrlInput.value.trim() : '';
-        const targetDoc = getActiveConfigDoc();
-        const targetName = currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2';
-        if (!logoUrl) {
-          if (terraceLogoStatus) terraceLogoStatus.textContent = 'Pegá la URL pública del logo de terraza.';
-          return;
-        }
-        saveTerraceLogo.disabled = true;
-        if (terraceLogoStatus) terraceLogoStatus.textContent = 'Guardando logo terraza...';
-        try {
-          await db.collection('config').doc(targetDoc).set({
-            terraceEventName: terraceEventNameInput ? terraceEventNameInput.value.trim() : '',
-            terraceLogoUrl: logoUrl,
-            updatedAt: Date.now(),
-            updatedBy: auth.currentUser?.email || 'admin'
-          }, { merge: true });
-          updateTerraceLogoPreview(logoUrl);
-          if (terraceLogoStatus) terraceLogoStatus.textContent = 'Logo de Terrace Soul (' + targetName + ') publicado correctamente.';
-        } catch (err) {
-          if (terraceLogoStatus) terraceLogoStatus.textContent = 'Error: ' + err.message;
-        }
-        saveTerraceLogo.disabled = false;
-      });
+        // --- Handlers Globales Robustos de Terrace Soul ---
+    function updateTerraceActiveBadge() {
+      const el = document.getElementById('terraceActiveDateText');
+      if (!el) return;
+      if (currentAdminEvent === 'fecha1') {
+        el.textContent = 'FECHA 1: ' + (configData1.headingText || 'SÁBADO 7') + ' ' + (configData1.eventDate || 'NOV');
+      } else {
+        el.textContent = 'FECHA 2: ' + (configData2.headingText || 'DOMINGO 08') + ' ' + (configData2.eventDate || 'NOV');
+      }
     }
 
-    if (removeTerraceLogo) {
-      removeTerraceLogo.addEventListener('click', async () => {
-        const targetDoc = getActiveConfigDoc();
-        const targetName = currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2';
-        try {
-          await db.collection('config').doc(targetDoc).set({
-            terraceLogoUrl: '',
-            terraceEventName: '',
-            updatedAt: Date.now()
-          }, { merge: true });
-          if (terraceLogoUrlInput) terraceLogoUrlInput.value = '';
-          updateTerraceLogoPreview('');
-          if (terraceLogoStatus) terraceLogoStatus.textContent = 'Logo de Terrace Soul (' + targetName + ') quitado.';
-        } catch (err) {
-          if (terraceLogoStatus) terraceLogoStatus.textContent = 'Error: ' + err.message;
-        }
-      });
-    }
+    window.guardarTerraceLogo = async function() {
+      const input = document.getElementById('terraceLogoUrlInput');
+      const nameInput = document.getElementById('terraceEventNameInput');
+      const status = document.getElementById('terraceLogoStatus');
+      const btn = document.getElementById('saveTerraceLogo');
+      const logoUrl = input ? input.value.trim() : '';
+      const targetDoc = getActiveConfigDoc();
+      const targetName = currentAdminEvent === 'fecha1' ? (configData1.headingText || 'Fecha 1') : (configData2.headingText || 'Fecha 2');
 
-    if (saveTerraceBg) {
-      saveTerraceBg.addEventListener('click', async () => {
-        const bgUrl = terraceBgUrlInput ? terraceBgUrlInput.value.trim() : '';
-        const targetDoc = getActiveConfigDoc();
-        const targetName = currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2';
-        if (!bgUrl) {
-          if (terraceBgStatus) terraceBgStatus.textContent = 'Pegá la URL pública del fondo de terraza.';
-          return;
+      if (!logoUrl) {
+        alert('⚠️ Pegá la URL pública del logo de terraza antes de guardar.');
+        if (status) status.textContent = 'Pegá la URL pública del logo de terraza.';
+        return;
+      }
+      if (btn) btn.disabled = true;
+      if (status) {
+        status.style.display = 'block';
+        status.style.color = '#ffbd3e';
+        status.textContent = '⏳ Guardando logo terraza...';
+      }
+      try {
+        await db.collection('config').doc(targetDoc).set({
+          terraceEventName: nameInput ? nameInput.value.trim() : '',
+          terraceLogoUrl: logoUrl,
+          updatedAt: Date.now(),
+          updatedBy: auth.currentUser?.email || 'admin'
+        }, { merge: true });
+        updateTerraceLogoPreview(logoUrl);
+        if (status) {
+          status.style.color = '#4ade80';
+          status.textContent = '✅ Logo de Terrace Soul (' + targetName + ') publicado correctamente.';
         }
-        if (!bgUrl.startsWith('http://') && !bgUrl.startsWith('https://')) {
-          if (terraceBgStatus) terraceBgStatus.textContent = 'La URL debe comenzar con https:// o http://';
-          return;
+        alert('✅ ¡Logo de terraza guardado con éxito para ' + targetName + '!');
+      } catch (err) {
+        if (status) {
+          status.style.color = '#ff5555';
+          status.textContent = '❌ Error: ' + err.message;
         }
-        saveTerraceBg.disabled = true;
-        if (terraceBgStatus) terraceBgStatus.textContent = 'Guardando fondo terraza...';
-        try {
-          await db.collection('config').doc(targetDoc).set({
-            terraceBgUrl: bgUrl,
-            updatedAt: Date.now(),
-            updatedBy: auth.currentUser?.email || 'admin'
-          }, { merge: true });
-          updateTerraceBgPreview(bgUrl);
-          if (terraceBgStatus) terraceBgStatus.textContent = 'Fondo de Terrace Soul (' + targetName + ') guardado correctamente.';
-        } catch (err) {
-          if (terraceBgStatus) terraceBgStatus.textContent = 'Error: ' + err.message;
-        }
-        saveTerraceBg.disabled = false;
-      });
-    }
+        alert('❌ Error al guardar logo: ' + err.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    };
 
-    if (removeTerraceBg) {
-      removeTerraceBg.addEventListener('click', async () => {
-        const targetDoc = getActiveConfigDoc();
-        const targetName = currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2';
-        try {
-          await db.collection('config').doc(targetDoc).set({
-            terraceBgUrl: '',
-            updatedAt: Date.now()
-          }, { merge: true });
-          if (terraceBgUrlInput) terraceBgUrlInput.value = '';
-          updateTerraceBgPreview('');
-          if (terraceBgStatus) terraceBgStatus.textContent = 'Fondo de Terrace Soul (' + targetName + ') quitado.';
-        } catch (err) {
-          if (terraceBgStatus) terraceBgStatus.textContent = 'Error: ' + err.message;
+    window.quitarTerraceLogo = async function() {
+      const input = document.getElementById('terraceLogoUrlInput');
+      const status = document.getElementById('terraceLogoStatus');
+      const targetDoc = getActiveConfigDoc();
+      const targetName = currentAdminEvent === 'fecha1' ? (configData1.headingText || 'Fecha 1') : (configData2.headingText || 'Fecha 2');
+      try {
+        await db.collection('config').doc(targetDoc).set({
+          terraceLogoUrl: '',
+          terraceEventName: '',
+          updatedAt: Date.now()
+        }, { merge: true });
+        if (input) input.value = '';
+        updateTerraceLogoPreview('');
+        if (status) {
+          status.style.color = '#ffbd3e';
+          status.textContent = 'Logo de Terrace Soul (' + targetName + ') quitado.';
         }
-      });
-    }
+        alert('🗑️ Logo de terraza quitado de ' + targetName + '.');
+      } catch (err) {
+        alert('❌ Error al quitar logo: ' + err.message);
+      }
+    };
 
-    if (saveTerraceDate) {
-      saveTerraceDate.addEventListener('click', async () => {
-        const targetDoc = getActiveConfigDoc();
-        const targetName = currentAdminEvent === 'fecha1' ? 'Fecha 1' : 'Fecha 2';
-        saveTerraceDate.disabled = true;
-        if (terraceDateStatus) terraceDateStatus.textContent = 'Guardando fecha terraza...';
-        try {
-          await db.collection('config').doc(targetDoc).set({
-            terraceDate: terraceDateInput ? terraceDateInput.value.trim() : '',
-            updatedAt: Date.now(),
-            updatedBy: auth.currentUser?.email || 'admin'
-          }, { merge: true });
-          if (terraceDateStatus) {
-            terraceDateStatus.textContent = 'Fecha de Terrace Soul (' + targetName + ') guardada.';
-            setTimeout(() => { if (terraceDateStatus) terraceDateStatus.textContent = ''; }, 3500);
-          }
-        } catch (err) {
-          if (terraceDateStatus) terraceDateStatus.textContent = 'Error: ' + err.message;
+    window.guardarTerraceBg = async function() {
+      const input = document.getElementById('terraceBgUrlInput');
+      const status = document.getElementById('terraceBgStatus');
+      const btn = document.getElementById('saveTerraceBg');
+      const bgUrl = input ? input.value.trim() : '';
+      const targetDoc = getActiveConfigDoc();
+      const targetName = currentAdminEvent === 'fecha1' ? (configData1.headingText || 'Fecha 1') : (configData2.headingText || 'Fecha 2');
+
+      if (!bgUrl) {
+        alert('⚠️ Por favor pegá la URL pública de la imagen de fondo de terraza.');
+        if (status) status.textContent = 'Pegá la URL pública del fondo de terraza.';
+        return;
+      }
+      if (!bgUrl.startsWith('http://') && !bgUrl.startsWith('https://')) {
+        alert('⚠️ La URL debe comenzar con https:// o http://');
+        if (status) status.textContent = 'La URL debe comenzar con https:// o http://';
+        return;
+      }
+      if (btn) btn.disabled = true;
+      if (status) {
+        status.style.display = 'block';
+        status.style.color = '#ffbd3e';
+        status.textContent = '⏳ Guardando fondo para ' + targetName + '...';
+      }
+      try {
+        await db.collection('config').doc(targetDoc).set({
+          terraceBgUrl: bgUrl,
+          updatedAt: Date.now(),
+          updatedBy: auth.currentUser?.email || 'admin'
+        }, { merge: true });
+        updateTerraceBgPreview(bgUrl);
+        if (status) {
+          status.style.color = '#4ade80';
+          status.textContent = '✅ Fondo de Terrace Soul (' + targetName + ') guardado correctamente.';
         }
-        saveTerraceDate.disabled = false;
-      });
-    }
+        alert('✅ ¡Fondo de terraza guardado con éxito para ' + targetName + '!');
+      } catch (err) {
+        if (status) {
+          status.style.color = '#ff5555';
+          status.textContent = '❌ Error: ' + err.message;
+        }
+        alert('❌ Error al guardar en base de datos: ' + err.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    };
+
+    window.quitarTerraceBg = async function() {
+      const input = document.getElementById('terraceBgUrlInput');
+      const status = document.getElementById('terraceBgStatus');
+      const targetDoc = getActiveConfigDoc();
+      const targetName = currentAdminEvent === 'fecha1' ? (configData1.headingText || 'Fecha 1') : (configData2.headingText || 'Fecha 2');
+      try {
+        await db.collection('config').doc(targetDoc).set({
+          terraceBgUrl: '',
+          updatedAt: Date.now()
+        }, { merge: true });
+        if (input) input.value = '';
+        updateTerraceBgPreview('');
+        if (status) {
+          status.style.color = '#ffbd3e';
+          status.textContent = 'Fondo de Terrace Soul (' + targetName + ') quitado.';
+        }
+        alert('🗑️ Fondo de terraza quitado de ' + targetName + '.');
+      } catch (err) {
+        alert('❌ Error al quitar fondo: ' + err.message);
+      }
+    };
+
+    window.guardarTerraceDate = async function() {
+      const input = document.getElementById('terraceDateInput');
+      const status = document.getElementById('terraceDateStatus');
+      const btn = document.getElementById('saveTerraceDate');
+      const targetDoc = getActiveConfigDoc();
+      const targetName = currentAdminEvent === 'fecha1' ? (configData1.headingText || 'Fecha 1') : (configData2.headingText || 'Fecha 2');
+      const dateVal = input ? input.value.trim() : '';
+
+      if (btn) btn.disabled = true;
+      if (status) {
+        status.style.display = 'block';
+        status.style.color = '#ffbd3e';
+        status.textContent = '⏳ Guardando fecha...';
+      }
+      try {
+        await db.collection('config').doc(targetDoc).set({
+          terraceDate: dateVal,
+          updatedAt: Date.now(),
+          updatedBy: auth.currentUser?.email || 'admin'
+        }, { merge: true });
+        if (status) {
+          status.style.color = '#4ade80';
+          status.textContent = '✅ Fecha de Terrace Soul (' + targetName + ') guardada.';
+          setTimeout(() => { if (status) status.textContent = ''; }, 3500);
+        }
+        alert('✅ ¡Fecha de terraza guardada con éxito para ' + targetName + '!');
+      } catch (err) {
+        if (status) {
+          status.style.color = '#ff5555';
+          status.textContent = '❌ Error: ' + err.message;
+        }
+        alert('❌ Error al guardar fecha: ' + err.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    };
 
     let currentUserRole = null;
     auth.onAuthStateChanged(async (user) => {

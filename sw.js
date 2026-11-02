@@ -1,5 +1,5 @@
 // Service Worker para Cubano Bar (PWA)
-const CACHE_NAME = 'cubanobar-v3';
+const CACHE_NAME = 'cubanobar-v4';
 const STATIC_ASSETS = [
   './shared.css',
   './manifest.json',
@@ -35,6 +35,11 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   
   if (url.origin !== self.origin || url.pathname.includes('/__/')) {
+    return;
+  }
+
+  // NUNCA cachear el panel de administración (ni /admin ni /admin.html)
+  if (url.pathname.includes('admin')) {
     return;
   }
 
