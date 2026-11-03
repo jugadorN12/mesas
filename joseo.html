@@ -198,6 +198,19 @@
       color: #fff;
       cursor: not-allowed;
     }
+    .table-btn .x-mark {
+      font-family: 'Bebas Neue', 'Inter', sans-serif;
+      font-size: 1.25em;
+      font-weight: 800;
+      line-height: 1;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+      pointer-events: none;
+    }
+    .table-btn .table-label {
+      line-height: 1;
+      pointer-events: none;
+    }
 
     /* Modal Sheet */
     .overlay {
@@ -436,14 +449,19 @@
         btn.style.top = table.y + "%";
         btn.style.width = "5.6%";
         btn.style.height = "3.15%";
-        btn.textContent = table.num;
-
         if (isReservaOcupada(r)) {
           btn.classList.add("occupied");
+          btn.innerHTML = '<span class="x-mark">X</span>';
+          btn.setAttribute("aria-label", "Mesa " + table.num + " (ocupada)");
           ocupadas++;
         } else if (isReservaDisputa(r)) {
           btn.classList.add("dispute");
+          btn.innerHTML = '<span class="table-label">' + table.num + '</span>';
+          btn.setAttribute("aria-label", "Mesa " + table.num + " (en proceso)");
           ocupadas++;
+        } else {
+          btn.innerHTML = '<span class="table-label">' + table.num + '</span>';
+          btn.setAttribute("aria-label", "Mesa " + table.num + " (libre)");
         }
 
         btn.addEventListener("click", () => {
