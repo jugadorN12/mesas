@@ -1425,83 +1425,85 @@
       <div class="event-status" id="terraceDateStatus"></div>
     </section>
 
-    <!-- ============================================== -->
-    <!-- GESTIÓN DE CLIENTE EXTERNO: EVENTO JOSEO       -->
-    <!-- ============================================== -->
-    <div style="margin: 40px 0 16px; border-top: 2px solid rgba(255,189,62,0.4); padding-top: 24px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:8px;">
-        <h3 style="color: var(--gold); font-size: 16px; letter-spacing: 1.5px; text-transform: uppercase; margin: 0; display:flex; align-items:center; gap:8px;">
-          <span>🍸</span> CLIENTE EXTERNO: EVENTO JOSEO
-        </h3>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <a href="/joseo" target="_blank" style="padding: 6px 12px; font-size: 12px; font-weight:700; background: rgba(255,255,255,0.08); color:#fff; border-radius:6px; text-decoration:none; border:1px solid rgba(255,255,255,0.15); display:inline-flex; align-items:center; gap:4px;">🔗 Mapa Público</a>
-          <a href="/joseo-admin" target="_blank" style="padding: 6px 12px; font-size: 12px; font-weight:700; background: rgba(255,189,62,0.15); color:var(--gold); border-radius:6px; text-decoration:none; border:1px solid rgba(255,189,62,0.3); display:inline-flex; align-items:center; gap:4px;">👑 Panel Admin Joseo</a>
-          <a href="/joseo-boleteria" target="_blank" style="padding: 6px 12px; font-size: 12px; font-weight:700; background: rgba(59,130,246,0.15); color:#60a5fa; border-radius:6px; text-decoration:none; border:1px solid rgba(59,130,246,0.3); display:inline-flex; align-items:center; gap:4px;">🎟️ Boletería Joseo</a>
+    <!-- ======================================================== -->
+    <!-- GESTIÓN DE CLIENTES EXTERNOS (SOLO SUPERUSUARIOS)        -->
+    <!-- ======================================================== -->
+    <div id="externalClientsSection" style="display: none;">
+      <div style="margin: 40px 0 16px; border-top: 2px solid rgba(255,189,62,0.4); padding-top: 24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:8px;">
+          <h3 style="color: var(--gold); font-size: 16px; letter-spacing: 1.5px; text-transform: uppercase; margin: 0; display:flex; align-items:center; gap:8px;">
+            <span>🍸</span> CLIENTE EXTERNO: EVENTO JOSEO
+          </h3>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <a href="/joseo" target="_blank" style="padding: 6px 12px; font-size: 12px; font-weight:700; background: rgba(255,255,255,0.08); color:#fff; border-radius:6px; text-decoration:none; border:1px solid rgba(255,255,255,0.15); display:inline-flex; align-items:center; gap:4px;">🔗 Mapa Público</a>
+            <a href="/joseo-admin" target="_blank" style="padding: 6px 12px; font-size: 12px; font-weight:700; background: rgba(255,189,62,0.15); color:var(--gold); border-radius:6px; text-decoration:none; border:1px solid rgba(255,189,62,0.3); display:inline-flex; align-items:center; gap:4px;">👑 Panel Admin Joseo</a>
+            <a href="/joseo-boleteria" target="_blank" style="padding: 6px 12px; font-size: 12px; font-weight:700; background: rgba(59,130,246,0.15); color:#60a5fa; border-radius:6px; text-decoration:none; border:1px solid rgba(59,130,246,0.3); display:inline-flex; align-items:center; gap:4px;">🎟️ Boletería Joseo</a>
+          </div>
         </div>
+        <p style="font-size: 12.5px; color: var(--muted); margin: 0 0 16px;">
+          Gestioná la configuración visual del evento Joseo y creá la cuenta de su Administrador. Este evento está 100% aislado de las reservas y caja de Cubano.
+        </p>
       </div>
-      <p style="font-size: 12.5px; color: var(--muted); margin: 0 0 16px;">
-        Gestioná la configuración visual del evento Joseo y creá la cuenta de su Administrador. Este evento está 100% aislado de las reservas y caja de Cubano.
-      </p>
+
+      <!-- 1. CREAR CUENTA ADMIN DE JOSEO -->
+      <section class="event-card" id="joseoAdminCreatorCard">
+        <h2>Crear Administrador de Joseo</h2>
+        <p>Creá la cuenta para el dueño/administrador de Joseo. Con este usuario podrá ingresar a su panel (<a href="/joseo-admin" target="_blank" style="color:var(--gold);">/joseo-admin</a>), gestionar reservas, calcular precios por mesa/persona, controlar cobros y crear sus propios asistentes y boletería.</p>
+        
+        <div class="event-controls" style="grid-template-columns: 1fr 1fr auto; gap:12px;">
+          <label>Email del Admin de Joseo<input id="joseoAdminEmailInput" type="email" placeholder="admin@joseo.com" autocomplete="off"></label>
+          <label>Contraseña (mínimo 6 caracteres)<input id="joseoAdminPasswordInput" type="password" placeholder="••••••••" autocomplete="new-password"></label>
+          <button id="btnCreateJoseoAdmin" type="button" onclick="crearAdminJoseo()" style="align-self: flex-end; height: 42px; background: linear-gradient(135deg, #ffbd3e, #d97706); color:#000; font-weight:800;">Crear Admin Joseo</button>
+        </div>
+        <div class="event-status" id="joseoAdminStatus"></div>
+
+        <!-- Lista de admins de Joseo registrados -->
+        <div style="margin-top:16px; border-top:1px solid var(--grey-line); padding-top:12px;">
+          <span style="font-size:12px; color:var(--muted); font-weight:700; text-transform:uppercase;">Admins de Joseo activos:</span>
+          <div id="joseoAdminsList" style="margin-top:8px; display:flex; flex-direction:column; gap:6px; font-size:13px; color:#fff;">
+            <em style="color:var(--muted); font-size:12px;">Cargando...</em>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. CONFIGURACIÓN VISUAL DEL EVENTO JOSEO -->
+      <section class="event-card" id="joseoDesignCard">
+        <h2>Diseño y Fecha del Evento Joseo</h2>
+        <p>Modificá el logo, imagen de fondo y fecha visibles en el mapa de Joseo (<a href="/joseo" target="_blank" style="color:var(--gold);">/joseo</a>).</p>
+        
+        <div style="display:flex; flex-direction:column; gap:16px; margin-top:12px;">
+          <!-- Logo Joseo -->
+          <div class="event-controls">
+            <label style="flex:2;">URL pública del logo de Joseo (Cloudinary)<input id="joseoLogoUrlInput" type="url" placeholder="https://res.cloudinary.com/..."></label>
+            <button id="saveJoseoLogo" type="button" onclick="guardarJoseoLogo()">Guardar logo</button>
+            <button id="removeJoseoLogo" type="button" class="delete" style="width:auto; margin-top:0;" onclick="quitarJoseoLogo()">Quitar logo</button>
+          </div>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div id="joseoLogoPreview" style="display:none; width:60px; height:60px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background-size:contain; background-position:center; background-repeat:no-repeat; box-shadow:0 2px 6px rgba(0,0,0,0.5); background-color: rgba(0,0,0,0.4);"></div>
+            <span id="joseoLogoPreviewLabel" style="font-size:12px; color:var(--grey); display:none;">Vista previa del logo</span>
+          </div>
+
+          <!-- Fondo Joseo -->
+          <div class="event-controls">
+            <label style="flex:2;">URL pública del fondo interactivo de Joseo (Cloudinary)<input id="joseoBgUrlInput" type="url" placeholder="https://res.cloudinary.com/..."></label>
+            <button id="saveJoseoBg" type="button" onclick="guardarJoseoBg()">Guardar fondo</button>
+            <button id="removeJoseoBg" type="button" class="delete" style="width:auto; margin-top:0;" onclick="quitarJoseoBg()">Quitar fondo</button>
+          </div>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div id="joseoBgPreview" style="display:none; width:60px; height:60px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background-size:cover; background-position:center; background-repeat:no-repeat; box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>
+            <span id="joseoBgPreviewLabel" style="font-size:12px; color:var(--grey); display:none;">Vista previa del fondo</span>
+          </div>
+
+          <!-- Fecha Joseo -->
+          <div class="event-controls">
+            <label style="flex:2;">Fecha o texto a mostrar en el mapa Joseo<input id="joseoDateInput" type="text" maxlength="40" placeholder="Ej.: SÁBADO 15 NOV / PRE FERIADO"></label>
+            <button id="saveJoseoDate" type="button" onclick="guardarJoseoDate()">Guardar fecha</button>
+          </div>
+        </div>
+
+        <div class="event-status" id="joseoDesignStatus"></div>
+      </section>
     </div>
-
-    <!-- 1. CREAR CUENTA ADMIN DE JOSEO -->
-    <section class="event-card" id="joseoAdminCreatorCard">
-      <h2>Crear Administrador de Joseo</h2>
-      <p>Creá la cuenta para el dueño/administrador de Joseo. Con este usuario podrá ingresar a su panel (<a href="/joseo-admin" target="_blank" style="color:var(--gold);">/joseo-admin</a>), gestionar reservas, calcular precios por mesa/persona, controlar cobros y crear sus propios asistentes y boletería.</p>
-      
-      <div class="event-controls" style="grid-template-columns: 1fr 1fr auto; gap:12px;">
-        <label>Email del Admin de Joseo<input id="joseoAdminEmailInput" type="email" placeholder="admin@joseo.com" autocomplete="off"></label>
-        <label>Contraseña (mínimo 6 caracteres)<input id="joseoAdminPasswordInput" type="password" placeholder="••••••••" autocomplete="new-password"></label>
-        <button id="btnCreateJoseoAdmin" type="button" onclick="crearAdminJoseo()" style="align-self: flex-end; height: 42px; background: linear-gradient(135deg, #ffbd3e, #d97706); color:#000; font-weight:800;">Crear Admin Joseo</button>
-      </div>
-      <div class="event-status" id="joseoAdminStatus"></div>
-
-      <!-- Lista de admins de Joseo registrados -->
-      <div style="margin-top:16px; border-top:1px solid var(--grey-line); padding-top:12px;">
-        <span style="font-size:12px; color:var(--muted); font-weight:700; text-transform:uppercase;">Admins de Joseo activos:</span>
-        <div id="joseoAdminsList" style="margin-top:8px; display:flex; flex-direction:column; gap:6px; font-size:13px; color:#fff;">
-          <em style="color:var(--muted); font-size:12px;">Cargando...</em>
-        </div>
-      </div>
-    </section>
-
-    <!-- 2. CONFIGURACIÓN VISUAL DEL EVENTO JOSEO -->
-    <section class="event-card" id="joseoDesignCard">
-      <h2>Diseño y Fecha del Evento Joseo</h2>
-      <p>Modificá el logo, imagen de fondo y fecha visibles en el mapa de Joseo (<a href="/joseo" target="_blank" style="color:var(--gold);">/joseo</a>).</p>
-      
-      <div style="display:flex; flex-direction:column; gap:16px; margin-top:12px;">
-        <!-- Logo Joseo -->
-        <div class="event-controls">
-          <label style="flex:2;">URL pública del logo de Joseo (Cloudinary)<input id="joseoLogoUrlInput" type="url" placeholder="https://res.cloudinary.com/..."></label>
-          <button id="saveJoseoLogo" type="button" onclick="guardarJoseoLogo()">Guardar logo</button>
-          <button id="removeJoseoLogo" type="button" class="delete" style="width:auto; margin-top:0;" onclick="quitarJoseoLogo()">Quitar logo</button>
-        </div>
-        <div style="display:flex; gap:12px; align-items:center;">
-          <div id="joseoLogoPreview" style="display:none; width:60px; height:60px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background-size:contain; background-position:center; background-repeat:no-repeat; box-shadow:0 2px 6px rgba(0,0,0,0.5); background-color: rgba(0,0,0,0.4);"></div>
-          <span id="joseoLogoPreviewLabel" style="font-size:12px; color:var(--grey); display:none;">Vista previa del logo</span>
-        </div>
-
-        <!-- Fondo Joseo -->
-        <div class="event-controls">
-          <label style="flex:2;">URL pública del fondo interactivo de Joseo (Cloudinary)<input id="joseoBgUrlInput" type="url" placeholder="https://res.cloudinary.com/..."></label>
-          <button id="saveJoseoBg" type="button" onclick="guardarJoseoBg()">Guardar fondo</button>
-          <button id="removeJoseoBg" type="button" class="delete" style="width:auto; margin-top:0;" onclick="quitarJoseoBg()">Quitar fondo</button>
-        </div>
-        <div style="display:flex; gap:12px; align-items:center;">
-          <div id="joseoBgPreview" style="display:none; width:60px; height:60px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background-size:cover; background-position:center; background-repeat:no-repeat; box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>
-          <span id="joseoBgPreviewLabel" style="font-size:12px; color:var(--grey); display:none;">Vista previa del fondo</span>
-        </div>
-
-        <!-- Fecha Joseo -->
-        <div class="event-controls">
-          <label style="flex:2;">Fecha o texto a mostrar en el mapa Joseo<input id="joseoDateInput" type="text" maxlength="40" placeholder="Ej.: SÁBADO 15 NOV / PRE FERIADO"></label>
-          <button id="saveJoseoDate" type="button" onclick="guardarJoseoDate()">Guardar fecha</button>
-        </div>
-      </div>
-
-      <div class="event-status" id="joseoDesignStatus"></div>
-    </section>
 
     <section class="print-report" id="printReport" aria-hidden="true"></section>
 
@@ -2580,6 +2582,8 @@
           });
 
           render(); // Dibujar la lista de reservas
+          const extSection = document.getElementById('externalClientsSection');
+          if (extSection) extSection.style.display = isMaster ? 'block' : 'none';
           if (isMaster) initJoseoManager();
         } catch(uiErr) {
           console.error("UI Render Warning (no expulsa la sesión):", uiErr);
