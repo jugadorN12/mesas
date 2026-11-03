@@ -663,11 +663,8 @@
     }
 
     function renderMesasAdmin() {
-      // Render Plano Visual
+      // 1. Render Plano Visual (posiciones x, y sobre el mapa)
       planoMesas.querySelectorAll(".table-btn").forEach(b => b.remove());
-      // Render Lista
-      mesasListContainer.innerHTML = "";
-
       TABLES_TERRAZA.forEach(table => {
         const mesaId = table.id;
         const r = reservasJoseo[mesaId] || {};
@@ -676,7 +673,6 @@
         const isApproved = ["aprobada", "confirmada", "vendida", "ocupada"].includes(status);
         const isPending = ["disputa", "pendiente", "seña", "sena"].includes(status);
 
-        // 1. Botón en el mapa
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "table-btn" + (isIngresada ? " ingresada" : isApproved ? " approved" : isPending ? " pending" : "");
@@ -685,8 +681,23 @@
         btn.textContent = table.num;
         btn.addEventListener("click", () => abrirCalculadora(mesaId));
         planoMesas.appendChild(btn);
+      });
 
-        // 2. Fila en la lista
+      // 2. Render Lista Resumen (ordenada naturalmente: 1 a 19, luego A a E)
+      mesasListContainer.innerHTML = "";
+      const sortedTables = [...TABLES_TERRAZA].sort((a, b) => {
+        const isNumA = /^\d+$/.test(a.num);
+        const isNumB = /^\d+$/.test(b.num);
+        if (isNumA && isNumB) return Number(a.num) - Number(b.num);
+        if (isNumA && !isNumB) return -1;
+        if (!isNumA && isNumB) return 1;
+        return a.num.localeCompare(b.num);
+      });
+
+      sortedTables.forEach(table => {
+        const mesaId = table.id;
+        const r = reservasJoseo[mesaId] || {};
+        const status = r.status || "libre";
         const ex = r.excepcion || {};
         const saldo = ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : (r.saldoPuerta || 0);
         const sena = ex.senaPactada !== undefined ? ex.senaPactada : (r.montoSenado || 0);
