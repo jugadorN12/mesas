@@ -27,7 +27,7 @@ service cloud.firestore {
 
     match /config/{configId} {
       allow read: if true;
-      allow write: if hasRole('admin') || (configId != 'joseo' && hasRole('assistant'));
+      allow write: if hasRole('admin') || (configId == 'joseo' && hasRole('admin_joseo')) || (configId != 'joseo' && hasRole('assistant'));
     }
 
     match /reservas/{mesaId} {

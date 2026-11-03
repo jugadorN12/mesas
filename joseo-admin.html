@@ -442,6 +442,44 @@
         </div>
         <div id="staffStatus" style="font-size: 12.5px; margin-top: 10px;"></div>
       </section>
+
+      <!-- Sección Datos de Pago y Contacto de Joseo (Solo Admin) -->
+      <section class="card" id="pagoCard" style="display: none;">
+        <h2>💳 Datos de Cobro y Contacto (Transferencias y WhatsApp)</h2>
+        <p>Estos datos se mostrarán a los clientes en el mapa público al reservar su mesa y en el botón de WhatsApp.</p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+          <div>
+            <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">Alias de transferencia</label>
+            <input type="text" id="cfgAlias" placeholder="joseo.terraza.mp" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">Titular de la cuenta</label>
+            <input type="text" id="cfgTitular" placeholder="Joseo Eventos / Nombre del titular" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+          <div>
+            <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">CBU / CVU (Opcional)</label>
+            <input type="text" id="cfgCbu" placeholder="00000031000..." style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">Monto de seña fija por mesa ($)</label>
+            <input type="number" id="cfgMontoSena" placeholder="50000" step="1000" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">Número de WhatsApp para consultas y comprobantes (sin 0 ni 15, ej.: 5491123456789)</label>
+          <input type="tel" id="cfgWhatsapp" placeholder="5491123456789" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <button type="button" class="btn-action" id="btnSavePagoConfig">Guardar Datos de Cobro y WhatsApp</button>
+          <span id="pagoConfigStatus" style="font-size: 12.5px;"></span>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -496,6 +534,7 @@
 
       <div style="display: flex; gap: 10px; margin-top: 20px;">
         <button type="button" class="btn-action" style="background: rgba(255,255,255,0.1); color:#fff; flex:1;" id="btnCancelCalc">Cerrar</button>
+        <button type="button" class="btn-action" style="background: #e11d48; color:#fff; flex:1.2; display:none;" id="btnLiberarMesa">🔓 Liberar Mesa</button>
         <button type="button" class="btn-action" style="flex:2;" id="btnSaveCalc">Guardar Reserva</button>
       </div>
     </div>
@@ -616,6 +655,7 @@
 
           // Solo el Admin de Joseo (o superadmin) puede ver y gestionar personal/roles
           personalCard.style.display = (role === "admin_joseo" || role === "admin") ? "block" : "none";
+          if (document.getElementById("pagoCard")) document.getElementById("pagoCard").style.display = (role === "admin_joseo" || role === "admin") ? "block" : "none";
 
           iniciarEscuchas();
         } catch (err) {
@@ -651,6 +691,18 @@
         } else {
           terraceDateBadge.style.display = "none";
         }
+
+        // Cargar datos de cobro
+        const cfgAlias = document.getElementById("cfgAlias");
+        const cfgTitular = document.getElementById("cfgTitular");
+        const cfgCbu = document.getElementById("cfgCbu");
+        const cfgMontoSena = document.getElementById("cfgMontoSena");
+        const cfgWhatsapp = document.getElementById("cfgWhatsapp");
+        if (cfgAlias) cfgAlias.value = c.alias || "";
+        if (cfgTitular) cfgTitular.value = c.titular || "";
+        if (cfgCbu) cfgCbu.value = c.cbu || "";
+        if (cfgMontoSena) cfgMontoSena.value = c.montoSena !== undefined ? c.montoSena : 50000;
+        if (cfgWhatsapp) cfgWhatsapp.value = c.whatsapp || "";
       });
 
       // 2. Escuchar reservas (reservas_joseo)
@@ -780,6 +832,9 @@
 
       btnSaveCalc.style.display = "block";
       btnCancelCalc.textContent = "Cerrar";
+      const btnLiberarMesa = document.getElementById("btnLiberarMesa");
+      const tieneReserva = r && (r.nombre || r.status === "aprobada" || r.status === "confirmada" || r.status === "ocupada" || r.status === "vendida" || r.status === "pendiente" || r.status === "disputa");
+      if (btnLiberarMesa) btnLiberarMesa.style.display = tieneReserva ? "block" : "none";
 
       recalcularSaldo();
       calcModalOverlay.classList.add("open");
@@ -789,6 +844,73 @@
       calcModalOverlay.classList.remove("open");
       activeMesaId = null;
     });
+
+    const btnLiberarMesa = document.getElementById("btnLiberarMesa");
+    if (btnLiberarMesa) {
+      btnLiberarMesa.addEventListener("click", async () => {
+        if (!activeMesaId) return;
+        const num = activeMesaId.replace("T-", "");
+        const ok = confirm("¿Estás seguro de LIBERAR la Mesa " + num + "?\n\nSe cancelará la reserva y la mesa quedará libre inmediatamente para todos.");
+        if (!ok) return;
+        btnLiberarMesa.disabled = true;
+        try {
+          await db.collection("reservas_joseo").doc(activeMesaId).delete();
+          calcModalOverlay.classList.remove("open");
+          activeMesaId = null;
+          alert("✅ Mesa " + num + " liberada exitosamente.");
+        } catch (err) {
+          alert("Error al liberar la mesa: " + err.message);
+        } finally {
+          btnLiberarMesa.disabled = false;
+        }
+      });
+    }
+
+    const btnSavePagoConfig = document.getElementById("btnSavePagoConfig");
+    const pagoConfigStatus = document.getElementById("pagoConfigStatus");
+    if (btnSavePagoConfig) {
+      btnSavePagoConfig.addEventListener("click", async () => {
+        if (currentRole !== "admin_joseo" && currentRole !== "admin") {
+          alert("Solo el Administrador de Joseo puede guardar datos de cobro.");
+          return;
+        }
+        btnSavePagoConfig.disabled = true;
+        if (pagoConfigStatus) {
+          pagoConfigStatus.textContent = "⏳ Guardando...";
+          pagoConfigStatus.style.color = "#ffbd3e";
+        }
+        try {
+          const cfgAlias = document.getElementById("cfgAlias");
+          const cfgTitular = document.getElementById("cfgTitular");
+          const cfgCbu = document.getElementById("cfgCbu");
+          const cfgMontoSena = document.getElementById("cfgMontoSena");
+          const cfgWhatsapp = document.getElementById("cfgWhatsapp");
+
+          await db.collection("config").doc("joseo").set({
+            alias: cfgAlias ? cfgAlias.value.trim() : "",
+            titular: cfgTitular ? cfgTitular.value.trim() : "",
+            cbu: cfgCbu ? cfgCbu.value.trim() : "",
+            montoSena: cfgMontoSena ? (Number(cfgMontoSena.value) || 0) : 50000,
+            whatsapp: cfgWhatsapp ? cfgWhatsapp.value.trim() : "",
+            updatedAt: Date.now(),
+            updatedBy: auth.currentUser.email
+          }, { merge: true });
+
+          if (pagoConfigStatus) {
+            pagoConfigStatus.textContent = "✅ Guardado correctamente";
+            pagoConfigStatus.style.color = "#10b981";
+            setTimeout(() => { pagoConfigStatus.textContent = ""; }, 3500);
+          }
+        } catch (err) {
+          if (pagoConfigStatus) {
+            pagoConfigStatus.textContent = "❌ Error: " + err.message;
+            pagoConfigStatus.style.color = "#e11d48";
+          }
+        } finally {
+          btnSavePagoConfig.disabled = false;
+        }
+      });
+    }
 
     btnSaveCalc.addEventListener("click", async () => {
       if (!activeMesaId) return;

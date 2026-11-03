@@ -1499,6 +1499,23 @@
             <label style="flex:2;">Fecha o texto a mostrar en el mapa Joseo<input id="joseoDateInput" type="text" maxlength="40" placeholder="Ej.: SÁBADO 15 NOV / PRE FERIADO"></label>
             <button id="saveJoseoDate" type="button" onclick="guardarJoseoDate()">Guardar fecha</button>
           </div>
+
+          <!-- Datos de Cobro y WhatsApp de Joseo -->
+          <div style="border-top:1px solid rgba(255,255,255,0.08); margin-top:16px; padding-top:14px;">
+            <div style="font-size:13px; font-weight:700; color:var(--gold); margin-bottom:10px;">💳 Datos de Cobro y WhatsApp para Señas (Joseo)</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+              <label>Alias de transferencia<input id="joseoAliasInput" type="text" placeholder="joseo.terrace.mp"></label>
+              <label>Titular de la cuenta<input id="joseoTitularInput" type="text" placeholder="Joseo Eventos / Nombre"></label>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+              <label>CBU / CVU (Opcional)<input id="joseoCbuInput" type="text" placeholder="00000031000..."></label>
+              <label>Monto de Seña Fija ($)<input id="joseoMontoSenaInput" type="number" placeholder="50000" step="1000"></label>
+            </div>
+            <div style="margin-bottom:12px;">
+              <label>Número WhatsApp para comprobantes (con código de país, ej.: 5491123456789)<input id="joseoWhatsappInput" type="tel" placeholder="5491123456789"></label>
+            </div>
+            <button id="saveJoseoPago" type="button" onclick="guardarJoseoPago()" style="background:var(--gold); color:#000; font-weight:700;">Guardar Datos de Cobro y WhatsApp</button>
+          </div>
         </div>
 
         <div class="event-status" id="joseoDesignStatus"></div>
@@ -2441,6 +2458,50 @@
       }
     };
 
+    window.guardarJoseoPago = async function() {
+      const alias = document.getElementById('joseoAliasInput')?.value.trim() || '';
+      const titular = document.getElementById('joseoTitularInput')?.value.trim() || '';
+      const cbu = document.getElementById('joseoCbuInput')?.value.trim() || '';
+      const montoSena = Number(document.getElementById('joseoMontoSenaInput')?.value) || 50000;
+      const whatsapp = document.getElementById('joseoWhatsappInput')?.value.trim() || '';
+      const status = document.getElementById('joseoDesignStatus');
+      const btn = document.getElementById('saveJoseoPago');
+
+      if (btn) btn.disabled = true;
+      if (status) {
+        status.style.display = 'block';
+        status.style.color = '#ffbd3e';
+        status.textContent = '⏳ Guardando datos de cobro...';
+      }
+
+      try {
+        await db.collection('config').doc('joseo').set({
+          alias,
+          titular,
+          cbu,
+          montoSena,
+          whatsapp,
+          updatedAt: Date.now(),
+          updatedBy: auth.currentUser?.email || 'admin'
+        }, { merge: true });
+
+        if (status) {
+          status.style.color = '#4ade80';
+          status.textContent = '✅ Datos de cobro y WhatsApp guardados correctamente.';
+          setTimeout(() => { if (status) status.textContent = ''; }, 3500);
+        }
+        alert('✅ ¡Datos de cobro y WhatsApp de Joseo guardados con éxito!');
+      } catch (err) {
+        if (status) {
+          status.style.color = '#ff5555';
+          status.textContent = '❌ Error: ' + err.message;
+        }
+        alert('❌ Error al guardar datos de cobro: ' + err.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    };
+
     window.guardarJoseoDate = async function() {
       const input = document.getElementById('joseoDateInput');
       const status = document.getElementById('joseoDesignStatus');
@@ -2496,6 +2557,18 @@
         updateJoseoBgPreview(data.bgUrl || '');
 
         if (dateIn && document.activeElement !== dateIn) dateIn.value = data.eventDate || '';
+
+        const aliasIn = document.getElementById('joseoAliasInput');
+        const titularIn = document.getElementById('joseoTitularInput');
+        const cbuIn = document.getElementById('joseoCbuInput');
+        const senaIn = document.getElementById('joseoMontoSenaInput');
+        const waIn = document.getElementById('joseoWhatsappInput');
+
+        if (aliasIn && document.activeElement !== aliasIn) aliasIn.value = data.alias || '';
+        if (titularIn && document.activeElement !== titularIn) titularIn.value = data.titular || '';
+        if (cbuIn && document.activeElement !== cbuIn) cbuIn.value = data.cbu || '';
+        if (senaIn && document.activeElement !== senaIn) senaIn.value = data.montoSena !== undefined ? data.montoSena : 50000;
+        if (waIn && document.activeElement !== waIn) waIn.value = data.whatsapp || '';
       });
 
       // Escuchar admins de Joseo registrados
