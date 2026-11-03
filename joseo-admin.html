@@ -612,8 +612,9 @@
           currentRole = role;
           loginView.style.display = "none";
           adminApp.style.display = "block";
-          adminRoleBadge.textContent = role === "admin_joseo" ? "ADMIN JOSEO" : (role === "admin" ? "SUPERADMIN" : "ASISTENTE (SOLO LECTURA)");
+          adminRoleBadge.textContent = role === "admin_joseo" ? "ADMIN JOSEO" : (role === "admin" ? "SUPERADMIN" : "ASISTENTE JOSEO");
 
+          // Solo el Admin de Joseo (o superadmin) puede ver y gestionar personal/roles
           personalCard.style.display = (role === "admin_joseo" || role === "admin") ? "block" : "none";
 
           iniciarEscuchas();
@@ -702,7 +703,6 @@
         const saldo = ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : (r.saldoPuerta || 0);
         const sena = ex.senaPactada !== undefined ? ex.senaPactada : (r.montoSenado || 0);
 
-        const isReadOnly = (currentRole === "assistant_joseo");
         const row = document.createElement("div");
         row.className = "mesa-row";
         row.innerHTML = `
@@ -718,7 +718,7 @@
             ${saldo > 0 ? `<span style="color:var(--gold); font-weight:700;">Resta: $${Number(saldo).toLocaleString('es-AR')}</span>` : (r.nombre ? '<span style="color:var(--green)">Pagada</span>' : 'Libre')}
           </div>
           <div style="text-align:right;">
-            <button type="button" class="btn-calc" onclick="abrirCalculadora('${mesaId}')">${isReadOnly ? 'Ver Detalle' : 'Calculadora'}</button>
+            <button type="button" class="btn-calc" onclick="abrirCalculadora('${mesaId}')">Calculadora</button>
           </div>
         `;
         mesasListContainer.appendChild(row);
@@ -752,14 +752,11 @@
     window.abrirCalculadora = function(mesaId) {
       activeMesaId = mesaId;
       const num = mesaId.replace("T-", "");
-      const isReadOnly = (currentRole === "assistant_joseo");
 
-      calcModalTitle.textContent = isReadOnly ? ("Detalle — Mesa " + num) : ("Calculadora — Mesa " + num);
+      calcModalTitle.textContent = "Calculadora — Mesa " + num;
       const sub = document.getElementById("calcModalSubtitle");
       if (sub) {
-        sub.textContent = isReadOnly 
-          ? "Consulta de valores, señas y vouchers (modo solo lectura)." 
-          : "Configurá precios, señas, cobro en puerta y vouchers de bebidas.";
+        sub.textContent = "Configurá precios, señas, cobro en puerta y vouchers de bebidas.";
       }
 
       const r = reservasJoseo[mesaId] || {};
@@ -773,17 +770,16 @@
       calcBebidas.value = ex.bebidas || (r.vouchersBebida ? (r.vouchersBebida + " vouchers de bebida") : "");
       calcNota.value = ex.nota || r.nota || "";
 
-      // Deshabilitar campos si es asistente (modo solo lectura)
-      calcNombre.disabled = isReadOnly;
-      calcContacto.disabled = isReadOnly;
-      calcValorTotal.disabled = isReadOnly;
-      calcMontoSena.disabled = isReadOnly;
-      calcPersonas.disabled = isReadOnly;
-      calcBebidas.disabled = isReadOnly;
-      calcNota.disabled = isReadOnly;
+      calcNombre.disabled = false;
+      calcContacto.disabled = false;
+      calcValorTotal.disabled = false;
+      calcMontoSena.disabled = false;
+      calcPersonas.disabled = false;
+      calcBebidas.disabled = false;
+      calcNota.disabled = false;
 
-      btnSaveCalc.style.display = isReadOnly ? "none" : "block";
-      btnCancelCalc.textContent = isReadOnly ? "Cerrar" : "Cancelar";
+      btnSaveCalc.style.display = "block";
+      btnCancelCalc.textContent = "Cerrar";
 
       recalcularSaldo();
       calcModalOverlay.classList.add("open");
@@ -796,11 +792,6 @@
 
     btnSaveCalc.addEventListener("click", async () => {
       if (!activeMesaId) return;
-
-      if (currentRole === "assistant_joseo") {
-        alert("Tu rol de Asistente es solo de lectura. No puedes modificar reservas.");
-        return;
-      }
 
       const total = Number(calcValorTotal.value) || 0;
       const sena = Number(calcMontoSena.value) || 0;
