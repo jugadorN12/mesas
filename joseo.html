@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Joseo - Reserva tu mesa</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #060608;
+      --card: #0d0d12;
+      --card-hover: #13131a;
+      --red: #e11d48;
+      --gold: #ffbd3e;
+      --gold-dark: #b8860b;
+      --green: #10b981;
+      --yellow: #f59e0b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --line: rgba(255, 255, 255, 0.08);
+      --grey-line: rgba(255, 255, 255, 0.12);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      background: rgba(6, 6, 8, 0.85);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 2px;
+      color: #fff;
+    }
+    .header-logo span { color: var(--gold); }
+    .header-badge {
+      background: rgba(255, 189, 62, 0.15);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .main-wrap {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* Estado / Leyenda */
+    .legend-bar {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; }
+    .dot.free { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .dot.dispute { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+    .dot.confirmed { background: var(--red); }
+
+    /* Plano Mesas Container */
+    .map-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 900 / 1600;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: #09090c;
+      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
+      user-select: none;
+    }
+    .map-bg-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      pointer-events: none;
+    }
+    #mapImg {
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    /* Logo overlay en recuadro amarillo */
+    .map-frame .terrace-logo-overlay {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 1.5%;
+      width: 78% !important;
+      height: 21% !important;
+      max-width: 78%;
+      max-height: 21%;
+      z-index: 5;
+      display: none;
+      object-fit: contain;
+      object-position: bottom center;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.85));
+    }
+
+    /* Fecha badge en recuadro verde */
+    .terrace-date-badge {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 70.3%;
+      width: auto;
+      min-width: 38%;
+      max-width: 70%;
+      height: 5.8%;
+      z-index: 5;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 12px;
+      box-sizing: border-box;
+      font-family: 'Bebas Neue', 'Inter', sans-serif;
+      font-size: clamp(13px, 3.8vw, 22px);
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      color: #ffffff;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(255, 40, 40, 0.7), 0 2px 4px rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(255, 60, 60, 0.45);
+      border-radius: 6px;
+      background: rgba(10, 10, 15, 0.75);
+      backdrop-filter: blur(4px);
+      box-shadow: 0 0 14px rgba(255, 30, 30, 0.25), inset 0 0 8px rgba(255, 30, 30, 0.2);
+      pointer-events: none;
+    }
+
+    /* Table buttons */
+    .table-btn {
+      position: absolute;
+      z-index: 10;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      cursor: pointer;
+      border: 2px solid rgba(255, 255, 255, 0.85);
+      background: rgba(16, 185, 129, 0.9);
+      color: #000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 10px rgba(16, 185, 129, 0.6);
+      transition: transform 0.15s ease, background 0.2s ease;
+      font-size: clamp(9px, 2.3vw, 13px);
+    }
+    .table-btn:active { transform: translate(-50%, -50%) scale(0.92); }
+    .table-btn.dispute {
+      background: rgba(245, 158, 11, 0.95);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 10px rgba(245, 158, 11, 0.7);
+      color: #000;
+    }
+    .table-btn.occupied {
+      background: rgba(225, 29, 72, 0.85);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      color: #fff;
+      cursor: not-allowed;
+    }
+
+    /* Modal Sheet */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .overlay.open { display: flex; }
+    .sheet {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card);
+      border-top: 1px solid var(--line);
+      border-radius: 20px 20px 0 0;
+      padding: 24px;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideUp 0.25s ease-out;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .sheet-title { margin: 0 0 6px; font-size: 20px; font-weight: 800; }
+    .sheet-sub { color: var(--muted); font-size: 13px; margin: 0 0 20px; }
+    .sheet label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+    .sheet input {
+      width: 100%;
+      background: #060608;
+      border: 1px solid var(--grey-line);
+      border-radius: 8px;
+      padding: 12px 14px;
+      color: #fff;
+      font-size: 14px;
+      margin-bottom: 14px;
+      box-sizing: border-box;
+    }
+    .sheet-actions { display: flex; gap: 10px; margin-top: 16px; }
+    .btn {
+      flex: 1;
+      padding: 13px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      text-align: center;
+      transition: opacity 0.2s;
+    }
+    .btn-primary { background: var(--gold); color: #000; }
+    .btn-secondary { background: rgba(255, 255, 255, 0.1); color: #fff; }
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1e293b;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      z-index: 200;
+      transition: transform 0.3s ease;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-logo" id="headerTitle">JOSEO <span>TERRACE</span></div>
+    <div class="header-badge" id="freeTablesCount">Cargando...</div>
+  </header>
+
+  <main class="main-wrap">
+    <div class="legend-bar">
+      <div class="legend-item"><span class="dot free"></span> Libre</div>
+      <div class="legend-item"><span class="dot dispute"></span> En proceso</div>
+      <div class="legend-item"><span class="dot confirmed"></span> Ocupada</div>
+    </div>
+
+    <div class="map-frame" id="plano-mesas">
+      <div id="mapBgLayer" class="map-bg-layer"></div>
+      <img id="terraceLogoOverlay" class="terrace-logo-overlay" alt="Logo Joseo Terrace">
+      <div id="terraceDateBadge" class="terrace-date-badge" aria-label="Fecha del evento"></div>
+      <img id="mapImg" src="terraza.png" alt="Plano Terraza Joseo">
+    </div>
+  </main>
+
+  <div class="overlay" id="modalOverlay">
+    <div class="sheet">
+      <h2 class="sheet-title" id="modalMesaTitle">MESA --</h2>
+      <p class="sheet-sub">Ingresá tus datos para señar tu lugar en la terraza.</p>
+
+      <label for="inputNombre">Nombre y Apellido</label>
+      <input type="text" id="inputNombre" placeholder="Ej.: Martín Gómez" maxlength="50">
+
+      <label for="inputContacto">Teléfono / WhatsApp</label>
+      <input type="tel" id="inputContacto" placeholder="Ej.: 11 2345-6789" maxlength="25">
+
+      <div class="sheet-actions">
+        <button type="button" class="btn btn-secondary" id="btnCancelarModal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="btnConfirmarReserva">Señar Mesa</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({apiKey:"AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY",authDomain:"mesas-cubano-bar.firebaseapp.com",projectId:"mesas-cubano-bar",storageBucket:"mesas-cubano-bar.firebasestorage.app",messagingSenderId:"1072135346765",appId:"1:1072135346765:web:e8a6ee5497366a8b1f5a04"});
+    const db = firebase.firestore();
+
+    const TABLES_TERRAZA = [
+      { id:"T-3",  num:"3",  x:10.9, y:35.4 },
+      { id:"T-4",  num:"4",  x:18.9, y:34.6 },
+      { id:"T-5",  num:"5",  x:26.8, y:34.6 },
+      { id:"T-6",  num:"6",  x:49.8, y:36.9 },
+      { id:"T-7",  num:"7",  x:37.7, y:41.9 },
+      { id:"T-A",  num:"A",  x:23.9, y:45.9 },
+      { id:"T-B",  num:"B",  x:36.8, y:45.9 },
+      { id:"T-C",  num:"C",  x:50.0, y:45.9 },
+      { id:"T-D",  num:"D",  x:36.8, y:52.5 },
+      { id:"T-E",  num:"E",  x:50.1, y:52.5 },
+      { id:"T-2",  num:"2",  x:11.4, y:43.4 },
+      { id:"T-1",  num:"1",  x:11.7, y:50.9 },
+      { id:"T-8",  num:"8",  x:19.0, y:52.8 },
+      { id:"T-16", num:"16", x:73.0, y:34.2 },
+      { id:"T-17", num:"17", x:77.9, y:40.6 },
+      { id:"T-18", num:"18", x:77.9, y:45.9 },
+      { id:"T-19", num:"19", x:77.9, y:50.9 },
+      { id:"T-15", num:"15", x:90.6, y:41.4 },
+      { id:"T-9",  num:"9",  x:30.3, y:64.8 },
+      { id:"T-10", num:"10", x:39.7, y:64.8 },
+      { id:"T-11", num:"11", x:48.7, y:64.8 },
+      { id:"T-12", num:"12", x:57.7, y:64.8 },
+      { id:"T-13", num:"13", x:81.7, y:64.8 },
+      { id:"T-14", num:"14", x:90.0, y:64.8 }
+    ];
+
+    const planoMesas = document.getElementById("plano-mesas");
+    const mapBgLayer = document.getElementById("mapBgLayer");
+    const terraceLogoOverlay = document.getElementById("terraceLogoOverlay");
+    const terraceDateBadge = document.getElementById("terraceDateBadge");
+    const freeTablesCount = document.getElementById("freeTablesCount");
+    const modalOverlay = document.getElementById("modalOverlay");
+    const modalMesaTitle = document.getElementById("modalMesaTitle");
+    const inputNombre = document.getElementById("inputNombre");
+    const inputContacto = document.getElementById("inputContacto");
+    const btnCancelarModal = document.getElementById("btnCancelarModal");
+    const btnConfirmarReserva = document.getElementById("btnConfirmarReserva");
+    const toast = document.getElementById("toast");
+
+    let reservasData = {};
+    let selectedMesaId = null;
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2500);
+    }
+
+    // Cargar Configuración de Joseo
+    db.collection("config").doc("joseo").onSnapshot(doc => {
+      const cfg = doc.exists ? doc.data() : {};
+      
+      // Logo
+      if (cfg.logoUrl) {
+        terraceLogoOverlay.src = cfg.logoUrl;
+        terraceLogoOverlay.style.display = "block";
+      } else {
+        terraceLogoOverlay.style.display = "none";
+      }
+
+      // Fondo
+      if (cfg.bgUrl) {
+        mapBgLayer.style.backgroundImage = `url("${cfg.bgUrl}")`;
+      } else {
+        mapBgLayer.style.backgroundImage = "none";
+      }
+
+      // Fecha
+      const fechaTxt = cfg.terraceDate || cfg.eventDate || "";
+      if (fechaTxt) {
+        terraceDateBadge.textContent = fechaTxt;
+        terraceDateBadge.style.display = "flex";
+      } else {
+        terraceDateBadge.style.display = "none";
+      }
+    });
+
+    // Escuchar Reservas de Joseo
+    db.collection("reservas_joseo").onSnapshot(snapshot => {
+      reservasData = {};
+      snapshot.forEach(doc => {
+        reservasData[doc.id] = doc.data();
+      });
+      renderMesas();
+    });
+
+    function isReservaOcupada(r) {
+      if (!r) return false;
+      return ["aprobada", "ocupada", "vendida", "ingresada"].includes(r.status);
+    }
+
+    function isReservaDisputa(r) {
+      if (!r) return false;
+      if (r.status === "disputa" && r.expiresAt && r.expiresAt <= Date.now()) return false;
+      return ["pendiente", "disputa"].includes(r.status);
+    }
+
+    function renderMesas() {
+      // Remover botones previos
+      const prevBtns = planoMesas.querySelectorAll(".table-btn");
+      prevBtns.forEach(b => b.remove());
+
+      let ocupadas = 0;
+
+      TABLES_TERRAZA.forEach(table => {
+        const r = reservasData[table.id];
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "table-btn";
+        btn.style.left = table.x + "%";
+        btn.style.top = table.y + "%";
+        btn.style.width = "5.6%";
+        btn.style.height = "3.15%";
+        btn.textContent = table.num;
+
+        if (isReservaOcupada(r)) {
+          btn.classList.add("occupied");
+          ocupadas++;
+        } else if (isReservaDisputa(r)) {
+          btn.classList.add("dispute");
+          ocupadas++;
+        }
+
+        btn.addEventListener("click", () => {
+          if (isReservaOcupada(r)) {
+            showToast("La mesa " + table.num + " ya está reservada.");
+            return;
+          }
+          abrirModal(table);
+        });
+
+        planoMesas.appendChild(btn);
+      });
+
+      const libres = TABLES_TERRAZA.length - ocupadas;
+      freeTablesCount.textContent = libres + (libres === 1 ? " mesa libre" : " mesas libres");
+    }
+
+    function abrirModal(table) {
+      selectedMesaId = table.id;
+      modalMesaTitle.textContent = "MESA " + table.num + " — JOSEO TERRACE";
+      inputNombre.value = "";
+      inputContacto.value = "";
+      modalOverlay.classList.add("open");
+      inputNombre.focus();
+    }
+
+    function cerrarModal() {
+      modalOverlay.classList.remove("open");
+      selectedMesaId = null;
+    }
+
+    btnCancelarModal.addEventListener("click", cerrarModal);
+
+    btnConfirmarReserva.addEventListener("click", async () => {
+      const nombre = inputNombre.value.trim();
+      const contacto = inputContacto.value.trim();
+
+      if (!nombre) {
+        alert("Por favor ingresá tu nombre.");
+        inputNombre.focus();
+        return;
+      }
+      if (!contacto) {
+        alert("Por favor ingresá un teléfono o WhatsApp de contacto.");
+        inputContacto.focus();
+        return;
+      }
+
+      btnConfirmarReserva.disabled = true;
+      btnConfirmarReserva.textContent = "Guardando...";
+
+      try {
+        await db.collection("reservas_joseo").doc(selectedMesaId).set({
+          nombre: nombre,
+          contacto: contacto,
+          status: "pendiente",
+          sector: "terrace_soul",
+          ts: Date.now()
+        });
+
+        cerrarModal();
+        showToast("¡Solicitud enviada para Mesa " + selectedMesaId.replace("T-", "") + "!");
+      } catch (err) {
+        alert("Error al enviar solicitud: " + err.message);
+      } finally {
+        btnConfirmarReserva.disabled = false;
+        btnConfirmarReserva.textContent = "Señar Mesa";
+      }
+    });
+  </script>
+</body>
+</html>

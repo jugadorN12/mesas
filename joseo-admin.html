@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Joseo - Panel de Control</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #09090c;
+      --card: #111116;
+      --card-hover: #171720;
+      --gold: #ffbd3e;
+      --gold-dark: #b8860b;
+      --red: #e11d48;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --line: rgba(255, 255, 255, 0.08);
+      --grey-line: rgba(255, 255, 255, 0.14);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+    .top-bar {
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0d0d12;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      letter-spacing: 2px;
+      color: #fff;
+    }
+    .brand span { color: var(--gold); }
+    .badge-role {
+      background: rgba(255, 189, 62, 0.15);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .btn-logout {
+      background: transparent;
+      border: 1px solid var(--grey-line);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 900px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card p {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0 0 16px;
+    }
+
+    /* Auth View */
+    .login-box {
+      max-width: 380px;
+      margin: 10vh auto;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    }
+    .login-box h1 { margin: 0 0 6px; font-size: 22px; }
+    .login-box label { display: block; font-size: 12px; color: var(--muted); margin: 12px 0 6px; }
+    .login-box input, .card input, .card select {
+      width: 100%;
+      background: #060608;
+      border: 1px solid var(--grey-line);
+      border-radius: 8px;
+      padding: 11px 13px;
+      color: #fff;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .btn-action {
+      background: var(--gold);
+      color: #000;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 16px;
+    }
+    .btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Tables list */
+    .mesa-row {
+      display: grid;
+      grid-template-columns: 80px 1.5fr 1fr 140px;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      gap: 12px;
+      font-size: 13.5px;
+    }
+    .mesa-row:last-child { border-bottom: none; }
+    .mesa-badge {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .status-pill.libre { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; }
+    .status-pill.pendiente { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; }
+    .status-pill.aprobada { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid #3b82f6; }
+    .status-pill.ingresada { background: rgba(225, 29, 72, 0.15); color: #e11d48; border: 1px solid #e11d48; }
+
+    .btn-calc {
+      background: rgba(255, 189, 62, 0.12);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Modal Calculadora */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      width: 100%;
+      max-width: 520px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .calc-total {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid #10b981;
+      padding: 14px;
+      border-radius: 10px;
+      margin: 16px 0;
+      text-align: center;
+    }
+    .calc-total h3 { margin: 0 0 4px; font-size: 13px; color: #10b981; text-transform: uppercase; }
+    .calc-total .amount { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #fff; }
+  </style>
+</head>
+<body>
+
+  <!-- Vista Login -->
+  <div id="loginView" class="login-box">
+    <h1>JOSEO <span>ADMIN</span></h1>
+    <p style="color:var(--muted); font-size:13px; margin:0 0 16px;">Ingresá con tu cuenta autorizada para gestionar las mesas de Joseo.</p>
+    <label for="loginEmail">Email</label>
+    <input type="email" id="loginEmail" placeholder="admin@joseo.com">
+    <label for="loginPassword">Contraseña</label>
+    <input type="password" id="loginPassword" placeholder="••••••••">
+    <button type="button" class="btn-action" id="btnLogin">Iniciar Sesión</button>
+    <div id="loginError" style="color:#ff5555; font-size:12px; margin-top:12px; text-align:center;"></div>
+  </div>
+
+  <!-- Vista Aplicación Admin -->
+  <div id="adminApp" style="display: none;">
+    <header class="top-bar">
+      <div class="brand">JOSEO <span>TERRACE</span> <span id="adminRoleBadge" class="badge-role">ADMIN</span></div>
+      <button type="button" class="btn-logout" id="btnLogout">Cerrar Sesión</button>
+    </header>
+
+    <main class="container">
+      <!-- Sección Calculadora / Resumen Rápido -->
+      <section class="card">
+        <h2>📊 Estado de Mesas en Vivo</h2>
+        <p>Listado de reservas en tiempo real para el sector terraza de Joseo.</p>
+        <div id="mesasListContainer">
+          <!-- Render dinámico de mesas -->
+        </div>
+      </section>
+
+      <!-- Sección Mi Personal (Solo para Admin Joseo) -->
+      <section class="card" id="personalCard" style="display: none;">
+        <h2>👥 Mi Personal (Boletería y Asistentes)</h2>
+        <p>Creá usuarios para tu personal de puerta y colaboradores del evento Joseo.</p>
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr auto; gap: 10px; align-items: flex-end;">
+          <div>
+            <label style="font-size: 11.5px; color: var(--muted); display: block; margin-bottom: 4px;">Email del personal</label>
+            <input type="email" id="newStaffEmail" placeholder="boletero@joseo.com">
+          </div>
+          <div>
+            <label style="font-size: 11.5px; color: var(--muted); display: block; margin-bottom: 4px;">Contraseña</label>
+            <input type="password" id="newStaffPassword" placeholder="••••••••">
+          </div>
+          <div>
+            <label style="font-size: 11.5px; color: var(--muted); display: block; margin-bottom: 4px;">Rol</label>
+            <select id="newStaffRole">
+              <option value="boleteria_joseo">🎟️ Boletería</option>
+              <option value="assistant_joseo">💼 Asistente</option>
+            </select>
+          </div>
+          <button type="button" class="btn-action" id="btnCreateStaff" style="width: auto; margin-top: 0; padding: 11px 18px;">Crear Usuario</button>
+        </div>
+        <div id="staffStatus" style="font-size: 12.5px; margin-top: 10px;"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal Calculadora de Mesa / Excepción -->
+  <div class="modal-overlay" id="calcModalOverlay">
+    <div class="modal-box">
+      <h2 id="calcModalTitle">Calculadora — Mesa --</h2>
+      <p>Configurá precios, señas, cobro en puerta y vouchers de bebidas.</p>
+
+      <div class="calc-grid">
+        <div>
+          <label style="font-size: 12px; color: var(--muted);">Nombre de la reserva</label>
+          <input type="text" id="calcNombre" placeholder="Nombre del cliente">
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--muted);">Teléfono / Contacto</label>
+          <input type="text" id="calcContacto" placeholder="11 2345-6789">
+        </div>
+      </div>
+
+      <div class="calc-grid">
+        <div>
+          <label style="font-size: 12px; color: var(--muted);">Valor Total Pactado ($)</label>
+          <input type="number" id="calcValorTotal" value="100000">
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--muted);">Monto Señado ($)</label>
+          <input type="number" id="calcMontoSena" value="50000">
+        </div>
+      </div>
+
+      <div class="calc-grid">
+        <div>
+          <label style="font-size: 12px; color: var(--muted);">Cantidad de Personas</label>
+          <input type="number" id="calcPersonas" value="4">
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--muted);">Bebidas / Vouchers</label>
+          <input type="text" id="calcBebidas" placeholder="Ej.: 1 Chandon + 4 Speed">
+        </div>
+      </div>
+
+      <div>
+        <label style="font-size: 12px; color: var(--muted);">Nota / Medio de Pago Seña</label>
+        <input type="text" id="calcNota" placeholder="Ej.: Transf Banco Galicia">
+      </div>
+
+      <div class="calc-total">
+        <h3>Saldo a cobrar en puerta por Boletería:</h3>
+        <div class="amount" id="calcSaldoDisplay">$50.000</div>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button type="button" class="btn-action" style="background: rgba(255,255,255,0.1); color:#fff;" id="btnCancelCalc">Cerrar</button>
+        <button type="button" class="btn-action" id="btnSaveCalc">Guardar Reserva</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = {apiKey:"AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY",authDomain:"mesas-cubano-bar.firebaseapp.com",projectId:"mesas-cubano-bar",storageBucket:"mesas-cubano-bar.firebasestorage.app",messagingSenderId:"1072135346765",appId:"1:1072135346765:web:e8a6ee5497366a8b1f5a04"};
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    const loginView = document.getElementById("loginView");
+    const adminApp = document.getElementById("adminApp");
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPassword = document.getElementById("loginPassword");
+    const btnLogin = document.getElementById("btnLogin");
+    const loginError = document.getElementById("loginError");
+    const btnLogout = document.getElementById("btnLogout");
+    const personalCard = document.getElementById("personalCard");
+    const adminRoleBadge = document.getElementById("adminRoleBadge");
+    const mesasListContainer = document.getElementById("mesasListContainer");
+
+    const TABLES_TERRAZA = [
+      'T-1','T-2','T-3','T-4','T-5','T-6','T-7','T-8','T-9','T-10','T-11','T-12','T-13','T-14','T-15','T-16','T-17','T-18','T-19','T-A','T-B','T-C','T-D','T-E'
+    ];
+
+    let currentRole = null;
+    let reservasJoseo = {};
+    let activeMesaId = null;
+
+    // Login
+    btnLogin.addEventListener("click", async () => {
+      const email = loginEmail.value.trim();
+      const pass = loginPassword.value;
+      loginError.textContent = "";
+      btnLogin.disabled = true;
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+      } catch (err) {
+        loginError.textContent = "Error: " + err.message;
+        btnLogin.disabled = false;
+      }
+    });
+
+    btnLogout.addEventListener("click", () => auth.signOut());
+
+    // Validar Auth y Rol
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const userDoc = await db.collection("users").doc(user.email.toLowerCase()).get();
+          if (!userDoc.exists) throw new Error("No tienes un rol asignado en el sistema.");
+          const role = userDoc.data().role;
+
+          if (role !== "admin_joseo" && role !== "assistant_joseo" && role !== "admin") {
+            throw new Error("No tienes permisos para administrar el evento Joseo.");
+          }
+
+          currentRole = role;
+          loginView.style.display = "none";
+          adminApp.style.display = "block";
+          adminRoleBadge.textContent = role === "admin_joseo" ? "ADMIN JOSEO" : (role === "admin" ? "SUPERADMIN" : "ASISTENTE JOSEO");
+
+          // Mostrar tarjeta de personal solo a admin_joseo o superadmin
+          personalCard.style.display = (role === "admin_joseo" || role === "admin") ? "block" : "none";
+
+          iniciarEscuchas();
+        } catch (err) {
+          loginError.textContent = err.message;
+          setTimeout(() => auth.signOut(), 2500);
+        }
+      } else {
+        loginView.style.display = "block";
+        adminApp.style.display = "none";
+        btnLogin.disabled = false;
+      }
+    });
+
+    function iniciarEscuchas() {
+      db.collection("reservas_joseo").onSnapshot(snapshot => {
+        reservasJoseo = {};
+        snapshot.forEach(doc => {
+          reservasJoseo[doc.id] = doc.data();
+        });
+        renderMesasAdmin();
+      });
+    }
+
+    function renderMesasAdmin() {
+      mesasListContainer.innerHTML = "";
+
+      TABLES_TERRAZA.forEach(mesaId => {
+        const r = reservasJoseo[mesaId];
+        const row = document.createElement("div");
+        row.className = "mesa-row";
+
+        const num = mesaId.replace("T-", "");
+        const status = r?.status || "libre";
+
+        row.innerHTML = `
+          <div class="mesa-badge">MESA ${num}</div>
+          <div>
+            <strong>${r?.nombre || '—'}</strong>
+            <div style="font-size:11.5px; color:var(--muted);">${r?.contacto || 'Sin contacto'}</div>
+          </div>
+          <div>
+            <span class="status-pill ${status}">${status}</span>
+          </div>
+          <div style="text-align:right;">
+            <button type="button" class="btn-calc" onclick="abrirCalculadora('${mesaId}')">Calculadora</button>
+          </div>
+        `;
+
+        mesasListContainer.appendChild(row);
+      });
+    }
+
+    // Modal Calculadora
+    const calcModalOverlay = document.getElementById("calcModalOverlay");
+    const calcModalTitle = document.getElementById("calcModalTitle");
+    const calcNombre = document.getElementById("calcNombre");
+    const calcContacto = document.getElementById("calcContacto");
+    const calcValorTotal = document.getElementById("calcValorTotal");
+    const calcMontoSena = document.getElementById("calcMontoSena");
+    const calcPersonas = document.getElementById("calcPersonas");
+    const calcBebidas = document.getElementById("calcBebidas");
+    const calcNota = document.getElementById("calcNota");
+    const calcSaldoDisplay = document.getElementById("calcSaldoDisplay");
+    const btnCancelCalc = document.getElementById("btnCancelCalc");
+    const btnSaveCalc = document.getElementById("btnSaveCalc");
+
+    function recalcularSaldo() {
+      const total = Number(calcValorTotal.value) || 0;
+      const sena = Number(calcMontoSena.value) || 0;
+      const saldo = Math.max(0, total - sena);
+      calcSaldoDisplay.textContent = "$" + saldo.toLocaleString("es-AR");
+    }
+
+    calcValorTotal.addEventListener("input", recalcularSaldo);
+    calcMontoSena.addEventListener("input", recalcularSaldo);
+
+    window.abrirCalculadora = function(mesaId) {
+      activeMesaId = mesaId;
+      const num = mesaId.replace("T-", "");
+      calcModalTitle.textContent = "Calculadora — Mesa " + num;
+
+      const r = reservasJoseo[mesaId] || {};
+      const ex = r.excepcion || {};
+
+      calcNombre.value = r.nombre || "";
+      calcContacto.value = r.contacto || "";
+      calcValorTotal.value = ex.valorPactado !== undefined ? ex.valorPactado : 100000;
+      calcMontoSena.value = ex.senaPactada !== undefined ? ex.senaPactada : (r.montoSenado || 0);
+      calcPersonas.value = ex.personas !== undefined ? ex.personas : 4;
+      calcBebidas.value = ex.bebidas || "";
+      calcNota.value = ex.nota || r.nota || "";
+
+      recalcularSaldo();
+      calcModalOverlay.classList.add("open");
+    };
+
+    btnCancelCalc.addEventListener("click", () => {
+      calcModalOverlay.classList.remove("open");
+      activeMesaId = null;
+    });
+
+    btnSaveCalc.addEventListener("click", async () => {
+      if (!activeMesaId) return;
+
+      const total = Number(calcValorTotal.value) || 0;
+      const sena = Number(calcMontoSena.value) || 0;
+      const saldo = Math.max(0, total - sena);
+
+      btnSaveCalc.disabled = true;
+
+      try {
+        await db.collection("reservas_joseo").doc(activeMesaId).set({
+          nombre: calcNombre.value.trim(),
+          contacto: calcContacto.value.trim(),
+          status: sena > 0 ? "aprobada" : (calcNombre.value.trim() ? "pendiente" : "libre"),
+          montoSenado: sena,
+          sector: "terrace_soul",
+          updatedAt: Date.now(),
+          updatedBy: auth.currentUser.email,
+          excepcion: {
+            activa: true,
+            valorPactado: total,
+            senaPactada: sena,
+            saldoEnPuerta: saldo,
+            personas: Number(calcPersonas.value) || 4,
+            bebidas: calcBebidas.value.trim(),
+            nota: calcNota.value.trim(),
+            updatedAt: Date.now(),
+            responsable: auth.currentUser.email
+          }
+        }, { merge: true });
+
+        calcModalOverlay.classList.remove("open");
+        activeMesaId = null;
+      } catch (err) {
+        alert("Error al guardar reserva: " + err.message);
+      } finally {
+        btnSaveCalc.disabled = false;
+      }
+    });
+
+    // Crear Personal (Boletería / Asistente) sin desloguear al Admin usando Secondary App
+    const newStaffEmail = document.getElementById("newStaffEmail");
+    const newStaffPassword = document.getElementById("newStaffPassword");
+    const newStaffRole = document.getElementById("newStaffRole");
+    const btnCreateStaff = document.getElementById("btnCreateStaff");
+    const staffStatus = document.getElementById("staffStatus");
+
+    btnCreateStaff.addEventListener("click", async () => {
+      const email = newStaffEmail.value.trim().toLowerCase();
+      const pass = newStaffPassword.value;
+      const role = newStaffRole.value;
+
+      if (!email || !email.includes("@")) {
+        alert("Ingresá un email válido para el personal.");
+        return;
+      }
+      if (!pass || pass.length < 6) {
+        alert("La contraseña debe tener al menos 6 caracteres.");
+        return;
+      }
+
+      btnCreateStaff.disabled = true;
+      staffStatus.textContent = "⏳ Creando cuenta...";
+      staffStatus.style.color = "var(--gold)";
+
+      try {
+        // App secundaria para no cerrar sesión del admin
+        const secondaryApp = firebase.initializeApp(firebaseConfig, "JoseoSecondary_" + Date.now());
+        const secAuth = secondaryApp.auth();
+
+        await secAuth.createUserWithEmailAndPassword(email, pass);
+
+        // Asignar rol en Firestore
+        await db.collection("users").doc(email).set({
+          role: role,
+          cliente: "joseo",
+          createdAt: Date.now(),
+          createdBy: auth.currentUser.email
+        });
+
+        await secAuth.signOut();
+        await secondaryApp.delete();
+
+        staffStatus.textContent = "✅ Usuario " + email + " creado exitosamente con rol " + role + ".";
+        staffStatus.style.color = "var(--green)";
+        newStaffEmail.value = "";
+        newStaffPassword.value = "";
+        alert("✅ Usuario " + email + " creado con éxito.");
+      } catch (err) {
+        staffStatus.textContent = "❌ Error: " + err.message;
+        staffStatus.style.color = "var(--red)";
+        alert("❌ Error: " + err.message);
+      } finally {
+        btnCreateStaff.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

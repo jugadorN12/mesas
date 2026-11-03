@@ -1425,6 +1425,84 @@
       <div class="event-status" id="terraceDateStatus"></div>
     </section>
 
+    <!-- ============================================== -->
+    <!-- GESTIÓN DE CLIENTE EXTERNO: EVENTO JOSEO       -->
+    <!-- ============================================== -->
+    <div style="margin: 40px 0 16px; border-top: 2px solid rgba(255,189,62,0.4); padding-top: 24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:8px;">
+        <h3 style="color: var(--gold); font-size: 16px; letter-spacing: 1.5px; text-transform: uppercase; margin: 0; display:flex; align-items:center; gap:8px;">
+          <span>🍸</span> CLIENTE EXTERNO: EVENTO JOSEO
+        </h3>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <a href="/joseo" target="_blank" style="padding: 6px 12px; font-size: 12px; font-weight:700; background: rgba(255,255,255,0.08); color:#fff; border-radius:6px; text-decoration:none; border:1px solid rgba(255,255,255,0.15); display:inline-flex; align-items:center; gap:4px;">🔗 Mapa Público</a>
+          <a href="/joseo-admin" target="_blank" style="padding: 6px 12px; font-size: 12px; font-weight:700; background: rgba(255,189,62,0.15); color:var(--gold); border-radius:6px; text-decoration:none; border:1px solid rgba(255,189,62,0.3); display:inline-flex; align-items:center; gap:4px;">👑 Panel Admin Joseo</a>
+          <a href="/joseo-boleteria" target="_blank" style="padding: 6px 12px; font-size: 12px; font-weight:700; background: rgba(59,130,246,0.15); color:#60a5fa; border-radius:6px; text-decoration:none; border:1px solid rgba(59,130,246,0.3); display:inline-flex; align-items:center; gap:4px;">🎟️ Boletería Joseo</a>
+        </div>
+      </div>
+      <p style="font-size: 12.5px; color: var(--muted); margin: 0 0 16px;">
+        Gestioná la configuración visual del evento Joseo y creá la cuenta de su Administrador. Este evento está 100% aislado de las reservas y caja de Cubano.
+      </p>
+    </div>
+
+    <!-- 1. CREAR CUENTA ADMIN DE JOSEO -->
+    <section class="event-card" id="joseoAdminCreatorCard">
+      <h2>Crear Administrador de Joseo</h2>
+      <p>Creá la cuenta para el dueño/administrador de Joseo. Con este usuario podrá ingresar a su panel (<a href="/joseo-admin" target="_blank" style="color:var(--gold);">/joseo-admin</a>), gestionar reservas, calcular precios por mesa/persona, controlar cobros y crear sus propios asistentes y boletería.</p>
+      
+      <div class="event-controls" style="grid-template-columns: 1fr 1fr auto; gap:12px;">
+        <label>Email del Admin de Joseo<input id="joseoAdminEmailInput" type="email" placeholder="admin@joseo.com" autocomplete="off"></label>
+        <label>Contraseña (mínimo 6 caracteres)<input id="joseoAdminPasswordInput" type="password" placeholder="••••••••" autocomplete="new-password"></label>
+        <button id="btnCreateJoseoAdmin" type="button" onclick="crearAdminJoseo()" style="align-self: flex-end; height: 42px; background: linear-gradient(135deg, #ffbd3e, #d97706); color:#000; font-weight:800;">Crear Admin Joseo</button>
+      </div>
+      <div class="event-status" id="joseoAdminStatus"></div>
+
+      <!-- Lista de admins de Joseo registrados -->
+      <div style="margin-top:16px; border-top:1px solid var(--grey-line); padding-top:12px;">
+        <span style="font-size:12px; color:var(--muted); font-weight:700; text-transform:uppercase;">Admins de Joseo activos:</span>
+        <div id="joseoAdminsList" style="margin-top:8px; display:flex; flex-direction:column; gap:6px; font-size:13px; color:#fff;">
+          <em style="color:var(--muted); font-size:12px;">Cargando...</em>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. CONFIGURACIÓN VISUAL DEL EVENTO JOSEO -->
+    <section class="event-card" id="joseoDesignCard">
+      <h2>Diseño y Fecha del Evento Joseo</h2>
+      <p>Modificá el logo, imagen de fondo y fecha visibles en el mapa de Joseo (<a href="/joseo" target="_blank" style="color:var(--gold);">/joseo</a>).</p>
+      
+      <div style="display:flex; flex-direction:column; gap:16px; margin-top:12px;">
+        <!-- Logo Joseo -->
+        <div class="event-controls">
+          <label style="flex:2;">URL pública del logo de Joseo (Cloudinary)<input id="joseoLogoUrlInput" type="url" placeholder="https://res.cloudinary.com/..."></label>
+          <button id="saveJoseoLogo" type="button" onclick="guardarJoseoLogo()">Guardar logo</button>
+          <button id="removeJoseoLogo" type="button" class="delete" style="width:auto; margin-top:0;" onclick="quitarJoseoLogo()">Quitar logo</button>
+        </div>
+        <div style="display:flex; gap:12px; align-items:center;">
+          <div id="joseoLogoPreview" style="display:none; width:60px; height:60px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background-size:contain; background-position:center; background-repeat:no-repeat; box-shadow:0 2px 6px rgba(0,0,0,0.5); background-color: rgba(0,0,0,0.4);"></div>
+          <span id="joseoLogoPreviewLabel" style="font-size:12px; color:var(--grey); display:none;">Vista previa del logo</span>
+        </div>
+
+        <!-- Fondo Joseo -->
+        <div class="event-controls">
+          <label style="flex:2;">URL pública del fondo interactivo de Joseo (Cloudinary)<input id="joseoBgUrlInput" type="url" placeholder="https://res.cloudinary.com/..."></label>
+          <button id="saveJoseoBg" type="button" onclick="guardarJoseoBg()">Guardar fondo</button>
+          <button id="removeJoseoBg" type="button" class="delete" style="width:auto; margin-top:0;" onclick="quitarJoseoBg()">Quitar fondo</button>
+        </div>
+        <div style="display:flex; gap:12px; align-items:center;">
+          <div id="joseoBgPreview" style="display:none; width:60px; height:60px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background-size:cover; background-position:center; background-repeat:no-repeat; box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>
+          <span id="joseoBgPreviewLabel" style="font-size:12px; color:var(--grey); display:none;">Vista previa del fondo</span>
+        </div>
+
+        <!-- Fecha Joseo -->
+        <div class="event-controls">
+          <label style="flex:2;">Fecha o texto a mostrar en el mapa Joseo<input id="joseoDateInput" type="text" maxlength="40" placeholder="Ej.: SÁBADO 15 NOV / PRE FERIADO"></label>
+          <button id="saveJoseoDate" type="button" onclick="guardarJoseoDate()">Guardar fecha</button>
+        </div>
+      </div>
+
+      <div class="event-status" id="joseoDesignStatus"></div>
+    </section>
+
     <section class="print-report" id="printReport" aria-hidden="true"></section>
 
     <!-- Barra de filtro por sector para la lista de reservas -->
@@ -2116,6 +2194,331 @@
       }
     };
 
+    // --- GESTIÓN JOSEO (ADMIN Y CONFIGURACIÓN) ---
+    const FB_CONFIG = {
+      apiKey: "AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY",
+      authDomain: "mesas-cubano-bar.firebaseapp.com",
+      projectId: "mesas-cubano-bar",
+      storageBucket: "mesas-cubano-bar.firebasestorage.app",
+      messagingSenderId: "1072135346765",
+      appId: "1:1072135346765:web:e8a6ee5497366a8b1f5a04"
+    };
+
+    window.crearAdminJoseo = async function() {
+      const emailInput = document.getElementById('joseoAdminEmailInput');
+      const passInput = document.getElementById('joseoAdminPasswordInput');
+      const status = document.getElementById('joseoAdminStatus');
+      const btn = document.getElementById('btnCreateJoseoAdmin');
+
+      const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+      const pass = passInput ? passInput.value.trim() : '';
+
+      if (!email || !email.includes('@')) {
+        alert('⚠️ Ingresá un email válido para el admin de Joseo.');
+        return;
+      }
+      if (!pass || pass.length < 6) {
+        alert('⚠️ La contraseña debe tener al menos 6 caracteres.');
+        return;
+      }
+
+      if (btn) btn.disabled = true;
+      if (status) {
+        status.style.display = 'block';
+        status.style.color = '#ffbd3e';
+        status.textContent = '⏳ Creando cuenta de Admin Joseo...';
+      }
+
+      let secApp = null;
+      try {
+        secApp = firebase.initializeApp(FB_CONFIG, "JoseoSecAdmin_" + Date.now());
+        const secAuth = secApp.auth();
+
+        await secAuth.createUserWithEmailAndPassword(email, pass);
+
+        await db.collection("users").doc(email).set({
+          role: "admin_joseo",
+          cliente: "joseo",
+          createdAt: Date.now(),
+          createdBy: auth.currentUser?.email || 'admin'
+        }, { merge: true });
+
+        await secAuth.signOut();
+        await secApp.delete();
+        secApp = null;
+
+        if (status) {
+          status.style.color = '#4ade80';
+          status.textContent = '✅ ¡Admin de Joseo (' + email + ') creado exitosamente!';
+        }
+        if (emailInput) emailInput.value = '';
+        if (passInput) passInput.value = '';
+        alert('✅ ¡Cuenta de Admin Joseo creada con éxito!\n\nEmail: ' + email + '\nYa puede ingresar a su panel en /joseo-admin para gestionar sus reservas y crear su personal.');
+      } catch (err) {
+        if (secApp) {
+          try { await secApp.delete(); } catch (_) {}
+        }
+        if (status) {
+          status.style.color = '#ff5555';
+          status.textContent = '❌ Error: ' + err.message;
+        }
+        alert('❌ Error al crear admin de Joseo: ' + err.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    };
+
+    function updateJoseoLogoPreview(url) {
+      const p = document.getElementById('joseoLogoPreview');
+      const l = document.getElementById('joseoLogoPreviewLabel');
+      if (!p) return;
+      if (url) {
+        p.style.backgroundImage = 'url("' + url + '")';
+        p.style.display = 'block';
+        if (l) l.style.display = 'inline';
+      } else {
+        p.style.backgroundImage = '';
+        p.style.display = 'none';
+        if (l) l.style.display = 'none';
+      }
+    }
+
+    function updateJoseoBgPreview(url) {
+      const p = document.getElementById('joseoBgPreview');
+      const l = document.getElementById('joseoBgPreviewLabel');
+      if (!p) return;
+      if (url) {
+        p.style.backgroundImage = 'url("' + url + '")';
+        p.style.display = 'block';
+        if (l) l.style.display = 'inline';
+      } else {
+        p.style.backgroundImage = '';
+        p.style.display = 'none';
+        if (l) l.style.display = 'none';
+      }
+    }
+
+    window.guardarJoseoLogo = async function() {
+      const input = document.getElementById('joseoLogoUrlInput');
+      const status = document.getElementById('joseoDesignStatus');
+      const btn = document.getElementById('saveJoseoLogo');
+      const url = input ? input.value.trim() : '';
+
+      if (!url) {
+        alert('⚠️ Pegá la URL pública del logo antes de guardar.');
+        return;
+      }
+      if (btn) btn.disabled = true;
+      if (status) {
+        status.style.display = 'block';
+        status.style.color = '#ffbd3e';
+        status.textContent = '⏳ Guardando logo de Joseo...';
+      }
+      try {
+        await db.collection('config').doc('joseo').set({
+          logoUrl: url,
+          updatedAt: Date.now(),
+          updatedBy: auth.currentUser?.email || 'admin'
+        }, { merge: true });
+        updateJoseoLogoPreview(url);
+        if (status) {
+          status.style.color = '#4ade80';
+          status.textContent = '✅ Logo de Joseo guardado correctamente.';
+          setTimeout(() => { if (status) status.textContent = ''; }, 3500);
+        }
+        alert('✅ ¡Logo del evento Joseo guardado correctamente!');
+      } catch (err) {
+        if (status) {
+          status.style.color = '#ff5555';
+          status.textContent = '❌ Error: ' + err.message;
+        }
+        alert('❌ Error al guardar logo: ' + err.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    };
+
+    window.quitarJoseoLogo = async function() {
+      if (!confirm('¿Seguro que deseás quitar el logo del evento Joseo?')) return;
+      const input = document.getElementById('joseoLogoUrlInput');
+      const status = document.getElementById('joseoDesignStatus');
+      const btn = document.getElementById('removeJoseoLogo');
+
+      if (btn) btn.disabled = true;
+      try {
+        await db.collection('config').doc('joseo').set({
+          logoUrl: '',
+          updatedAt: Date.now(),
+          updatedBy: auth.currentUser?.email || 'admin'
+        }, { merge: true });
+        if (input) input.value = '';
+        updateJoseoLogoPreview('');
+        if (status) {
+          status.style.display = 'block';
+          status.style.color = '#4ade80';
+          status.textContent = '✅ Logo de Joseo quitado.';
+          setTimeout(() => { if (status) status.textContent = ''; }, 3500);
+        }
+        alert('✅ Logo de Joseo quitado.');
+      } catch (err) {
+        alert('❌ Error al quitar logo: ' + err.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    };
+
+    window.guardarJoseoBg = async function() {
+      const input = document.getElementById('joseoBgUrlInput');
+      const status = document.getElementById('joseoDesignStatus');
+      const btn = document.getElementById('saveJoseoBg');
+      const url = input ? input.value.trim() : '';
+
+      if (!url) {
+        alert('⚠️ Pegá la URL pública del fondo antes de guardar.');
+        return;
+      }
+      if (btn) btn.disabled = true;
+      if (status) {
+        status.style.display = 'block';
+        status.style.color = '#ffbd3e';
+        status.textContent = '⏳ Guardando fondo de Joseo...';
+      }
+      try {
+        await db.collection('config').doc('joseo').set({
+          bgUrl: url,
+          updatedAt: Date.now(),
+          updatedBy: auth.currentUser?.email || 'admin'
+        }, { merge: true });
+        updateJoseoBgPreview(url);
+        if (status) {
+          status.style.color = '#4ade80';
+          status.textContent = '✅ Fondo interactivo de Joseo guardado correctamente.';
+          setTimeout(() => { if (status) status.textContent = ''; }, 3500);
+        }
+        alert('✅ ¡Fondo interactivo de Joseo guardado correctamente!');
+      } catch (err) {
+        if (status) {
+          status.style.color = '#ff5555';
+          status.textContent = '❌ Error: ' + err.message;
+        }
+        alert('❌ Error al guardar fondo: ' + err.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    };
+
+    window.quitarJoseoBg = async function() {
+      if (!confirm('¿Seguro que deseás quitar el fondo interactivo del evento Joseo?')) return;
+      const input = document.getElementById('joseoBgUrlInput');
+      const status = document.getElementById('joseoDesignStatus');
+      const btn = document.getElementById('removeJoseoBg');
+
+      if (btn) btn.disabled = true;
+      try {
+        await db.collection('config').doc('joseo').set({
+          bgUrl: '',
+          updatedAt: Date.now(),
+          updatedBy: auth.currentUser?.email || 'admin'
+        }, { merge: true });
+        if (input) input.value = '';
+        updateJoseoBgPreview('');
+        if (status) {
+          status.style.display = 'block';
+          status.style.color = '#4ade80';
+          status.textContent = '✅ Fondo interactivo de Joseo quitado.';
+          setTimeout(() => { if (status) status.textContent = ''; }, 3500);
+        }
+        alert('✅ Fondo interactivo de Joseo quitado.');
+      } catch (err) {
+        alert('❌ Error al quitar fondo: ' + err.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    };
+
+    window.guardarJoseoDate = async function() {
+      const input = document.getElementById('joseoDateInput');
+      const status = document.getElementById('joseoDesignStatus');
+      const btn = document.getElementById('saveJoseoDate');
+      const dateVal = input ? input.value.trim() : '';
+
+      if (btn) btn.disabled = true;
+      if (status) {
+        status.style.display = 'block';
+        status.style.color = '#ffbd3e';
+        status.textContent = '⏳ Guardando fecha de Joseo...';
+      }
+      try {
+        await db.collection('config').doc('joseo').set({
+          eventDate: dateVal,
+          updatedAt: Date.now(),
+          updatedBy: auth.currentUser?.email || 'admin'
+        }, { merge: true });
+        if (status) {
+          status.style.color = '#4ade80';
+          status.textContent = '✅ Fecha del evento Joseo guardada.';
+          setTimeout(() => { if (status) status.textContent = ''; }, 3500);
+        }
+        alert('✅ ¡Fecha del evento Joseo guardada con éxito!');
+      } catch (err) {
+        if (status) {
+          status.style.color = '#ff5555';
+          status.textContent = '❌ Error: ' + err.message;
+        }
+        alert('❌ Error al guardar fecha: ' + err.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    };
+
+    let joseoManagerInitialized = false;
+    function initJoseoManager() {
+      if (joseoManagerInitialized) return;
+      joseoManagerInitialized = true;
+
+      // Escuchar cambios de config/joseo
+      db.collection('config').doc('joseo').onSnapshot(doc => {
+        if (!doc.exists) return;
+        const data = doc.data();
+        const logoIn = document.getElementById('joseoLogoUrlInput');
+        const bgIn = document.getElementById('joseoBgUrlInput');
+        const dateIn = document.getElementById('joseoDateInput');
+
+        if (logoIn && document.activeElement !== logoIn) logoIn.value = data.logoUrl || '';
+        updateJoseoLogoPreview(data.logoUrl || '');
+
+        if (bgIn && document.activeElement !== bgIn) bgIn.value = data.bgUrl || '';
+        updateJoseoBgPreview(data.bgUrl || '');
+
+        if (dateIn && document.activeElement !== dateIn) dateIn.value = data.eventDate || '';
+      });
+
+      // Escuchar admins de Joseo registrados
+      db.collection('users').where('role', '==', 'admin_joseo').onSnapshot(snap => {
+        const list = document.getElementById('joseoAdminsList');
+        if (!list) return;
+        if (snap.empty) {
+          list.innerHTML = '<span style="color:var(--muted); font-size:12px;">No hay administradores de Joseo creados aún.</span>';
+          return;
+        }
+        list.innerHTML = '';
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          const row = document.createElement('div');
+          row.style.cssText = 'background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:6px; padding:6px 12px; display:flex; justify-content:space-between; align-items:center;';
+          const createdStr = d.createdAt ? new Date(d.createdAt).toLocaleDateString('es-AR') : '';
+          row.innerHTML = `
+            <div>
+              <strong style="color:#fff;">${docSnap.id}</strong>
+              ${createdStr ? `<span style="font-size:11px; color:var(--muted); margin-left:8px;">(creado el ${createdStr})</span>` : ''}
+            </div>
+            <span style="background:rgba(255,189,62,0.15); border:1px solid var(--gold); color:var(--gold); font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:4px;">ADMIN JOSEO</span>
+          `;
+          list.appendChild(row);
+        });
+      });
+    }
+
     let currentUserRole = null;
     auth.onAuthStateChanged(async (user) => {
       console.log("Auth State Changed. User:", user ? user.email : "none");
@@ -2174,6 +2577,7 @@
           });
 
           render(); // Dibujar la lista de reservas
+          if (isMaster) initJoseoManager();
         } catch(uiErr) {
           console.error("UI Render Warning (no expulsa la sesión):", uiErr);
         }

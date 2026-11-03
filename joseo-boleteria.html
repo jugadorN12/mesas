@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Joseo - Boletería / Puerta</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #09090c;
+      --card: #111116;
+      --gold: #ffbd3e;
+      --green: #10b981;
+      --red: #e11d48;
+      --blue: #3b82f6;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --line: rgba(255, 255, 255, 0.08);
+      --grey-line: rgba(255, 255, 255, 0.14);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+    .top-bar {
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0d0d12;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .brand { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; }
+    .brand span { color: var(--gold); }
+    .badge {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--green);
+      color: var(--green);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .btn-logout {
+      background: transparent;
+      border: 1px solid var(--grey-line);
+      color: #fff;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .container { max-width: 600px; margin: 16px auto; padding: 0 16px; }
+
+    /* Buscador */
+    .search-box {
+      margin-bottom: 16px;
+      display: flex;
+      gap: 10px;
+    }
+    .search-box input {
+      flex: 1;
+      background: #060608;
+      border: 1px solid var(--grey-line);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: #fff;
+      font-size: 15px;
+    }
+
+    /* Grid de mesas */
+    .tables-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px;
+    }
+    .card-mesa {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.2s;
+    }
+    .card-mesa:active { transform: scale(0.96); }
+    .card-mesa.libre { border-color: rgba(16, 185, 129, 0.4); }
+    .card-mesa.aprobada { border-color: rgba(59, 130, 246, 0.6); background: rgba(59, 130, 246, 0.08); }
+    .card-mesa.ingresada { border-color: rgba(225, 29, 72, 0.5); opacity: 0.6; }
+
+    .mesa-num { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: #fff; }
+    .mesa-titular { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px; }
+    .mesa-pill { font-size: 9.5px; font-weight: 800; padding: 2px 6px; border-radius: 8px; text-transform: uppercase; margin-top: 6px; display: inline-block; }
+    .mesa-pill.p-libre { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+    .mesa-pill.p-aprobada { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+    .mesa-pill.p-ingresada { background: rgba(225, 29, 72, 0.2); color: #e11d48; }
+
+    /* Modal de Cobro */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      width: 100%;
+      max-width: 440px;
+      background: var(--card);
+      border: 1px solid var(--grey-line);
+      border-radius: 18px;
+      padding: 24px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .saldo-box {
+      background: rgba(255, 189, 62, 0.12);
+      border: 1px solid var(--gold);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      margin: 16px 0;
+    }
+    .saldo-label { font-size: 12px; color: var(--gold); text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+    .saldo-val { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: #fff; }
+
+    .voucher-box {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px dashed #10b981;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+    .voucher-title { font-weight: 700; color: #10b981; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+
+    .btn-pay {
+      padding: 14px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+      margin-bottom: 8px;
+    }
+    .btn-cash { background: #10b981; color: #000; }
+    .btn-transf { background: #3b82f6; color: #fff; }
+    .btn-cancel { background: rgba(255, 255, 255, 0.1); color: #fff; }
+
+    /* Login */
+    .login-wrap { max-width: 360px; margin: 15vh auto; padding: 24px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
+    .login-wrap h1 { margin: 0 0 16px; font-size: 22px; text-align: center; }
+    .login-wrap input { width: 100%; background: #060608; border: 1px solid var(--grey-line); border-radius: 8px; padding: 12px; color: #fff; margin-bottom: 12px; box-sizing: border-box; }
+    .login-wrap button { width: 100%; padding: 12px; background: var(--gold); color: #000; font-weight: 800; border: none; border-radius: 8px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <!-- Vista Login -->
+  <div id="loginView" class="login-wrap">
+    <h1>JOSEO <span>BOLETERÍA</span></h1>
+    <input type="email" id="loginEmail" placeholder="boletero@joseo.com">
+    <input type="password" id="loginPassword" placeholder="••••••••">
+    <button type="button" id="btnLogin">Ingresar a Boletería</button>
+    <div id="loginError" style="color:#ff5555; font-size:12px; margin-top:12px; text-align:center;"></div>
+  </div>
+
+  <!-- Vista Boletería -->
+  <div id="bolApp" style="display: none;">
+    <header class="top-bar">
+      <div class="brand">JOSEO <span>PUERTA</span> <span class="badge">TERRAZA</span></div>
+      <button type="button" class="btn-logout" id="btnLogout">Salir</button>
+    </header>
+
+    <main class="container">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Buscar por número o nombre de cliente...">
+      </div>
+
+      <div class="tables-grid" id="tablesGrid">
+        <!-- Render dinámico de mesas -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Cobro en Puerta -->
+  <div class="modal-overlay" id="cobroModal">
+    <div class="modal-box">
+      <h2 id="modalMesaTitle" style="margin: 0 0 4px; font-size: 20px;">MESA --</h2>
+      <div id="modalTitular" style="color: var(--muted); font-size: 13px; margin-bottom: 12px;">Cliente: —</div>
+
+      <div class="saldo-box">
+        <div class="saldo-label">Saldo a cobrar en puerta</div>
+        <div class="saldo-val" id="saldoMontoDisplay">$0</div>
+        <div id="senaPreviaText" style="font-size: 11.5px; color: var(--muted); margin-top: 4px;">Seña previa: $0</div>
+      </div>
+
+      <div class="voucher-box" id="voucherBox">
+        <div class="voucher-title">🍾 Entregar Vouchers / Bebidas:</div>
+        <div id="voucherContent" style="font-weight: 600;">Ninguna bebida asignada</div>
+      </div>
+
+      <div style="font-size: 12px; color: var(--muted); margin-bottom: 12px; text-align: center;">Registrar cobro de saldo y marcar ingreso:</div>
+
+      <button type="button" class="btn-pay btn-cash" id="btnCobroEfectivo">💵 Cobrado en EFECTIVO</button>
+      <button type="button" class="btn-pay btn-transf" id="btnCobroTransferencia">💳 Cobrado por TRANSFERENCIA</button>
+      <button type="button" class="btn-pay btn-cancel" id="btnCancelCobro">Volver</button>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = {apiKey:"AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY",authDomain:"mesas-cubano-bar.firebaseapp.com",projectId:"mesas-cubano-bar",storageBucket:"mesas-cubano-bar.firebasestorage.app",messagingSenderId:"1072135346765",appId:"1:1072135346765:web:e8a6ee5497366a8b1f5a04"};
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    const loginView = document.getElementById("loginView");
+    const bolApp = document.getElementById("bolApp");
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPassword = document.getElementById("loginPassword");
+    const btnLogin = document.getElementById("btnLogin");
+    const loginError = document.getElementById("loginError");
+    const btnLogout = document.getElementById("btnLogout");
+    const tablesGrid = document.getElementById("tablesGrid");
+    const searchInput = document.getElementById("searchInput");
+
+    const TABLES_TERRAZA = [
+      'T-1','T-2','T-3','T-4','T-5','T-6','T-7','T-8','T-9','T-10','T-11','T-12','T-13','T-14','T-15','T-16','T-17','T-18','T-19','T-A','T-B','T-C','T-D','T-E'
+    ];
+
+    let reservasData = {};
+    let activeMesaId = null;
+
+    btnLogin.addEventListener("click", async () => {
+      const email = loginEmail.value.trim();
+      const pass = loginPassword.value;
+      loginError.textContent = "";
+      btnLogin.disabled = true;
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+      } catch (err) {
+        loginError.textContent = "Error: " + err.message;
+        btnLogin.disabled = false;
+      }
+    });
+
+    btnLogout.addEventListener("click", () => auth.signOut());
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const userDoc = await db.collection("users").doc(user.email.toLowerCase()).get();
+          if (!userDoc.exists) throw new Error("Usuario sin rol.");
+          const role = userDoc.data().role;
+
+          if (role !== "boleteria_joseo" && role !== "admin_joseo" && role !== "admin") {
+            throw new Error("No tienes permisos de boletería para Joseo.");
+          }
+
+          loginView.style.display = "none";
+          bolApp.style.display = "block";
+          iniciarEscuchas();
+        } catch (err) {
+          loginError.textContent = err.message;
+          setTimeout(() => auth.signOut(), 2500);
+        }
+      } else {
+        loginView.style.display = "block";
+        bolApp.style.display = "none";
+        btnLogin.disabled = false;
+      }
+    });
+
+    function iniciarEscuchas() {
+      db.collection("reservas_joseo").onSnapshot(snapshot => {
+        reservasData = {};
+        snapshot.forEach(doc => {
+          reservasData[doc.id] = doc.data();
+        });
+        renderGrid();
+      });
+    }
+
+    function renderGrid() {
+      tablesGrid.innerHTML = "";
+      const query = searchInput.value.trim().toLowerCase();
+
+      TABLES_TERRAZA.forEach(id => {
+        const r = reservasData[id] || {};
+        const num = id.replace("T-", "");
+        const nombre = r.nombre || "";
+        const status = r.status || "libre";
+
+        if (query) {
+          const matchNum = num.toLowerCase().includes(query);
+          const matchNombre = nombre.toLowerCase().includes(query);
+          if (!matchNum && !matchNombre) return;
+        }
+
+        const card = document.createElement("div");
+        card.className = "card-mesa " + (status === "ingresada" ? "ingresada" : (r.nombre ? "aprobada" : "libre"));
+
+        card.innerHTML = `
+          <div class="mesa-num">${num}</div>
+          <div class="mesa-titular">${nombre || 'Sin reserva'}</div>
+          <div><span class="mesa-pill p-${status === 'ingresada' ? 'ingresada' : (r.nombre ? 'aprobada' : 'libre')}">${status}</span></div>
+        `;
+
+        card.addEventListener("click", () => abrirCobroModal(id));
+        tablesGrid.appendChild(card);
+      });
+    }
+
+    searchInput.addEventListener("input", renderGrid);
+
+    // Modal de Cobro
+    const cobroModal = document.getElementById("cobroModal");
+    const modalMesaTitle = document.getElementById("modalMesaTitle");
+    const modalTitular = document.getElementById("modalTitular");
+    const saldoMontoDisplay = document.getElementById("saldoMontoDisplay");
+    const senaPreviaText = document.getElementById("senaPreviaText");
+    const voucherContent = document.getElementById("voucherContent");
+    const btnCobroEfectivo = document.getElementById("btnCobroEfectivo");
+    const btnCobroTransferencia = document.getElementById("btnCobroTransferencia");
+    const btnCancelCobro = document.getElementById("btnCancelCobro");
+
+    function abrirCobroModal(id) {
+      activeMesaId = id;
+      const num = id.replace("T-", "");
+      const r = reservasData[id] || {};
+      const ex = r.excepcion || {};
+
+      modalMesaTitle.textContent = "MESA " + num;
+      modalTitular.textContent = "Cliente: " + (r.nombre || "Sin nombre") + (r.contacto ? " (" + r.contacto + ")" : "");
+
+      const saldo = ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : 0;
+      const sena = ex.senaPactada !== undefined ? ex.senaPactada : (r.montoSenado || 0);
+
+      saldoMontoDisplay.textContent = "$" + saldo.toLocaleString("es-AR");
+      senaPreviaText.textContent = "Seña previa registrada: $" + sena.toLocaleString("es-AR");
+
+      voucherContent.textContent = ex.bebidas ? ex.bebidas : "Sin bebidas bonificadas registradas";
+
+      cobroModal.classList.add("open");
+    }
+
+    btnCancelCobro.addEventListener("click", () => {
+      cobroModal.classList.remove("open");
+      activeMesaId = null;
+    });
+
+    async function registrarCobro(medioPago) {
+      if (!activeMesaId) return;
+      const r = reservasData[activeMesaId] || {};
+      const ex = r.excepcion || {};
+      const saldo = ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : 0;
+
+      btnCobroEfectivo.disabled = true;
+      btnCobroTransferencia.disabled = true;
+
+      try {
+        // 1. Actualizar mesa en reservas_joseo
+        await db.collection("reservas_joseo").doc(activeMesaId).set({
+          status: "ingresada",
+          saldoCobradoEnPuerta: saldo,
+          medioPagoPuerta: medioPago,
+          ingresadoAt: Date.now(),
+          cobradoPor: auth.currentUser.email
+        }, { merge: true });
+
+        // 2. Registrar en caja_joseo
+        if (saldo > 0) {
+          await db.collection("caja_joseo").add({
+            mesaId: activeMesaId,
+            monto: saldo,
+            medioPago: medioPago,
+            tipo: "cobro_puerta",
+            cliente: r.nombre || "Mesa " + activeMesaId,
+            responsable: auth.currentUser.email,
+            ts: Date.now()
+          });
+        }
+
+        cobroModal.classList.remove("open");
+        activeMesaId = null;
+        alert("✅ Ingreso confirmado y cobro de $" + saldo.toLocaleString("es-AR") + " registrado.");
+      } catch (err) {
+        alert("Error al registrar cobro: " + err.message);
+      } finally {
+        btnCobroEfectivo.disabled = false;
+        btnCobroTransferencia.disabled = false;
+      }
+    }
+
+    btnCobroEfectivo.addEventListener("click", () => registrarCobro("efectivo"));
+    btnCobroTransferencia.addEventListener("click", () => registrarCobro("transferencia"));
+  </script>
+</body>
+</html>

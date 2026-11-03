@@ -38,8 +38,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // NUNCA cachear el panel de administración (ni /admin ni /admin.html)
-  if (url.pathname.includes('admin')) {
+  // NUNCA cachear paneles de gestión ni boletería
+  if (url.pathname.includes('admin') || url.pathname.includes('boleteria')) {
     return;
   }
 
