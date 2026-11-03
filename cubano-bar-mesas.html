@@ -1,806 +1,1413 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#060608">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Cubano Bar">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<title>Cubano Bar — Reservá tu mesa VIP</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="shared.css">
-<style>
-  :root{
-    --bg: #060608;
-    --panel: #101014;
-    --panel-2: #17171d;
-    --red: #ff2d3d;
-    --red-dim: #7a1018;
-    --red-glow: rgba(255,45,61,0.55);
-    --white: #f3f1ee;
-    --grey: #8b8b93;
-    --grey-line: #2a2a31;
-    --green: #2ee6a6;
-    --blue: #58a6ff;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;}
-  body{
-    min-height:100vh;
-    background:
-      radial-gradient(ellipse at 20% -10%, rgba(255,45,61,0.10), transparent 55%),
-      radial-gradient(ellipse at 90% 110%, rgba(255,45,61,0.08), transparent 50%),
-      var(--bg);
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#060608">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Cubano Bar">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Cubano Bar — Reservá tu mesa VIP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    :root {
+      --bg: #060608;
+      --panel: #101014;
+      --panel-2: #17171d;
+      --red: #ff2d3d;
+      --red-dim: #7a1018;
+      --red-glow: rgba(255, 45, 61, 0.55);
+      --white: #f3f1ee;
+      --grey: #8b8b93;
+      --grey-line: #2a2a31;
+      --green: #2ee6a6;
+      --blue: #58a6ff;
+    }
 
-  .topbar{
-    position:sticky; top:0; z-index:20;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:16px 20px;
-    background:rgba(6,6,8,0.86);
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--grey-line);
-  }
-  .brand{
-    font-family:'Bebas Neue',sans-serif;
-    font-size:26px;
-    letter-spacing:1.5px;
-    color:var(--white);
-    line-height:1;
-  }
-  .brand span{color:var(--red);}
-  .brand small{
-    display:block;
-    font-family:'Inter',sans-serif;
-    font-size:11px;
-    letter-spacing:0.5px;
-    color:var(--grey);
-    font-weight:500;
-    margin-top:2px;
-  }
-  .legend{display:flex; gap:14px; font-size:12px; color:var(--grey);}
-  .legend .dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle;}
-  .dot.free{background:var(--green); box-shadow:0 0 8px rgba(46,230,166,0.7);}
-  .dot.pending{background:#f6b73c; box-shadow:0 0 8px rgba(246,183,60,0.65);}
-  .dot.approved{background:var(--red); box-shadow:0 0 8px var(--red-glow);}
-  .dot.ingresada-master{background:var(--blue); box-shadow:0 0 8px rgba(88,166,255,0.7);}
+    * {
+      box-sizing: border-box;
+    }
 
-  .hero-text{
-    padding:22px 20px 6px;
-    max-width:640px;
-  }
-  .hero-text h1{
-    font-family:'Bebas Neue',sans-serif;
-    font-size:34px;
-    letter-spacing:1px;
-    margin:0 0 6px;
-    line-height:1.05;
-  }
-  .hero-text p{
-    margin:0;
-    color:var(--grey);
-    font-size:14.5px;
-    line-height:1.5;
-  }
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+    }
 
-  .map-wrap{
-    position:relative;
-    max-width:520px;
-    margin:22px auto 40px;
-    padding:0 16px;
-  }
-  .map-heading{
-    display:flex;
-    flex-wrap:wrap;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    margin-bottom:8px;
-    color:var(--grey);
-    font-size:10px;
-    font-weight:700;
-    letter-spacing:1.4px;
-    text-transform:uppercase;
-  }
-  .map-heading strong{ color:var(--white); font-family:'Bebas Neue',sans-serif; font-size:17px; letter-spacing:1px; }
-  .map-heading strong .event-date{margin-left:8px;color:var(--green);font-family:inherit;font-size:.72em;letter-spacing:.8px}
-  .event-tabs-wrap{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);padding:3px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);}
-  .event-tab-btn{border:1px solid transparent;background:transparent;color:var(--grey);font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;gap:6px;line-height:1;}
-  .event-tab-btn .tab-date{color:var(--grey);font-size:0.8em;letter-spacing:0.8px;transition:color 0.2s;}
-  .event-tab-btn.active{background:rgba(255,255,255,0.16);color:var(--white);box-shadow:0 2px 10px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.25);}
-  .event-tab-btn.active .tab-date{color:var(--green);font-weight:bold;}
-  .event-tab-btn:hover:not(.active){color:var(--white);background:rgba(255,255,255,0.08);}
-  @media(max-width:480px){.event-tab-btn{font-size:14px;padding:5px 9px;gap:4px;}}
-  /* --- Selector de Sector (Salón vs Terraza) --- */
-  .sector-tabs-wrap{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:10px;
-    margin:0 0 16px 0;
-    width:100%;
-    box-sizing:border-box;
-    background:rgba(255,255,255,0.04);
-    padding:5px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,0.12);
-    box-shadow:0 8px 24px rgba(0,0,0,0.4);
-  }
-  .sector-tab-btn{
-    flex:1;
-    border:1px solid transparent;
-    background:transparent;
-    color:var(--grey);
-    font-family:'Bebas Neue',sans-serif;
-    font-size:18px;
-    letter-spacing:1px;
-    padding:10px 14px;
-    border-radius:10px;
-    cursor:pointer;
-    transition:all 0.25s ease;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    line-height:1;
-    white-space:nowrap;
-  }
-  .sector-tab-btn .sector-icon{ font-size:16px; }
-  .sector-tab-btn:hover:not(.active){
-    color:var(--white);
-    background:rgba(255,255,255,0.08);
-  }
-  .sector-tab-btn.active{
-    background:linear-gradient(135deg, #ff2d3d 0%, #b80012 100%);
-    color:#fff;
-    border-color:rgba(255,255,255,0.25);
-    box-shadow:0 4px 18px rgba(255,45,61,0.4);
-  }
-  @media(max-width:480px){
-    .sector-tab-btn{ font-size:15px; padding:9px 10px; gap:6px; }
-    .sector-tab-btn .sector-icon{ font-size:14px; }
-  }
-  .map-heading-actions{display:flex;align-items:center;gap:10px;margin-left:auto;}
-  .map-heading-actions span{color:var(--green);white-space:nowrap;}
-  .ultra-vip-overlay{position:absolute;left:52%;top:11.5%;z-index:3;width:34%;padding:0;border:0;background:transparent;color:var(--green);font:clamp(15px,3.5vw,24px) 'Bebas Neue',sans-serif;letter-spacing:1px;line-height:1;cursor:pointer;text-align:center;text-shadow:0 1px 3px #000}
-  .ultra-vip-overlay:hover{color:#fff}
-  .ultra-vip-overlay.dispute{color:#f6b73c}
-  .ultra-vip-overlay.confirmed{color:var(--red)}
-  .map-frame .event-logo-overlay{position:absolute;left:9%;top:2.5%;z-index:2;width:42% !important;height:19% !important;max-width:42%;max-height:19%;display:none;object-fit:contain;object-position:center;border-radius:8px;pointer-events:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,.7));overflow:hidden}
-  .map-frame{
-    position:relative;
-    width:100%;
-    border-radius:18px;
-    overflow:hidden;
-    border:1px solid rgba(255,255,255,0.16);
-    background:#09090c;
-    box-shadow:0 30px 60px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,45,61,0.08), inset 0 0 0 1px rgba(255,255,255,0.04);
-  }
-  /* --- Indicador de carga del mapa --- */
-  #mapLoadingOverlay{
-    position:absolute;
-    inset:0;
-    z-index:10;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:12px;
-    background:rgba(6,6,8,0.85);
-    border-radius:18px;
-    pointer-events:none;
-    transition:opacity 0.4s ease;
-  }
-  #mapLoadingOverlay.hidden{
-    opacity:0;
-    pointer-events:none;
-  }
-  .map-spinner{
-    width:32px;
-    height:32px;
-    border:3px solid rgba(255,255,255,0.1);
-    border-top-color:var(--green);
-    border-radius:50%;
-    animation:spin 0.8s linear infinite;
-  }
-  @keyframes spin{ to{ transform:rotate(360deg); } }
-  .map-loading-text{
-    font-size:13px;
-    color:var(--grey);
-    letter-spacing:0.5px;
-  }
-  /* --- Campos con error --- */
-  .input-error{
-    border-color: #ff5555 !important;
-    box-shadow: 0 0 0 2px rgba(255,85,85,0.25) !important;
-  }
-  .input-error:focus{
-    border-color: #ff5555 !important;
-  }
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 20% -10%, rgba(255, 45, 61, 0.10), transparent 55%),
+        radial-gradient(ellipse at 90% 110%, rgba(255, 45, 61, 0.08), transparent 50%),
+        var(--bg);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: rgba(6, 6, 8, 0.86);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--grey-line);
+    }
+
+    .brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 1.5px;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .brand span {
+      color: var(--red);
+    }
+
+    .brand small {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      color: var(--grey);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      font-size: 12px;
+      color: var(--grey);
+    }
+
+    .legend .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+
+    .dot.free {
+      background: var(--green);
+      box-shadow: 0 0 8px rgba(46, 230, 166, 0.7);
+    }
+
+    .dot.pending {
+      background: #f6b73c;
+      box-shadow: 0 0 8px rgba(246, 183, 60, 0.65);
+    }
+
+    .dot.approved {
+      background: var(--red);
+      box-shadow: 0 0 8px var(--red-glow);
+    }
+
+    .dot.ingresada-master {
+      background: var(--blue);
+      box-shadow: 0 0 8px rgba(88, 166, 255, 0.7);
+    }
+
+    .hero-text {
+      padding: 22px 20px 6px;
+      max-width: 640px;
+    }
+
+    .hero-text h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 34px;
+      letter-spacing: 1px;
+      margin: 0 0 6px;
+      line-height: 1.05;
+    }
+
+    .hero-text p {
+      margin: 0;
+      color: var(--grey);
+      font-size: 14.5px;
+      line-height: 1.5;
+    }
+
+    .map-wrap {
+      position: relative;
+      max-width: 520px;
+      margin: 22px auto 40px;
+      padding: 0 16px;
+    }
+
+    .map-heading {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      color: var(--grey);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+    }
+
+    .map-heading strong {
+      color: var(--white);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 17px;
+      letter-spacing: 1px;
+    }
+
+    .map-heading strong .event-date {
+      margin-left: 8px;
+      color: var(--green);
+      font-family: inherit;
+      font-size: .72em;
+      letter-spacing: .8px
+    }
+
+    .event-tabs-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 3px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .event-tab-btn {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--grey);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 17px;
+      letter-spacing: 1px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1;
+    }
+
+    .event-tab-btn .tab-date {
+      color: var(--grey);
+      font-size: 0.8em;
+      letter-spacing: 0.8px;
+      transition: color 0.2s;
+    }
+
+    .event-tab-btn.active {
+      background: rgba(255, 255, 255, 0.16);
+      color: var(--white);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .event-tab-btn.active .tab-date {
+      color: var(--green);
+      font-weight: bold;
+    }
+
+    .event-tab-btn:hover:not(.active) {
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    @media(max-width:480px) {
+      .event-tab-btn {
+        font-size: 14px;
+        padding: 5px 9px;
+        gap: 4px;
+      }
+    }
+
+    /* --- Selector de Sector (Salón vs Terraza) --- */
+    .sector-tabs-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 16px 0;
+      width: 100%;
+      box-sizing: border-box;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 5px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .sector-tab-btn {
+      flex: 1;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--grey);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 1px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .sector-tab-btn .sector-icon {
+      font-size: 16px;
+    }
+
+    .sector-tab-btn:hover:not(.active) {
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .sector-tab-btn.active {
+      background: linear-gradient(135deg, #ff2d3d 0%, #b80012 100%);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 18px rgba(255, 45, 61, 0.4);
+    }
+
+    @media(max-width:480px) {
+      .sector-tab-btn {
+        font-size: 15px;
+        padding: 9px 10px;
+        gap: 6px;
+      }
+
+      .sector-tab-btn .sector-icon {
+        font-size: 14px;
+      }
+    }
+
+    .map-heading-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+
+    .map-heading-actions span {
+      color: var(--green);
+      white-space: nowrap;
+    }
+
+    .ultra-vip-overlay {
+      position: absolute;
+      left: 52%;
+      top: 11.5%;
+      z-index: 3;
+      width: 34%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--green);
+      font: clamp(15px, 3.5vw, 24px) 'Bebas Neue', sans-serif;
+      letter-spacing: 1px;
+      line-height: 1;
+      cursor: pointer;
+      text-align: center;
+      text-shadow: 0 1px 3px #000
+    }
+
+    .ultra-vip-overlay:hover {
+      color: #fff
+    }
+
+    .ultra-vip-overlay.dispute {
+      color: #f6b73c
+    }
+
+    .ultra-vip-overlay.confirmed {
+      color: var(--red)
+    }
+
+    .map-frame .event-logo-overlay {
+      position: absolute;
+      left: 9%;
+      top: 2.5%;
+      z-index: 2;
+      width: 42% !important;
+      height: 19% !important;
+      max-width: 42%;
+      max-height: 19%;
+      display: none;
+      object-fit: contain;
+      object-position: center;
+      border-radius: 8px;
+      pointer-events: none;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .7));
+      overflow: hidden
+    }
+
+    .map-frame {
+      position: relative;
+      width: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: #09090c;
+      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 45, 61, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+
+    /* --- Indicador de carga del mapa --- */
+    #mapLoadingOverlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: rgba(6, 6, 8, 0.85);
+      border-radius: 18px;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    #mapLoadingOverlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .map-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .map-loading-text {
+      font-size: 13px;
+      color: var(--grey);
+      letter-spacing: 0.5px;
+    }
+
+    /* --- Campos con error --- */
+    .input-error {
+      border-color: #ff5555 !important;
+      box-shadow: 0 0 0 2px rgba(255, 85, 85, 0.25) !important;
+    }
+
+    .input-error:focus {
+      border-color: #ff5555 !important;
+    }
+
     /* --- Terrace Soul Overlays Interactivos --- */
-  .map-frame .terrace-logo-overlay{
-    position:absolute;
-    left:50%;
-    transform:translateX(-50%);
-    top:1.5%;
-    width:78% !important;
-    height:21% !important;
-    max-width:78%;
-    max-height:21%;
-    z-index:5;
-    display:none;
-    object-fit:contain;
-    object-position:bottom center;
-    pointer-events:none;
-    filter:drop-shadow(0 4px 10px rgba(0,0,0,0.85));
-  }
-  .terrace-date-badge{
-    position:absolute;
-    left:50%;
-    transform:translateX(-50%);
-    top:70.3%;
-    width:auto;
-    min-width:38%;
-    max-width:70%;
-    height:5.8%;
-    z-index:5;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding:0 12px;
-    box-sizing:border-box;
-    font-family:'Bebas Neue','Inter',sans-serif;
-    font-size:clamp(13px, 3.8vw, 22px);
-    font-weight:700;
-    letter-spacing:2.5px;
-    color:#ffffff;
-    text-transform:uppercase;
-    text-shadow:0 0 10px rgba(255,40,40,0.7), 0 2px 4px rgba(0,0,0,0.9);
-    border:1px solid rgba(255,60,60,0.45);
-    border-radius:6px;
-    background:rgba(10,10,15,0.75);
-    backdrop-filter:blur(4px);
-    box-shadow:0 0 14px rgba(255,30,30,0.25), inset 0 0 8px rgba(255,30,30,0.2);
-    pointer-events:none;
-  }
-  .map-bg-layer{
-    position:absolute;
-    inset:0;
-    z-index:0;
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
-    pointer-events:none;
-    transition:background-image 0.4s ease, opacity 0.4s ease;
-  }
-  .map-frame::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    background:transparent;
-  }
-  .map-frame img{
-    display:none;
-    width:100%;
-    height:auto;
-  }
-  .map-frame .uploaded-map, .map-frame #mapImg{
-    position:relative;
-    z-index:1;
-    display:block;
-    width:100%;
-    height:auto;
-    pointer-events:none;
-  }
-  .map-art{
-    display:none;
-    position:relative;
-    aspect-ratio:768 / 1376;
-    overflow:hidden;
-    background:radial-gradient(ellipse at 50% 45%, #18202d 0%, #090d16 52%, #020308 100%);
-  }
-  .map-art::before{
-    content:"";
-    position:absolute;
-    inset:2.5% 11% 2.5% 11%;
-    border:2px solid #af8c61;
-    background:#161922;
-  }
-  .map-zone{ position:absolute; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.16); color:rgba(243,241,238,0.72); font-size:clamp(8px,2vw,11px); letter-spacing:1px; text-transform:uppercase; }
-  .map-zone.dj{ left:52%; top:4%; width:39%; height:13%; background:#24262d; border-color:#b18f64; }
-  .map-zone.bar{ left:4%; top:20%; width:40%; height:20%; background:#24262d; writing-mode:horizontal-tb; }
-  .map-zone.dance{ left:4%; top:42%; width:40%; height:55%; border-style:solid; background:#11151d; }
-  .map-zone.vip{ left:47%; top:16%; width:44%; height:81%; background:#1b2029; writing-mode:vertical-rl; }
-  .map-zone.label-right{ display:none; }
-  .map-floor-line{ position:absolute; background:rgba(255,255,255,0.16); }
-  .map-floor-line.one{ left:44%; top:3%; width:1px; height:94%; }
-  .map-floor-line.two{ left:5%; top:70%; width:90%; height:1px; }
-  .map-title{ position:absolute; left:52%; top:7%; color:#d0ae7e; font:clamp(18px,5vw,28px) 'Bebas Neue',sans-serif; letter-spacing:2px; z-index:1; }
-  .map-subtitle{ position:absolute; right:10%; bottom:3%; color:var(--grey); font-size:9px; letter-spacing:1px; }
-  .map-trace{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    pointer-events:none;
-    display:none;
-  }
-  .map-trace line,.map-trace polyline,.map-trace rect,.map-trace path{
-    fill:none;
-    stroke:#ff4553;
-    stroke-width:.35;
-    vector-effect:non-scaling-stroke;
-  }
-  .map-trace .guide{ stroke:#65e6c1; stroke-width:.22; stroke-dasharray:1.5 1.2; }
-  .table-btn{
-    position:absolute;
-    transform:translate(-50%,-50%);
-    width:7.8%;
-    /* Quitamos el alto y aspect-ratio para manejarlo por JS con precisión de píxel */
-    border-radius:50%;
-    border:1px solid rgba(255,255,255,0.7);
-    background:linear-gradient(145deg, #66f5bf, #16b878 55%, #08734b);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 1px 1px 2px rgba(255,255,255,0.3);
-    color:var(--white);
-    font-family:'Bebas Neue',sans-serif;
-    font-size:clamp(12px, 2.6vw, 16px);
-    line-height:1;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:0;
-    z-index: 10;
-  }
-  .table-btn.terraza-btn{
-    font-size:clamp(9.5px, 2.1vw, 13px);
-  }
-  .table-btn.pending{
-    background:linear-gradient(145deg, #ffcf58, #b66a08 55%, #613000);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 10px rgba(246,183,60,0.4);
-  }
-  .table-btn.approved{
-    background:linear-gradient(145deg, #ff5b66, #d20e21 55%, #70000a);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 10px rgba(255,45,61,0.4);
-  }
-  .table-btn.ingresada{
-    background:linear-gradient(145deg, #ff5b66, #d20e21 55%, #70000a);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 10px rgba(255,45,61,0.4);
-  }
-  .table-btn.ingresada-master{
-    background:linear-gradient(145deg, #58a6ff, #0a56ad 55%, #002e61);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 10px rgba(88,166,255,0.4);
-  }
-  .table-btn .table-label{ pointer-events:none; color:#fff; text-shadow:0 1px 3px #000; font-size: 1.1em; }
-  .table-btn .x-mark{ font-size: 1.2em; text-shadow:0 1px 3px #000; display:block; color:#fff; font-family:'Bebas Neue',sans-serif; line-height:1; }
-  .table-btn.loading{ opacity:0; pointer-events:none; }
-  .table-btn.focus-table{animation:ultraVipPulse 1.1s ease-in-out 2}
-  @keyframes ultraVipPulse{50%{box-shadow:0 0 0 5px rgba(46,230,166,0.28),0 0 20px rgba(46,230,166,0.85)}}
+    .map-frame .terrace-logo-overlay {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 1.5%;
+      width: 78% !important;
+      height: 21% !important;
+      max-width: 78%;
+      max-height: 21%;
+      z-index: 5;
+      display: none;
+      object-fit: contain;
+      object-position: bottom center;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.85));
+    }
 
-  .legend-note{
-    text-align:center;
-    color:var(--grey);
-    font-size:12px;
-    margin-top:12px;
-  }
+    .terrace-date-badge {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 70.3%;
+      width: auto;
+      min-width: 38%;
+      max-width: 70%;
+      height: 5.8%;
+      z-index: 5;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 12px;
+      box-sizing: border-box;
+      font-family: 'Bebas Neue', 'Inter', sans-serif;
+      font-size: clamp(13px, 3.8vw, 22px);
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      color: #ffffff;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(255, 40, 40, 0.7), 0 2px 4px rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(255, 60, 60, 0.45);
+      border-radius: 6px;
+      background: rgba(10, 10, 15, 0.75);
+      backdrop-filter: blur(4px);
+      box-shadow: 0 0 14px rgba(255, 30, 30, 0.25), inset 0 0 8px rgba(255, 30, 30, 0.2);
+      pointer-events: none;
+    }
 
-  /* Modal */
-  .overlay{
-    position:fixed; inset:0; z-index:50;
-    background:rgba(4,4,6,0.78);
-    backdrop-filter:blur(4px);
-    display:flex; align-items:flex-end; justify-content:center;
-    opacity:0; pointer-events:none;
-    transition:opacity .2s ease;
-  }
-  .overlay.open{ opacity:1; pointer-events:auto; }
-  @media (min-width:560px){
-    .overlay{ align-items:center; }
-  }
+    .map-bg-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      pointer-events: none;
+      transition: background-image 0.4s ease, opacity 0.4s ease;
+    }
 
-  .sheet{
-    width: 100%;
-    max-width: 420px;
-    background: linear-gradient(180deg, var(--panel-2), var(--panel));
-    border: 1px solid var(--grey-line);
-    border-bottom: none;
-    border-radius: 20px 20px 0 0;
-    padding: 26px 22px 28px;
-    transform: translateY(24px);
-    transition: transform .25s ease;
-    box-shadow: 0 -20px 50px rgba(0,0,0,0.5);
-    max-height: 85vh;
-    overflow-y: auto;
-  }
-  @media (min-width:560px){
-    .sheet{ border-radius:20px; border-bottom:1px solid var(--grey-line); transform:translateY(0) scale(0.97); max-height: 90vh; }
-  }
+    .map-frame::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: transparent;
+    }
 
-  .important-notice {
-    color: var(--red);
-    font-weight: 800;
-    font-size: 20px;
-    line-height: 1.3;
-    margin: 20px 0;
-    text-transform: uppercase;
-  }
-  .overlay.open .sheet{ transform:translateY(0) scale(1); }
+    .map-frame img {
+      display: none;
+      width: 100%;
+      height: auto;
+    }
 
-  .sheet-eyebrow{ color:var(--red); font-size:12.5px; font-weight:600; letter-spacing:0.3px; }
-  .sheet h2{
-    font-family:'Bebas Neue',sans-serif;
-    font-size:30px;
-    letter-spacing:0.5px;
-    margin:2px 0 16px;
-  }
+    .map-frame .uploaded-map,
+    .map-frame #mapImg {
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      height: auto;
+      pointer-events: none;
+    }
 
-  .alias-box{
-    display:flex; align-items:center; justify-content:space-between;
-    background:rgba(0,0,0,0.35);
-    border:1px solid var(--grey-line);
-    border-radius:12px;
-    padding:14px 16px;
-    margin:14px 0 6px;
-  }
-  .alias-box div .label{ font-size:11px; color:var(--grey); margin-bottom:3px; }
-  .alias-box div .value{ font-size:19px; font-weight:700; letter-spacing:0.3px; }
-  .copy-btn{
-    background:var(--red);
-    color:#fff;
-    border:none;
-    border-radius:9px;
-    padding:9px 14px;
-    font-size:12.5px;
-    font-weight:600;
-    cursor:pointer;
-    white-space:nowrap;
-  }
-  .copy-btn:active{ transform:scale(0.96); }
-  .copy-btn.copied{ background:var(--green); color:#06120d; }
+    .map-art {
+      display: none;
+      position: relative;
+      aspect-ratio: 768 / 1376;
+      overflow: hidden;
+      background: radial-gradient(ellipse at 50% 45%, #18202d 0%, #090d16 52%, #020308 100%);
+    }
 
-  .titular{ font-size:13.5px; color:var(--grey); margin:2px 0 18px; }
-  .titular b{ color:var(--white); font-weight:600; }
-  .field-label{ display:block; color:var(--grey); font-size:12px; margin:18px 0 7px; }
-  .name-input{
-    width:100%;
-    border:1px solid var(--grey-line);
-    border-radius:10px;
-    background:rgba(0,0,0,0.35);
-    color:var(--white);
-    font:inherit;
-    font-size:14px;
-    padding:12px 13px;
-    outline:none;
-  }
-  .name-input:focus{ border-color:var(--red); box-shadow:0 0 0 3px rgba(255,45,61,0.12); }
+    .map-art::before {
+      content: "";
+      position: absolute;
+      inset: 2.5% 11% 2.5% 11%;
+      border: 2px solid #af8c61;
+      background: #161922;
+    }
 
-  .steps{
-    background:rgba(255,45,61,0.06);
-    border:1px solid rgba(255,45,61,0.18);
-    border-radius:12px;
-    padding:14px 16px;
-    font-size:13.5px;
-    line-height:1.55;
-    color:var(--white);
-    margin-bottom:22px;
-  }
-  .steps b{ color:var(--red); }
+    .map-zone {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: rgba(243, 241, 238, 0.72);
+      font-size: clamp(8px, 2vw, 11px);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
 
-  .btn-row{ display:flex; gap:10px; }
-  .btn-secondary, .btn-primary{
-    flex:1;
-    border:none;
-    border-radius:12px;
-    padding:14px 10px;
-    font-size:14px;
-    font-weight:700;
-    cursor:pointer;
-  }
-  .btn-secondary{
-    background:transparent;
-    border:1px solid var(--grey-line);
-    color:var(--grey);
-  }
-  .btn-primary{
-    background:linear-gradient(180deg, #ff4553, var(--red));
-    color:#fff;
-    box-shadow:0 8px 20px -8px rgba(255,45,61,0.7);
-  }
-  .btn-primary:active, .btn-secondary:active{ transform:scale(0.98); }
-  .btn-primary:disabled{ opacity:0.6; }
+    .map-zone.dj {
+      left: 52%;
+      top: 4%;
+      width: 39%;
+      height: 13%;
+      background: #24262d;
+      border-color: #b18f64;
+    }
 
-  .confirm-view{ display:none; text-align:center; }
-  .confirm-view.show{ display:block; }
-  .confirm-icon{
-    width:56px;height:56px;border-radius:50%;
-    background:rgba(46,230,166,0.12);
-    border:1px solid rgba(46,230,166,0.4);
-    display:flex;align-items:center;justify-content:center;
-    margin:4px auto 16px;
-    font-size:26px;
-    color:var(--green);
-  }
-  .confirm-view h2{ margin-bottom:8px; }
-  .confirm-view p{ color:var(--grey); font-size:13.5px; line-height:1.55; margin-bottom:22px; }
+    .map-zone.bar {
+      left: 4%;
+      top: 20%;
+      width: 40%;
+      height: 20%;
+      background: #24262d;
+      writing-mode: horizontal-tb;
+    }
 
-  .toast{
-    position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(10px);
-    background:var(--panel-2); border:1px solid var(--grey-line);
-    color:var(--white); font-size:13px; padding:11px 18px; border-radius:30px;
-    opacity:0; pointer-events:none; transition:all .25s ease; z-index:60;
-    box-shadow:0 10px 30px rgba(0,0,0,0.5);
-  }
-  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+    .map-zone.dance {
+      left: 4%;
+      top: 42%;
+      width: 40%;
+      height: 55%;
+      border-style: solid;
+      background: #11151d;
+    }
 
-  .captcha-box {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #1e1e26;
-    border: 2px dashed var(--grey-line);
-    border-radius: 10px;
-    padding: 15px;
-    margin: 15px 0;
-    user-select: none;
-  }
-  .captcha-num {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 32px;
-    letter-spacing: 5px;
-    color: var(--red);
-    text-shadow: 0 0 10px var(--red-glow);
-    font-style: italic;
-  }
-  /* Overlay de previsualización de captura */
-  #capturePreviewOverlay {
-    position: fixed; inset: 0; z-index: 100;
-    background: rgba(0,0,0,0.95);
-    display: none; flex-direction: column; align-items: center; justify-content: center;
-    padding: 20px;
-    text-align: center;
-  }
-  #capturePreviewOverlay.show { display: flex; }
-  #capturePreviewImg { max-width: 100%; max-height: 75vh; border: 2px solid var(--grey-line); border-radius: 12px; margin-bottom: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-  .preview-header { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 1px; margin-bottom: 10px; color: var(--white); }
-  .preview-actions { display: flex; gap: 15px; width: 100%; max-width: 400px; }
-  /* Master Panel */
-  .master-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-  .btn-master { background: #30303a; color: white; border: 1px solid var(--grey-line); padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 13px; }
-  #masterBrand { cursor: pointer; user-select: none; }
-  .master-logout { display:none; background:transparent; border:1px solid var(--grey-line); color:var(--muted); font-size:10px; padding:4px 8px; border-radius:6px; cursor:pointer; margin-top:4px; text-transform:uppercase; font-weight:bold; }
+    .map-zone.vip {
+      left: 47%;
+      top: 16%;
+      width: 44%;
+      height: 81%;
+      background: #1b2029;
+      writing-mode: vertical-rl;
+    }
 
-  /* Login Modal */
-  .login-modal { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; padding: 20px; }
-  .login-modal.show { display: flex; }
-  .login-card-modal { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 30px; width: 100%; max-width: 360px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-  .login-card-modal h3 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; margin: 0 0 20px; color: var(--red); letter-spacing: 1px; }
-  .login-card-modal input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--line); border-radius: 10px; color: white; padding: 12px; margin-bottom: 15px; outline: none; }
-  .login-card-modal input:focus { border-color: var(--red); }
-  .login-card-modal .btn-primary { width: 100%; margin-top: 10px; }
-  .login-card-modal .close-login { display: block; margin: 15px auto 0; background: transparent; color: var(--grey); border: none; font-size: 13px; cursor: pointer; }
+    .map-zone.label-right {
+      display: none;
+    }
 
-  /* Promo Banner */
-  .promo-banner {
-    max-width: 580px;
-    margin: -10px auto 20px;
-    background: linear-gradient(135deg, rgba(255, 45, 61, 0.15), rgba(255, 189, 62, 0.15));
-    border: 1px solid rgba(255, 189, 62, 0.4);
-    border-radius: 14px;
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(255, 45, 61, 0.15);
-    animation: promoGlow 2.5s infinite alternate;
-  }
-  @keyframes promoGlow {
-    0% { border-color: rgba(255, 189, 62, 0.3); box-shadow: 0 4px 15px rgba(255, 45, 61, 0.1); }
-    100% { border-color: rgba(255, 45, 61, 0.6); box-shadow: 0 4px 25px rgba(255, 189, 62, 0.25); }
-  }
-  .promo-badge {
-    background: var(--red);
-    color: white;
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 6px;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-  }
-  .promo-text {
-    font-size: 13.5px;
-    font-weight: 600;
-    color: var(--white);
-  }
-  .promo-text b {
-    color: var(--amber);
-  }
+    .map-floor-line {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.16);
+    }
 
-  /* Pricing & People Selector in Modal */
-  .people-selector-box {
-    background: #111116;
-    border: 1px solid var(--grey-line);
-    border-radius: 12px;
-    padding: 12px;
-    margin: 12px 0 16px;
-  }
-  .people-selector-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    color: var(--grey);
-    margin-bottom: 8px;
-    font-weight: 600;
-  }
-  .people-buttons {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-  .btn-people-step {
-    width: 38px;
-    height: 38px;
-    border-radius: 8px;
-    border: 1px solid var(--grey-line);
-    background: #1e1e26;
-    color: var(--white);
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-  }
-  .btn-people-step:hover {
-    background: var(--red);
-    border-color: var(--red);
-  }
-  .people-count-display {
-    font-size: 15px;
-    font-weight: bold;
-    color: var(--white);
-    flex: 1;
-    text-align: center;
-  }
+    .map-floor-line.one {
+      left: 44%;
+      top: 3%;
+      width: 1px;
+      height: 94%;
+    }
 
-  .pricing-card {
-    background: rgba(255, 189, 62, 0.05);
-    border: 1px solid rgba(255, 189, 62, 0.3);
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 16px;
-  }
-  .pricing-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-    margin-bottom: 6px;
-  }
-  .pricing-row:last-child {
-    margin-bottom: 0;
-    padding-top: 8px;
-    border-top: 1px dashed rgba(255, 255, 255, 0.1);
-  }
-  .pricing-row .label {
-    color: var(--grey);
-  }
-  .pricing-row .val {
-    font-weight: bold;
-    color: var(--white);
-  }
-  .pricing-row .val-green {
-    color: var(--green);
-    font-size: 14px;
-    font-weight: 800;
-  }
-  .pricing-row .val-amber {
-    color: var(--amber);
-    font-weight: 800;
-  }
+    .map-floor-line.two {
+      left: 5%;
+      top: 70%;
+      width: 90%;
+      height: 1px;
+    }
 
-  /* --- Banner de Invitación de Instalación PWA --- */
-  .pwa-install-banner {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 32px);
-    max-width: 440px;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 12px 16px;
-    background: rgba(16, 16, 20, 0.95);
-    border: 1px solid rgba(255, 45, 61, 0.4);
-    border-radius: 16px;
-    box-shadow: 0 12px 36px rgba(0,0,0,0.85), 0 0 24px rgba(255,45,61,0.25);
-    backdrop-filter: blur(12px);
-    animation: pwaSlideUp 0.4s ease;
-  }
-  @keyframes pwaSlideUp {
-    from { transform: translate(-50%, 40px); opacity: 0; }
-    to { transform: translate(-50%, 0); opacity: 1; }
-  }
-  .pwa-install-banner.hidden {
-    display: none !important;
-  }
-  .pwa-install-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-  }
-  .pwa-install-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
-    object-fit: cover;
-    flex-shrink: 0;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-  }
-  .pwa-install-info strong {
-    display: block;
-    font-size: 13.5px;
-    color: var(--white);
-    line-height: 1.2;
-    font-weight: 700;
-  }
-  .pwa-install-info small {
-    display: block;
-    font-size: 11px;
-    color: var(--grey);
-    margin-top: 3px;
-  }
-  .pwa-install-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-  }
-  .pwa-btn-install {
-    padding: 9px 16px;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(135deg, var(--red), #d61324);
-    color: var(--white);
-    font-size: 13px;
-    font-weight: 800;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(255,45,61,0.4);
-    transition: transform 0.15s ease;
-  }
-  .pwa-btn-install:active {
-    transform: scale(0.96);
-  }
-  .pwa-btn-dismiss {
-    background: transparent;
-    border: none;
-    color: var(--grey);
-    font-size: 18px;
-    line-height: 1;
-    cursor: pointer;
-    padding: 6px;
-  }
-</style>
+    .map-title {
+      position: absolute;
+      left: 52%;
+      top: 7%;
+      color: #d0ae7e;
+      font: clamp(18px, 5vw, 28px) 'Bebas Neue', sans-serif;
+      letter-spacing: 2px;
+      z-index: 1;
+    }
+
+    .map-subtitle {
+      position: absolute;
+      right: 10%;
+      bottom: 3%;
+      color: var(--grey);
+      font-size: 9px;
+      letter-spacing: 1px;
+    }
+
+    .map-trace {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: none;
+    }
+
+    .map-trace line,
+    .map-trace polyline,
+    .map-trace rect,
+    .map-trace path {
+      fill: none;
+      stroke: #ff4553;
+      stroke-width: .35;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .map-trace .guide {
+      stroke: #65e6c1;
+      stroke-width: .22;
+      stroke-dasharray: 1.5 1.2;
+    }
+
+    .table-btn {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      width: 7.8%;
+      /* Quitamos el alto y aspect-ratio para manejarlo por JS con precisión de píxel */
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      background: linear-gradient(145deg, #66f5bf, #16b878 55%, #08734b);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 1px 1px 2px rgba(255, 255, 255, 0.3);
+      color: var(--white);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(12px, 2.6vw, 16px);
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      z-index: 10;
+    }
+
+    .table-btn.terraza-btn {
+      font-size: clamp(9.5px, 2.1vw, 13px);
+    }
+
+    .table-btn.pending {
+      background: linear-gradient(145deg, #ffcf58, #b66a08 55%, #613000);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 10px rgba(246, 183, 60, 0.4);
+    }
+
+    .table-btn.approved {
+      background: linear-gradient(145deg, #ff5b66, #d20e21 55%, #70000a);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 45, 61, 0.4);
+    }
+
+    .table-btn.ingresada {
+      background: linear-gradient(145deg, #ff5b66, #d20e21 55%, #70000a);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 45, 61, 0.4);
+    }
+
+    .table-btn.ingresada-master {
+      background: linear-gradient(145deg, #58a6ff, #0a56ad 55%, #002e61);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 10px rgba(88, 166, 255, 0.4);
+    }
+
+    .table-btn .table-label {
+      pointer-events: none;
+      color: #fff;
+      text-shadow: 0 1px 3px #000;
+      font-size: 1.1em;
+    }
+
+    .table-btn .x-mark {
+      font-size: 1.2em;
+      text-shadow: 0 1px 3px #000;
+      display: block;
+      color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      line-height: 1;
+    }
+
+    .table-btn.loading {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .table-btn.focus-table {
+      animation: ultraVipPulse 1.1s ease-in-out 2
+    }
+
+    @keyframes ultraVipPulse {
+      50% {
+        box-shadow: 0 0 0 5px rgba(46, 230, 166, 0.28), 0 0 20px rgba(46, 230, 166, 0.85)
+      }
+    }
+
+    .legend-note {
+      text-align: center;
+      color: var(--grey);
+      font-size: 12px;
+      margin-top: 12px;
+    }
+
+    /* Modal */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(4, 4, 6, 0.78);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+
+    .overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @media (min-width:560px) {
+      .overlay {
+        align-items: center;
+      }
+    }
+
+    .sheet {
+      width: 100%;
+      max-width: 420px;
+      background: linear-gradient(180deg, var(--panel-2), var(--panel));
+      border: 1px solid var(--grey-line);
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+      padding: 26px 22px 28px;
+      transform: translateY(24px);
+      transition: transform .25s ease;
+      box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.5);
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    @media (min-width:560px) {
+      .sheet {
+        border-radius: 20px;
+        border-bottom: 1px solid var(--grey-line);
+        transform: translateY(0) scale(0.97);
+        max-height: 90vh;
+      }
+    }
+
+    .important-notice {
+      color: var(--red);
+      font-weight: 800;
+      font-size: 20px;
+      line-height: 1.3;
+      margin: 20px 0;
+      text-transform: uppercase;
+    }
+
+    .overlay.open .sheet {
+      transform: translateY(0) scale(1);
+    }
+
+    .sheet-eyebrow {
+      color: var(--red);
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .sheet h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 30px;
+      letter-spacing: 0.5px;
+      margin: 2px 0 16px;
+    }
+
+    .alias-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--grey-line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 14px 0 6px;
+    }
+
+    .alias-box div .label {
+      font-size: 11px;
+      color: var(--grey);
+      margin-bottom: 3px;
+    }
+
+    .alias-box div .value {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .copy-btn {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      padding: 9px 14px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .copy-btn:active {
+      transform: scale(0.96);
+    }
+
+    .copy-btn.copied {
+      background: var(--green);
+      color: #06120d;
+    }
+
+    .titular {
+      font-size: 13.5px;
+      color: var(--grey);
+      margin: 2px 0 18px;
+    }
+
+    .titular b {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    .field-label {
+      display: block;
+      color: var(--grey);
+      font-size: 12px;
+      margin: 18px 0 7px;
+    }
+
+    .name-input {
+      width: 100%;
+      border: 1px solid var(--grey-line);
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.35);
+      color: var(--white);
+      font: inherit;
+      font-size: 14px;
+      padding: 12px 13px;
+      outline: none;
+    }
+
+    .name-input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(255, 45, 61, 0.12);
+    }
+
+    .steps {
+      background: rgba(255, 45, 61, 0.06);
+      border: 1px solid rgba(255, 45, 61, 0.18);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--white);
+      margin-bottom: 22px;
+    }
+
+    .steps b {
+      color: var(--red);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-secondary,
+    .btn-primary {
+      flex: 1;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--grey-line);
+      color: var(--grey);
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #ff4553, var(--red));
+      color: #fff;
+      box-shadow: 0 8px 20px -8px rgba(255, 45, 61, 0.7);
+    }
+
+    .btn-primary:active,
+    .btn-secondary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+    }
+
+    .confirm-view {
+      display: none;
+      text-align: center;
+    }
+
+    .confirm-view.show {
+      display: block;
+    }
+
+    .confirm-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(46, 230, 166, 0.12);
+      border: 1px solid rgba(46, 230, 166, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 4px auto 16px;
+      font-size: 26px;
+      color: var(--green);
+    }
+
+    .confirm-view h2 {
+      margin-bottom: 8px;
+    }
+
+    .confirm-view p {
+      color: var(--grey);
+      font-size: 13.5px;
+      line-height: 1.55;
+      margin-bottom: 22px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--panel-2);
+      border: 1px solid var(--grey-line);
+      color: var(--white);
+      font-size: 13px;
+      padding: 11px 18px;
+      border-radius: 30px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all .25s ease;
+      z-index: 60;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .captcha-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1e1e26;
+      border: 2px dashed var(--grey-line);
+      border-radius: 10px;
+      padding: 15px;
+      margin: 15px 0;
+      user-select: none;
+    }
+
+    .captcha-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      letter-spacing: 5px;
+      color: var(--red);
+      text-shadow: 0 0 10px var(--red-glow);
+      font-style: italic;
+    }
+
+    /* Overlay de previsualización de captura */
+    #capturePreviewOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.95);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+    }
+
+    #capturePreviewOverlay.show {
+      display: flex;
+    }
+
+    #capturePreviewImg {
+      max-width: 100%;
+      max-height: 75vh;
+      border: 2px solid var(--grey-line);
+      border-radius: 12px;
+      margin-bottom: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .preview-header {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      color: var(--white);
+    }
+
+    .preview-actions {
+      display: flex;
+      gap: 15px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    /* Master Panel */
+    .master-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .btn-master {
+      background: #30303a;
+      color: white;
+      border: 1px solid var(--grey-line);
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    #masterBrand {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .master-logout {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--grey-line);
+      color: var(--muted);
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 4px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    /* Login Modal */
+    .login-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.9);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-modal.show {
+      display: flex;
+    }
+
+    .login-card-modal {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 30px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .login-card-modal h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      margin: 0 0 20px;
+      color: var(--red);
+      letter-spacing: 1px;
+    }
+
+    .login-card-modal input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: white;
+      padding: 12px;
+      margin-bottom: 15px;
+      outline: none;
+    }
+
+    .login-card-modal input:focus {
+      border-color: var(--red);
+    }
+
+    .login-card-modal .btn-primary {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .login-card-modal .close-login {
+      display: block;
+      margin: 15px auto 0;
+      background: transparent;
+      color: var(--grey);
+      border: none;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    /* Promo Banner */
+    .promo-banner {
+      max-width: 580px;
+      margin: -10px auto 20px;
+      background: linear-gradient(135deg, rgba(255, 45, 61, 0.15), rgba(255, 189, 62, 0.15));
+      border: 1px solid rgba(255, 189, 62, 0.4);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(255, 45, 61, 0.15);
+      animation: promoGlow 2.5s infinite alternate;
+    }
+
+    @keyframes promoGlow {
+      0% {
+        border-color: rgba(255, 189, 62, 0.3);
+        box-shadow: 0 4px 15px rgba(255, 45, 61, 0.1);
+      }
+
+      100% {
+        border-color: rgba(255, 45, 61, 0.6);
+        box-shadow: 0 4px 25px rgba(255, 189, 62, 0.25);
+      }
+    }
+
+    .promo-badge {
+      background: var(--red);
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .promo-text {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .promo-text b {
+      color: var(--amber);
+    }
+
+    /* Pricing & People Selector in Modal */
+    .people-selector-box {
+      background: #111116;
+      border: 1px solid var(--grey-line);
+      border-radius: 12px;
+      padding: 12px;
+      margin: 12px 0 16px;
+    }
+
+    .people-selector-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--grey);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .people-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .btn-people-step {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid var(--grey-line);
+      background: #1e1e26;
+      color: var(--white);
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-people-step:hover {
+      background: var(--red);
+      border-color: var(--red);
+    }
+
+    .people-count-display {
+      font-size: 15px;
+      font-weight: bold;
+      color: var(--white);
+      flex: 1;
+      text-align: center;
+    }
+
+    .pricing-card {
+      background: rgba(255, 189, 62, 0.05);
+      border: 1px solid rgba(255, 189, 62, 0.3);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .pricing-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .pricing-row:last-child {
+      margin-bottom: 0;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+
+    .pricing-row .label {
+      color: var(--grey);
+    }
+
+    .pricing-row .val {
+      font-weight: bold;
+      color: var(--white);
+    }
+
+    .pricing-row .val-green {
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .pricing-row .val-amber {
+      color: var(--amber);
+      font-weight: 800;
+    }
+
+    /* --- Banner de Invitación de Instalación PWA --- */
+    .pwa-install-banner {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 440px;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(16, 16, 20, 0.95);
+      border: 1px solid rgba(255, 45, 61, 0.4);
+      border-radius: 16px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85), 0 0 24px rgba(255, 45, 61, 0.25);
+      backdrop-filter: blur(12px);
+      animation: pwaSlideUp 0.4s ease;
+    }
+
+    @keyframes pwaSlideUp {
+      from {
+        transform: translate(-50%, 40px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+      }
+    }
+
+    .pwa-install-banner.hidden {
+      display: none !important;
+    }
+
+    .pwa-install-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .pwa-install-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .pwa-install-info strong {
+      display: block;
+      font-size: 13.5px;
+      color: var(--white);
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    .pwa-install-info small {
+      display: block;
+      font-size: 11px;
+      color: var(--grey);
+      margin-top: 3px;
+    }
+
+    .pwa-install-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .pwa-btn-install {
+      padding: 9px 16px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, var(--red), #d61324);
+      color: var(--white);
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255, 45, 61, 0.4);
+      transition: transform 0.15s ease;
+    }
+
+    .pwa-btn-install:active {
+      transform: scale(0.96);
+    }
+
+    .pwa-btn-dismiss {
+      background: transparent;
+      border: none;
+      color: var(--grey);
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 6px;
+    }
+  </style>
 </head>
+
 <body>
 
   <div class="topbar">
-    <div class="brand" id="masterBrand">CUBANO<span>BAR</span><small>Sector VIP — reservá tu mesa</small><button id="masterLogoutBtn" class="master-logout">Cerrar Sesión Maestro</button></div>
+    <div class="brand" id="masterBrand">CUBANO<span>BAR</span><small>Sector VIP — reservá tu mesa</small><button
+        id="masterLogoutBtn" class="master-logout">Cerrar Sesión Maestro</button></div>
     <div class="legend">
       <span><span class="dot free"></span>Libre</span>
       <span><span class="dot pending"></span>En disputa</span>
@@ -817,17 +1424,20 @@
   <!-- Promo Banner Dinámico (Oculto por defecto hasta activación desde Admin) -->
   <div class="promo-banner" id="promoBanner" style="display: none;">
     <span class="promo-badge" id="promoBadge">🔥 PROMO HOY</span>
-    <span class="promo-text" id="promoText">Reservando tu mesa hoy accedé al beneficio del <b>90%</b> en consumo del total de la mesa.</span>
+    <span class="promo-text" id="promoText">Reservando tu mesa hoy accedé al beneficio del <b>90%</b> en consumo del
+      total de la mesa.</span>
   </div>
 
   <div class="map-wrap" id="ultraVipSection" aria-label="Sección Ultra VIP">
     <!-- Selector de Sector: MAIN STAGE vs TERRACE SOUL -->
     <div class="sector-tabs-wrap" id="sectorTabsWrap" role="tablist" aria-label="Seleccionar sector">
-      <button type="button" id="tabSectorSalon" class="sector-tab-btn active" role="tab" aria-selected="true" aria-controls="plano-mesas">
+      <button type="button" id="tabSectorSalon" class="sector-tab-btn active" role="tab" aria-selected="true"
+        aria-controls="plano-mesas">
         <span class="sector-icon">🏢</span>
         <span class="sector-text">MAIN STAGE</span>
       </button>
-      <button type="button" id="tabSectorTerraza" class="sector-tab-btn" role="tab" aria-selected="false" aria-controls="plano-mesas">
+      <button type="button" id="tabSectorTerraza" class="sector-tab-btn" role="tab" aria-selected="false"
+        aria-controls="plano-mesas">
         <span class="sector-icon">🌙</span>
         <span class="sector-text">TERRACE SOUL</span>
       </button>
@@ -855,7 +1465,8 @@
         <div class="map-spinner"></div>
         <span class="map-loading-text">Cargando mesas...</span>
       </div>
-      <button class="ultra-vip-overlay" id="ultraVipReserveBtn" type="button" aria-label="Reservar en ULTRA VIP">RESERVAR</button>
+      <button class="ultra-vip-overlay" id="ultraVipReserveBtn" type="button"
+        aria-label="Reservar en ULTRA VIP">RESERVAR</button>
       <img class="event-logo-overlay" id="eventLogoOverlay" alt="Logo del evento ULTRA VIP">
       <!-- Overlay Logo exclusivo Terrace Soul (recuadro amarillo) -->
       <img id="terraceLogoOverlay" class="terrace-logo-overlay" alt="Logo evento Terrace Soul">
@@ -900,41 +1511,51 @@
         <div class="sheet-eyebrow" id="mesaEyebrow">MESA —</div>
         <h2 id="modalTitle">Señá tu mesa</h2>
 
-        <div id="masterPanel" style="display: none; margin-bottom: 20px; border-bottom: 1px solid var(--grey-line); padding-bottom: 20px;">
+        <div id="masterPanel"
+          style="display: none; margin-bottom: 20px; border-bottom: 1px solid var(--grey-line); padding-bottom: 20px;">
           <div class="sheet-eyebrow">CONTROL MAESTRO</div>
           <div style="margin-top: 10px; margin-bottom: 15px;">
-            <input class="name-input" id="masterNameInput" type="text" placeholder="Nombre de la reserva" style="margin-bottom: 8px;">
+            <input class="name-input" id="masterNameInput" type="text" placeholder="Nombre de la reserva"
+              style="margin-bottom: 8px;">
             <input class="name-input" id="masterNoteInput" type="text" placeholder="Nota / Medio de pago">
           </div>
 
           <!-- Módulo de Excepción / Trato Especial (Admin y Asistente) -->
-          <div style="margin-bottom: 15px; padding: 12px; background: rgba(255, 189, 62, 0.07); border: 1px dashed rgba(255, 189, 62, 0.4); border-radius: 10px;">
-            <label style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; color: var(--amber); cursor: pointer;">
-              <input type="checkbox" id="masterIsExcepcion" style="transform: scale(1.2); accent-color: var(--amber); cursor: pointer;">
+          <div
+            style="margin-bottom: 15px; padding: 12px; background: rgba(255, 189, 62, 0.07); border: 1px dashed rgba(255, 189, 62, 0.4); border-radius: 10px;">
+            <label
+              style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; color: var(--amber); cursor: pointer;">
+              <input type="checkbox" id="masterIsExcepcion"
+                style="transform: scale(1.2); accent-color: var(--amber); cursor: pointer;">
               ⚡ Venta con Excepción (Trato Especial)
             </label>
             <div id="masterExcepcionFields" style="display: none; margin-top: 12px;">
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
                 <div>
                   <label class="field-label" style="font-size: 11px;">Personas autorizadas</label>
-                  <input class="name-input" id="masterExPersonas" type="number" min="1" value="4" style="margin-top: 3px; padding: 8px;">
+                  <input class="name-input" id="masterExPersonas" type="number" min="1" value="4"
+                    style="margin-top: 3px; padding: 8px;">
                 </div>
                 <div>
                   <label class="field-label" style="font-size: 11px;">Precio Total Mesa ($)</label>
-                  <input class="name-input" id="masterExTotal" type="number" placeholder="Ej: 120000" style="margin-top: 3px; padding: 8px;">
+                  <input class="name-input" id="masterExTotal" type="number" placeholder="Ej: 120000"
+                    style="margin-top: 3px; padding: 8px;">
                 </div>
               </div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
                 <div>
                   <label class="field-label" style="font-size: 11px;">% en Bebidas</label>
-                  <input class="name-input" id="masterExDrinksPct" type="number" placeholder="Ej: 90" style="margin-top: 3px; padding: 8px;">
+                  <input class="name-input" id="masterExDrinksPct" type="number" placeholder="Ej: 90"
+                    style="margin-top: 3px; padding: 8px;">
                 </div>
                 <div>
                   <label class="field-label" style="font-size: 11px;">Seña Abonada ($)</label>
-                  <input class="name-input" id="masterExSena" type="number" placeholder="Ej: 30000" style="margin-top: 3px; padding: 8px;">
+                  <input class="name-input" id="masterExSena" type="number" placeholder="Ej: 30000"
+                    style="margin-top: 3px; padding: 8px;">
                 </div>
               </div>
-              <div id="masterExPreview" style="font-size: 12px; line-height: 1.5; color: #f3f1ee; background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; margin-top: 6px;">
+              <div id="masterExPreview"
+                style="font-size: 12px; line-height: 1.5; color: #f3f1ee; background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; margin-top: 6px;">
                 🍹 Voucher Bebidas: <b id="masterExDrinksPreview" style="color:var(--green);">$0</b><br>
                 💵 Abonó: <b id="masterExAbonadoPreview" style="color:var(--amber);">$0 (0%)</b><br>
                 🚪 Resta en Puerta: <b id="masterExSaldoPreview" style="color:var(--red);">$0 (0%)</b>
@@ -985,33 +1606,36 @@
           </div>
 
           <div class="alias-box">
-          <div>
-            <div class="label">Alias para transferir seña</div>
-            <div class="value">cubanobar</div>
+            <div>
+              <div class="label">Alias para transferir seña</div>
+              <div class="value">cubanobar</div>
+            </div>
+            <button class="copy-btn" id="copyBtn">Copiar</button>
           </div>
-          <button class="copy-btn" id="copyBtn">Copiar</button>
-        </div>
-        <div class="titular">A nombre de <b>Gabriela Marrazzo</b></div>
+          <div class="titular">A nombre de <b>Gabriela Marrazzo</b></div>
 
-        <label class="field-label" for="nameInput">Nombre o alias de la reserva</label>
-        <input class="name-input" id="nameInput" type="text" maxlength="60" autocomplete="name" placeholder="Ej.: Juan Pérez o @juanperez">
+          <label class="field-label" for="nameInput">Nombre o alias de la reserva</label>
+          <input class="name-input" id="nameInput" type="text" maxlength="60" autocomplete="name"
+            placeholder="Ej.: Juan Pérez o @juanperez">
 
-        <label class="field-label" for="contactInput">Número de WhatsApp (10 dígitos)</label>
-        <input class="name-input" id="contactInput" type="tel" maxlength="10" autocomplete="tel" placeholder="Ej.: 1123456789">
+          <label class="field-label" for="contactInput">Número de WhatsApp (10 dígitos)</label>
+          <input class="name-input" id="contactInput" type="tel" maxlength="10" autocomplete="tel"
+            placeholder="Ej.: 1123456789">
 
-        <div class="captcha-box">
-          <span class="captcha-num" id="captchaDisplay">12345</span>
-        </div>
-        <label class="field-label" for="captchaInput">Escribí el número de arriba para continuar</label>
-        <input class="name-input" id="captchaInput" type="text" inputmode="numeric" maxlength="5" placeholder="Código de 5 dígitos">
+          <div class="captcha-box">
+            <span class="captcha-num" id="captchaDisplay">12345</span>
+          </div>
+          <label class="field-label" for="captchaInput">Escribí el número de arriba para continuar</label>
+          <input class="name-input" id="captchaInput" type="text" inputmode="numeric" maxlength="5"
+            placeholder="Código de 5 dígitos">
 
-        <div class="steps">
-          <b>1.</b> Transferí la seña al alias de arriba.<br>
-          <b>2.</b> Una vez realizada la seña, enviá el comprobante a tu RRPP.<br>
-          <b>3.</b> Completá tu nombre y un contacto real.<br>
-          <b>4.</b> La mesa queda en disputa por 15 minutos.<br>
-          <b>5.</b> Apretá "Finalizar" para confirmar tu mesa.
-        </div>
+          <div class="steps">
+            <b>1.</b> Transferí la seña al alias de arriba.<br>
+            <b>2.</b> Una vez realizada la seña, enviá el comprobante a tu RRPP.<br>
+            <b>3.</b> Completá tu nombre y un contacto real.<br>
+            <b>4.</b> La mesa queda en disputa por 15 minutos.<br>
+            <b>5.</b> Apretá "Finalizar" para confirmar tu mesa.
+          </div>
         </div>
 
         <div class="btn-row" id="standardBtnRow">
@@ -1052,1294 +1676,1294 @@
     </div>
   </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script>
-  const firebaseConfig = { apiKey:"AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY", authDomain:"mesas-cubano-bar.firebaseapp.com", projectId:"mesas-cubano-bar", storageBucket:"mesas-cubano-bar.firebasestorage.app", messagingSenderId:"1072135346765", appId:"1:1072135346765:web:e8a6ee5497366a8b1f5a04" };
-  let firebaseDb = null;
-  let firebaseFunctions = null;
-  let auth = null;
-  let whatsappVerificationToken = "";
-  const USE_SECURE_RESERVATION = false;
-  try {
-    firebase.initializeApp(firebaseConfig);
-    firebaseDb = firebase.firestore();
-    auth = firebase.auth();
-    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-      firebaseDb.useEmulator("localhost", 8085);
-      auth.useEmulator("http://localhost:9099");
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    const firebaseConfig = { apiKey: "AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY", authDomain: "mesas-cubano-bar.firebaseapp.com", projectId: "mesas-cubano-bar", storageBucket: "mesas-cubano-bar.firebasestorage.app", messagingSenderId: "1072135346765", appId: "1:1072135346765:web:e8a6ee5497366a8b1f5a04" };
+    let firebaseDb = null;
+    let firebaseFunctions = null;
+    let auth = null;
+    let whatsappVerificationToken = "";
+    const USE_SECURE_RESERVATION = false;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      firebaseDb = firebase.firestore();
+      auth = firebase.auth();
+      if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+        firebaseDb.useEmulator("localhost", 8085);
+        auth.useEmulator("http://localhost:9099");
+      }
+    } catch (_) { }
+    try { if (USE_SECURE_RESERVATION) firebaseFunctions = firebase.app().functions("us-central1"); } catch (_) { }
+
+    // ---- Precios y Promociones de Consumo por Día ----
+    let currentPeopleCount = 4;
+    let pricingConfig = {
+      precioBaseMesa: 120000,
+      capacidadBase: 4,
+      precioPersonaExtra: 25000,
+      montoSena: 30000,
+      dias: [
+        { id: 1, name: "Lunes", pct: 90, active: true },
+        { id: 2, name: "Martes", pct: 85, active: true },
+        { id: 3, name: "Miércoles", pct: 80, active: true },
+        { id: 4, name: "Jueves", pct: 70, active: true },
+        { id: 5, name: "Viernes", pct: 60, active: true },
+        { id: 6, name: "Sábado", pct: 50, active: true },
+        { id: 0, name: "Domingo", pct: 90, active: true }
+      ]
+    };
+
+    function getTodayPromo() {
+      const dayOfWeek = new Date().getDay();
+      const found = pricingConfig.dias ? pricingConfig.dias.find(d => d.id === dayOfWeek) : null;
+      if (found && found.active) return found;
+      return { id: dayOfWeek, name: "Hoy", pct: 50, active: true };
     }
-  } catch (_) {}
-  try { if(USE_SECURE_RESERVATION) firebaseFunctions = firebase.app().functions("us-central1"); } catch (_) {}
 
-  // ---- Precios y Promociones de Consumo por Día ----
-  let currentPeopleCount = 4;
-  let pricingConfig = {
-    precioBaseMesa: 120000,
-    capacidadBase: 4,
-    precioPersonaExtra: 25000,
-    montoSena: 30000,
-    dias: [
-      { id: 1, name: "Lunes", pct: 90, active: true },
-      { id: 2, name: "Martes", pct: 85, active: true },
-      { id: 3, name: "Miércoles", pct: 80, active: true },
-      { id: 4, name: "Jueves", pct: 70, active: true },
-      { id: 5, name: "Viernes", pct: 60, active: true },
-      { id: 6, name: "Sábado", pct: 50, active: true },
-      { id: 0, name: "Domingo", pct: 90, active: true }
-    ]
-  };
+    function updatePromoBanner() {
+      const promo = getTodayPromo();
+      const banner = document.getElementById("promoBanner");
+      const badge = document.getElementById("promoBadge");
+      const text = document.getElementById("promoText");
+      if (!banner || !badge || !text) return;
 
-  function getTodayPromo() {
-    const dayOfWeek = new Date().getDay();
-    const found = pricingConfig.dias ? pricingConfig.dias.find(d => d.id === dayOfWeek) : null;
-    if (found && found.active) return found;
-    return { id: dayOfWeek, name: "Hoy", pct: 50, active: true };
-  }
+      const isPromoEnabled = !!(pricingConfig.mostrarBannerPromo && promo.active && promo.pct > 0);
+      banner.style.display = isPromoEnabled ? "flex" : "none";
 
-  function updatePromoBanner() {
-    const promo = getTodayPromo();
-    const banner = document.getElementById("promoBanner");
-    const badge = document.getElementById("promoBadge");
-    const text = document.getElementById("promoText");
-    if (!banner || !badge || !text) return;
-
-    const isPromoEnabled = !!(pricingConfig.mostrarBannerPromo && promo.active && promo.pct > 0);
-    banner.style.display = isPromoEnabled ? "flex" : "none";
-
-    if (isPromoEnabled) {
-      badge.textContent = `🔥 PROMO ${promo.name.toUpperCase()}`;
-      text.innerHTML = `Reservando tu mesa hoy accedé al beneficio del <b>${promo.pct}%</b> en consumo del total de la mesa.`;
-    }
-  }
-
-  function updateModalPricingDisplay() {
-    const basePrice = pricingConfig.precioBaseMesa || 120000;
-    const extraPrice = pricingConfig.precioPersonaExtra || 25000;
-    const senaAmount = pricingConfig.montoSena || 30000;
-    const promo = getTodayPromo();
-    const isPromoEnabled = !!(pricingConfig.mostrarBannerPromo && promo.active && promo.pct > 0);
-
-    const extraPeople = Math.max(0, currentPeopleCount - 4);
-    const totalMesa = basePrice + (extraPeople * extraPrice);
-    const consumoCredito = isPromoEnabled ? Math.round((totalMesa * promo.pct) / 100) : 0;
-    const saldoPuerta = Math.max(0, totalMesa - senaAmount);
-
-    const countDisplay = document.getElementById("peopleCountDisplay");
-    const badgeExtra = document.getElementById("peopleExtraBadge");
-    const totalEl = document.getElementById("summaryTotalMesa");
-    const consumoLabel = document.getElementById("summaryConsumoLabel");
-    const consumoVal = document.getElementById("summaryConsumoVal");
-    const senaVal = document.getElementById("summarySenaVal");
-    const saldoVal = document.getElementById("summarySaldoVal");
-
-    if (countDisplay) countDisplay.textContent = `${currentPeopleCount} ${currentPeopleCount === 1 ? 'Persona' : 'Personas'}`;
-    if (badgeExtra) {
-      badgeExtra.textContent = extraPeople > 0 ? `+${extraPeople} extra ($${(extraPeople * extraPrice).toLocaleString('es-AR')})` : "Base: 1 a 4 personas";
-    }
-    if (totalEl) totalEl.textContent = `$${totalMesa.toLocaleString('es-AR')}`;
-    
-    // Si la promo está activa, mostrar la fila de crédito de bebidas; sino ocultarla
-    if (consumoLabel && consumoLabel.parentElement) {
-      consumoLabel.parentElement.style.display = isPromoEnabled ? "flex" : "none";
       if (isPromoEnabled) {
-        consumoLabel.textContent = `🎁 Saldo a favor para tomar (${promo.pct}%):`;
-        if (consumoVal) consumoVal.textContent = `+$${consumoCredito.toLocaleString('es-AR')}`;
+        badge.textContent = `🔥 PROMO ${promo.name.toUpperCase()}`;
+        text.innerHTML = `Reservando tu mesa hoy accedé al beneficio del <b>${promo.pct}%</b> en consumo del total de la mesa.`;
       }
     }
-    if (senaVal) senaVal.textContent = `$${senaAmount.toLocaleString('es-AR')}`;
-    if (saldoVal) saldoVal.textContent = `$${saldoPuerta.toLocaleString('es-AR')}`;
 
-    return { totalMesa, consumoCredito, senaAmount, saldoPuerta, pct: isPromoEnabled ? promo.pct : 0 };
-  }
+    function updateModalPricingDisplay() {
+      const basePrice = pricingConfig.precioBaseMesa || 120000;
+      const extraPrice = pricingConfig.precioPersonaExtra || 25000;
+      const senaAmount = pricingConfig.montoSena || 30000;
+      const promo = getTodayPromo();
+      const isPromoEnabled = !!(pricingConfig.mostrarBannerPromo && promo.active && promo.pct > 0);
 
-  // Escuchar configuración de precios en Firestore
-  if (firebaseDb) {
-    firebaseDb.collection("config").doc("precios_consumo").onSnapshot(doc => {
-      if (doc.exists) {
-        const data = doc.data();
-        if (data.precioBaseMesa) pricingConfig.precioBaseMesa = data.precioBaseMesa;
-        if (data.precioPersonaExtra) pricingConfig.precioPersonaExtra = data.precioPersonaExtra;
-        if (data.montoSena) pricingConfig.montoSena = data.montoSena;
-        pricingConfig.mostrarBannerPromo = !!data.mostrarBannerPromo;
-        if (data.dias && Array.isArray(data.dias)) pricingConfig.dias = data.dias;
+      const extraPeople = Math.max(0, currentPeopleCount - 4);
+      const totalMesa = basePrice + (extraPeople * extraPrice);
+      const consumoCredito = isPromoEnabled ? Math.round((totalMesa * promo.pct) / 100) : 0;
+      const saldoPuerta = Math.max(0, totalMesa - senaAmount);
+
+      const countDisplay = document.getElementById("peopleCountDisplay");
+      const badgeExtra = document.getElementById("peopleExtraBadge");
+      const totalEl = document.getElementById("summaryTotalMesa");
+      const consumoLabel = document.getElementById("summaryConsumoLabel");
+      const consumoVal = document.getElementById("summaryConsumoVal");
+      const senaVal = document.getElementById("summarySenaVal");
+      const saldoVal = document.getElementById("summarySaldoVal");
+
+      if (countDisplay) countDisplay.textContent = `${currentPeopleCount} ${currentPeopleCount === 1 ? 'Persona' : 'Personas'}`;
+      if (badgeExtra) {
+        badgeExtra.textContent = extraPeople > 0 ? `+${extraPeople} extra ($${(extraPeople * extraPrice).toLocaleString('es-AR')})` : "Base: 1 a 4 personas";
       }
-      updatePromoBanner();
-      updateModalPricingDisplay();
-    });
-  }
+      if (totalEl) totalEl.textContent = `$${totalMesa.toLocaleString('es-AR')}`;
 
-  // ---- Posiciones de cada mesa sobre el mapa (en % del ancho/alto de la imagen) ----
-  const TABLES_SALON = [
-    { id:"19", num:"19", x:59.1, y:18.0 },
-    { id:"18", num:"18", x:79.8, y:17.3 },
-    { id:"17", num:"17", x:79.9, y:24.1 },
-    { id:"16", num:"16", x:66.0, y:26.6 },
-    { id:"15", num:"15", x:80.3, y:30.5 },
-    { id:"D",  num:"D",  x:52.1, y:35.1 },
-    { id:"14", num:"14", x:80.2, y:37.3 },
-    { id:"13", num:"13", x:22.9, y:38.0 },
-    { id:"12", num:"12", x:32.4, y:37.9 },
-    { id:"11", num:"11", x:42.7, y:38.0 },
-    { id:"10", num:"10", x:63.4, y:38.4 },
-    { id:"9",  num:"9",  x:80.6, y:44.3 },
-    { id:"C",  num:"C",  x:57.9, y:45.5 },
-    { id:"8",  num:"8",  x:80.7, y:50.9 },
-    { id:"7",  num:"7",  x:81.8, y:58.2 },
-    { id:"B",  num:"B",  x:58.2, y:61.1 },
-    { id:"6",  num:"6",  x:81.8, y:65.7 },
-    { id:"4",  num:"4",  x:58.2, y:68.0 },
-    { id:"3",  num:"3",  x:58.2, y:74.0 },
-    { id:"20", num:"20", x:70.8, y:74.1 },
-    { id:"5",  num:"5",  x:81.9, y:73.7 },
-    { id:"1",  num:"1",  x:58.5, y:80.5 },
-    { id:"2",  num:"2",  x:81.9, y:81.7 }
-  ];
-
-  const TABLES_TERRAZA = [
-    { id:"T-3",  num:"3",  x:10.9, y:35.4 },
-    { id:"T-4",  num:"4",  x:18.9, y:34.6 },
-    { id:"T-5",  num:"5",  x:26.8, y:34.6 },
-    { id:"T-6",  num:"6",  x:49.8, y:36.9 },
-    { id:"T-7",  num:"7",  x:37.7, y:41.9 },
-    { id:"T-A",  num:"A",  x:23.9, y:45.9 },
-    { id:"T-B",  num:"B",  x:36.8, y:45.9 },
-    { id:"T-C",  num:"C",  x:50.0, y:45.9 },
-    { id:"T-D",  num:"D",  x:36.8, y:52.5 },
-    { id:"T-E",  num:"E",  x:50.1, y:52.5 },
-    { id:"T-2",  num:"2",  x:11.4, y:43.4 },
-    { id:"T-1",  num:"1",  x:11.7, y:50.9 },
-    { id:"T-8",  num:"8",  x:19.0, y:52.8 },
-    { id:"T-16", num:"16", x:73.0, y:34.2 },
-    { id:"T-17", num:"17", x:77.9, y:40.6 },
-    { id:"T-18", num:"18", x:77.9, y:45.9 },
-    { id:"T-19", num:"19", x:77.9, y:50.9 },
-    { id:"T-15", num:"15", x:90.6, y:41.4 },
-    { id:"T-9",  num:"9",  x:30.3, y:64.8 },
-    { id:"T-10", num:"10", x:39.7, y:64.8 },
-    { id:"T-11", num:"11", x:48.7, y:64.8 },
-    { id:"T-12", num:"12", x:57.7, y:64.8 },
-    { id:"T-13", num:"13", x:81.7, y:64.8 },
-    { id:"T-14", num:"14", x:90.0, y:64.8 }
-  ];
-
-  let currentSector = 'salon'; // 'salon' | 'terraza'
-
-  function getActiveSectorTables() {
-    return currentSector === 'terraza' ? TABLES_TERRAZA : TABLES_SALON;
-  }
-
-  function setSector(sector) {
-    if (currentSector === sector) return;
-    currentSector = sector;
-
-    const tabSalon = document.getElementById("tabSectorSalon");
-    const tabTerraza = document.getElementById("tabSectorTerraza");
-    if (tabSalon) {
-      tabSalon.classList.toggle("active", sector === "salon");
-      tabSalon.setAttribute("aria-selected", sector === "salon");
-    }
-    if (tabTerraza) {
-      tabTerraza.classList.toggle("active", sector === "terraza");
-      tabTerraza.setAttribute("aria-selected", sector === "terraza");
-    }
-
-    const mapImgEl = document.getElementById("mapImg");
-    const legendEl = document.getElementById("legendNote");
-    const mapBgLayerEl = document.getElementById("mapBgLayer");
-
-    if (sector === "terraza") {
-      if (mapImgEl) mapImgEl.src = "terraza.png";
-      if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "none";
-      if (eventLogoOverlay) eventLogoOverlay.style.display = "none";
-      
-      const cfg = currentEventKey === 'fecha1' ? configFecha1 : configFecha2;
-
-      // Fondo temático de terraza
-      if (mapBgLayerEl) {
-        const terraceBg = cfg.terraceBgUrl || cfg.bgUrl;
-        if (terraceBg) {
-          mapBgLayerEl.style.backgroundImage = `url("${terraceBg}")`;
-          mapBgLayerEl.style.display = "";
-        } else {
-          mapBgLayerEl.style.backgroundImage = "none";
-          mapBgLayerEl.style.display = "none";
+      // Si la promo está activa, mostrar la fila de crédito de bebidas; sino ocultarla
+      if (consumoLabel && consumoLabel.parentElement) {
+        consumoLabel.parentElement.style.display = isPromoEnabled ? "flex" : "none";
+        if (isPromoEnabled) {
+          consumoLabel.textContent = `🎁 Saldo a favor para tomar (${promo.pct}%):`;
+          if (consumoVal) consumoVal.textContent = `+$${consumoCredito.toLocaleString('es-AR')}`;
         }
       }
+      if (senaVal) senaVal.textContent = `$${senaAmount.toLocaleString('es-AR')}`;
+      if (saldoVal) saldoVal.textContent = `$${saldoPuerta.toLocaleString('es-AR')}`;
 
-      // Logo exclusivo de terraza
-      if (terraceLogoOverlay) {
-        if (cfg.terraceLogoUrl) {
-          terraceLogoOverlay.src = cfg.terraceLogoUrl;
-          terraceLogoOverlay.alt = cfg.terraceEventName ? ("Logo de " + cfg.terraceEventName) : "Logo Terrace Soul";
-          terraceLogoOverlay.style.display = "block";
-        } else {
-          terraceLogoOverlay.src = "";
-          terraceLogoOverlay.style.display = "none";
+      return { totalMesa, consumoCredito, senaAmount, saldoPuerta, pct: isPromoEnabled ? promo.pct : 0 };
+    }
+
+    // Escuchar configuración de precios en Firestore
+    if (firebaseDb) {
+      firebaseDb.collection("config").doc("precios_consumo").onSnapshot(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          if (data.precioBaseMesa) pricingConfig.precioBaseMesa = data.precioBaseMesa;
+          if (data.precioPersonaExtra) pricingConfig.precioPersonaExtra = data.precioPersonaExtra;
+          if (data.montoSena) pricingConfig.montoSena = data.montoSena;
+          pricingConfig.mostrarBannerPromo = !!data.mostrarBannerPromo;
+          if (data.dias && Array.isArray(data.dias)) pricingConfig.dias = data.dias;
         }
-      }
-
-      // Fecha en recuadro verde de terraza
-      if (terraceDateBadge) {
-        const fechaTxt = cfg.terraceDate || (cfg.headingText ? (cfg.headingText + (cfg.eventDate ? ' ' + cfg.eventDate : '')) : cfg.eventDate);
-        if (fechaTxt) {
-          terraceDateBadge.textContent = fechaTxt;
-          terraceDateBadge.style.display = "flex";
-        } else {
-          terraceDateBadge.style.display = "none";
-        }
-      }
-
-      if (legendEl) legendEl.textContent = "Sector TERRACE SOUL (al aire libre): mesas 1 a 19 y mesas A, B, C, D, E";
-    } else {
-      if (mapImgEl) mapImgEl.src = "Gemini_Generated_Image_pxpekipxpekipxpe.png";
-      if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "";
-      if (terraceLogoOverlay) terraceLogoOverlay.style.display = "none";
-      if (terraceDateBadge) terraceDateBadge.style.display = "none";
-
-      const cfg = currentEventKey === 'fecha1' ? configFecha1 : configFecha2;
-      if (mapBgLayerEl) {
-        if (cfg.bgUrl) {
-          mapBgLayerEl.style.backgroundImage = `url("${cfg.bgUrl}")`;
-          mapBgLayerEl.style.display = "";
-        } else {
-          mapBgLayerEl.style.backgroundImage = "none";
-        }
-      }
-      cargarLogoEvento();
-      if (legendEl) legendEl.textContent = "Sector MAIN STAGE: mesas 1 a 20 y mesas B, C, D";
-    }
-
-    if (overlay && overlay.classList.contains("open")) {
-      cerrarModal();
-    }
-
-    renderMesas();
-    actualizarUltraVip();
-    actualizarContador();
-  }
-
-  const STORAGE_KEY = "mesas-estado";
-  const planoMesas = document.getElementById("plano-mesas");
-  const ultraVipReserveBtn = document.getElementById("ultraVipReserveBtn");
-  const ultraVipHeading = document.getElementById("ultraVipHeading");
-  const singleHeadingWrap = document.getElementById("singleHeadingWrap");
-  const eventTabsWrap = document.getElementById("eventTabsWrap");
-  const tabPublicFecha1 = document.getElementById("tabPublicFecha1");
-  const tabPublicFecha2 = document.getElementById("tabPublicFecha2");
-  const tabPublicFecha1Title = document.getElementById("tabPublicFecha1Title");
-  const tabPublicFecha1Date = document.getElementById("tabPublicFecha1Date");
-  const tabPublicFecha2Title = document.getElementById("tabPublicFecha2Title");
-  const tabPublicFecha2Date = document.getElementById("tabPublicFecha2Date");
-
-  let currentEventKey = 'fecha1';
-  let configFecha1 = {};
-  let configFecha2 = {};
-  let reservasUnsub = null;
-
-  function getActiveReservasCollection() {
-    return currentEventKey === 'fecha1' ? 'reservas' : 'reservas_fecha2';
-  }
-
-  const eventLogoOverlay = document.getElementById("eventLogoOverlay");
-  const mapImg = document.getElementById("mapImg");
-  if(mapImg) mapImg.src = "Gemini_Generated_Image_pxpekipxpekipxpe.png";
-  const overlay = document.getElementById("overlay");
-  const senaView = document.getElementById("senaView");
-  const confirmView = document.getElementById("confirmView");
-  const mesaEyebrow = document.getElementById("mesaEyebrow");
-  const nameInput = document.getElementById("nameInput");
-  const contactInput = document.getElementById("contactInput");
-  const captchaDisplay = document.getElementById("captchaDisplay");
-  const captchaInput = document.getElementById("captchaInput");
-  const confirmationText = document.getElementById("confirmationText");
-  const toast = document.getElementById("toast");
-  const freeTablesCount = document.getElementById("freeTablesCount");
-  const captureMode = new URLSearchParams(window.location.search).get("capture") === "admin";
-
-  let estado = {};       // { "1": {status:"ocupada", ts:...}, ... }
-  let mesaActual = null;
-  let currentCaptcha = "";
-
-  function generateCaptcha() {
-    currentCaptcha = Math.floor(10000 + Math.random() * 90000).toString();
-    captchaDisplay.textContent = currentCaptcha;
-    captchaInput.value = "";
-  }
-  const DISPUTE_MS = 15 * 60 * 1000;
-  const RATE_LIMIT_MS = 10 * 60 * 1000;
-  const RATE_LIMIT_MAX = 2;
-  const RATE_LIMIT_KEY = "mesas-dispute-attempts";
-  const DEVICE_ID_KEY = "cubano-device-id";
-
-  function getDeviceId() {
-    let id = localStorage.getItem(DEVICE_ID_KEY);
-    if (!id) {
-      id = "dev-" + Math.random().toString(36).substring(2, 15) + Date.now();
-      localStorage.setItem(DEVICE_ID_KEY, id);
-    }
-    return id;
-  }
-
-  function getMyActiveDispute() {
-    const key = "my-dispute-" + currentEventKey;
-    const myDispute = JSON.parse(localStorage.getItem(key) || "null");
-    if (myDispute && myDispute.expiresAt > Date.now()) {
-      return myDispute;
-    }
-    return null;
-  }
-
-  function reservaActiva(reserva){
-    if(!reserva) return false;
-    if(reserva.status === "disputa" && Number.isFinite(reserva.expiresAt) && reserva.expiresAt <= Date.now()) return false;
-    return ["pendiente", "disputa", "aprobada", "ocupada", "comprobante_subido", "pendiente_revision", "vendida", "ingresada"].includes(reserva.status);
-  }
-
-  function actualizarContador(){
-    const activeTables = getActiveSectorTables();
-    const ocupadas = activeTables.filter(t => reservaActiva(estado[t.id])).length;
-    const libres = Math.max(0, activeTables.length - ocupadas);
-    freeTablesCount.textContent = libres + (libres === 1 ? " mesa libre" : " mesas libres");
-  }
-
-  async function capturarMapaPublico(){
-    if(!captureMode || typeof html2canvas !== "function") return;
-    try{
-      // Esperar a que todo cargue bien
-      await new Promise(resolve => setTimeout(resolve, 4000));
-
-      const canvas = await html2canvas(planoMesas, {
-        backgroundColor: "#060608",
-        useCORS: true,
-        allowTaint: true,
-        scale: 2,
-        logging: false
+        updatePromoBanner();
+        updateModalPricingDisplay();
       });
-
-      const dataUrl = canvas.toDataURL("image/png");
-      document.getElementById("capturePreviewImg").src = dataUrl;
-      document.getElementById("capturePreviewOverlay").classList.add("show");
-
-    }catch(e){
-      console.error("Error capturando:", e);
-    }
-  }
-
-  document.getElementById("closePreviewBtn").addEventListener("click", () => {
-    document.getElementById("capturePreviewOverlay").classList.remove("show");
-  });
-
-  document.getElementById("downloadPreviewBtn").addEventListener("click", async () => {
-    const dataUrl = document.getElementById("capturePreviewImg").src;
-    const fileName = 'mapa-cubano.png';
-
-    // Intentar usar File System Access API para "Guardar como"
-    if ('showSaveFilePicker' in window) {
-      try {
-        const handle = await window.showSaveFilePicker({
-          suggestedName: fileName,
-          types: [{
-            description: 'Imagen PNG',
-            accept: {'image/png': ['.png']},
-          }],
-        });
-        const response = await fetch(dataUrl);
-        const blob = await response.blob();
-        const writable = await handle.createWritable();
-        await writable.write(blob);
-        await writable.close();
-        showToast("Imagen guardada correctamente");
-        return;
-      } catch (e) {
-        if (e.name === 'AbortError') return;
-        console.error("Error con showSaveFilePicker:", e);
-      }
     }
 
-    // Fallback al método tradicional de descarga
-    const link = document.createElement("a");
-    link.href = dataUrl;
-    link.download = fileName;
-    link.click();
-    showToast("Descarga iniciada");
-  });
+    // ---- Posiciones de cada mesa sobre el mapa (en % del ancho/alto de la imagen) ----
+    const TABLES_SALON = [
+      { id: "19", num: "19", x: 59.1, y: 18.0 },
+      { id: "18", num: "18", x: 79.8, y: 17.3 },
+      { id: "17", num: "17", x: 79.9, y: 24.1 },
+      { id: "16", num: "16", x: 66.0, y: 26.6 },
+      { id: "15", num: "15", x: 80.3, y: 30.5 },
+      { id: "D", num: "D", x: 52.1, y: 35.1 },
+      { id: "14", num: "14", x: 80.2, y: 37.3 },
+      { id: "13", num: "13", x: 22.9, y: 38.0 },
+      { id: "12", num: "12", x: 32.4, y: 37.9 },
+      { id: "11", num: "11", x: 42.7, y: 38.0 },
+      { id: "10", num: "10", x: 63.4, y: 38.4 },
+      { id: "9", num: "9", x: 80.6, y: 44.3 },
+      { id: "C", num: "C", x: 57.9, y: 45.5 },
+      { id: "8", num: "8", x: 80.7, y: 50.9 },
+      { id: "7", num: "7", x: 81.8, y: 58.2 },
+      { id: "B", num: "B", x: 58.2, y: 61.1 },
+      { id: "6", num: "6", x: 81.8, y: 65.7 },
+      { id: "4", num: "4", x: 58.2, y: 68.0 },
+      { id: "3", num: "3", x: 58.2, y: 74.0 },
+      { id: "20", num: "20", x: 70.8, y: 74.1 },
+      { id: "5", num: "5", x: 81.9, y: 73.7 },
+      { id: "1", num: "1", x: 58.5, y: 80.5 },
+      { id: "2", num: "2", x: 81.9, y: 81.7 }
+    ];
 
-  function showToast(msg){
-    toast.textContent = msg;
-    toast.classList.add("show");
-    setTimeout(()=> toast.classList.remove("show"), 2200);
-  }
+    const TABLES_TERRAZA = [
+      { id: "T-3", num: "3", x: 10.9, y: 35.4 },
+      { id: "T-4", num: "4", x: 18.9, y: 34.6 },
+      { id: "T-5", num: "5", x: 26.8, y: 34.6 },
+      { id: "T-6", num: "6", x: 49.8, y: 36.9 },
+      { id: "T-7", num: "7", x: 37.7, y: 41.9 },
+      { id: "T-A", num: "A", x: 23.9, y: 45.9 },
+      { id: "T-B", num: "B", x: 36.8, y: 45.9 },
+      { id: "T-C", num: "C", x: 50.0, y: 45.9 },
+      { id: "T-D", num: "D", x: 36.8, y: 52.5 },
+      { id: "T-E", num: "E", x: 50.1, y: 52.5 },
+      { id: "T-2", num: "2", x: 11.4, y: 43.4 },
+      { id: "T-1", num: "1", x: 11.7, y: 50.9 },
+      { id: "T-8", num: "8", x: 19.0, y: 52.8 },
+      { id: "T-16", num: "16", x: 73.0, y: 34.2 },
+      { id: "T-17", num: "17", x: 77.9, y: 40.6 },
+      { id: "T-18", num: "18", x: 77.9, y: 45.9 },
+      { id: "T-19", num: "19", x: 77.9, y: 50.9 },
+      { id: "T-15", num: "15", x: 90.6, y: 41.4 },
+      { id: "T-9", num: "9", x: 30.3, y: 64.8 },
+      { id: "T-10", num: "10", x: 39.7, y: 64.8 },
+      { id: "T-11", num: "11", x: 48.7, y: 64.8 },
+      { id: "T-12", num: "12", x: 57.7, y: 64.8 },
+      { id: "T-13", num: "13", x: 81.7, y: 64.8 },
+      { id: "T-14", num: "14", x: 90.0, y: 64.8 }
+    ];
 
-  function normalizarWhatsapp(value){ return value.trim().replace(/[\s().-]/g, ""); }
+    let currentSector = 'salon'; // 'salon' | 'terraza'
 
-  function getRecentAttempts(){
-    try{
-      const attempts = JSON.parse(localStorage.getItem(RATE_LIMIT_KEY) || "[]");
-      return attempts.filter(timestamp => Number.isFinite(timestamp) && timestamp > Date.now() - RATE_LIMIT_MS);
-    }catch(_){ return []; }
-  }
-
-  function rateLimitAllows(){ return getRecentAttempts().length < RATE_LIMIT_MAX; }
-
-  function recordAttempt(){
-    localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify([...getRecentAttempts(), Date.now()]));
-  }
-
-  // Super User Logic
-  let masterClicks = 0;
-  let masterTimer = null;
-  let userRole = null;
-  let isMaster = false;
-
-  let userHasChosenEvent = false;
-
-  function aplicarConfiguracionActiva(){
-    const modo = configFecha1.modoFechas || (configFecha1.dobleFechaActiva ? 'ambas_1_2' : 'fecha1');
-    const esDoble = modo.startsWith('ambas');
-
-    if (esDoble) {
-      if (!userHasChosenEvent) {
-        const defaultKey = (modo === 'ambas_2_1') ? 'fecha2' : 'fecha1';
-        if (currentEventKey !== defaultKey) {
-          currentEventKey = defaultKey;
-          escucharReservas();
-        }
-      }
-    } else {
-      const targetKey = (modo === 'fecha2') ? 'fecha2' : 'fecha1';
-      if (currentEventKey !== targetKey) {
-        currentEventKey = targetKey;
-        escucharReservas();
-      }
+    function getActiveSectorTables() {
+      return currentSector === 'terraza' ? TABLES_TERRAZA : TABLES_SALON;
     }
 
-    const cfg = currentEventKey === 'fecha1' ? configFecha1 : configFecha2;
+    function setSector(sector) {
+      if (currentSector === sector) return;
+      currentSector = sector;
 
-    const mapBgLayer = document.getElementById("mapBgLayer");
-
-    if (currentSector === 'terraza') {
-      if (eventLogoOverlay) eventLogoOverlay.style.display = "none";
-      if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "none";
-
-      if (terraceLogoOverlay) {
-        if (cfg.terraceLogoUrl) {
-          terraceLogoOverlay.src = cfg.terraceLogoUrl;
-          terraceLogoOverlay.alt = cfg.terraceEventName ? ("Logo de " + cfg.terraceEventName) : "Logo Terrace Soul";
-          terraceLogoOverlay.style.display = "block";
-        } else {
-          terraceLogoOverlay.src = "";
-          terraceLogoOverlay.style.display = "none";
-        }
+      const tabSalon = document.getElementById("tabSectorSalon");
+      const tabTerraza = document.getElementById("tabSectorTerraza");
+      if (tabSalon) {
+        tabSalon.classList.toggle("active", sector === "salon");
+        tabSalon.setAttribute("aria-selected", sector === "salon");
+      }
+      if (tabTerraza) {
+        tabTerraza.classList.toggle("active", sector === "terraza");
+        tabTerraza.setAttribute("aria-selected", sector === "terraza");
       }
 
-      if (terraceDateBadge) {
-        const fechaTxt = cfg.terraceDate || (cfg.headingText ? (cfg.headingText + (cfg.eventDate ? ' ' + cfg.eventDate : '')) : cfg.eventDate);
-        if (fechaTxt) {
-          terraceDateBadge.textContent = fechaTxt;
-          terraceDateBadge.style.display = "flex";
-        } else {
-          terraceDateBadge.style.display = "none";
-        }
-      }
+      const mapImgEl = document.getElementById("mapImg");
+      const legendEl = document.getElementById("legendNote");
+      const mapBgLayerEl = document.getElementById("mapBgLayer");
 
-      if (mapBgLayer) {
-        const terraceBg = cfg.terraceBgUrl || cfg.bgUrl;
-        if (terraceBg) {
-          mapBgLayer.style.backgroundImage = `url("${terraceBg}")`;
-          mapBgLayer.style.display = "";
-        } else {
-          mapBgLayer.style.backgroundImage = "none";
-          mapBgLayer.style.display = "none";
-        }
-      }
-    } else {
-      if (terraceLogoOverlay) terraceLogoOverlay.style.display = "none";
-      if (terraceDateBadge) terraceDateBadge.style.display = "none";
-      if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "";
+      if (sector === "terraza") {
+        if (mapImgEl) mapImgEl.src = "terraza.png";
+        if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "none";
+        if (eventLogoOverlay) eventLogoOverlay.style.display = "none";
 
-      eventLogoOverlay.src = cfg.logoUrl || "";
-      eventLogoOverlay.alt = cfg.eventName ? "Logo de " + cfg.eventName : "Logo del evento ULTRA VIP";
-      eventLogoOverlay.style.display = cfg.logoUrl ? "block" : "none";
+        const cfg = currentEventKey === 'fecha1' ? configFecha1 : configFecha2;
 
-      if (mapBgLayer) {
-        if (cfg.bgUrl) {
-          mapBgLayer.style.backgroundImage = `url("${cfg.bgUrl}")`;
-          mapBgLayer.style.display = "";
-        } else {
-          mapBgLayer.style.backgroundImage = "none";
+        // Fondo temático de terraza
+        if (mapBgLayerEl) {
+          const terraceBg = cfg.terraceBgUrl || cfg.bgUrl;
+          if (terraceBg) {
+            mapBgLayerEl.style.backgroundImage = `url("${terraceBg}")`;
+            mapBgLayerEl.style.display = "";
+          } else {
+            mapBgLayerEl.style.backgroundImage = "none";
+            mapBgLayerEl.style.display = "none";
+          }
         }
-      }
-    }
 
-    // Configuración de sectores disponibles en esta fecha: 'ambos' | 'main_stage' | 'terrace_soul'
-    const sectorTabsWrap = document.getElementById("sectorTabsWrap");
-    const sectorMode = cfg.sectoresHabilitados || 'ambos';
-    if (sectorTabsWrap) {
-      if (sectorMode === 'main_stage') {
-        sectorTabsWrap.style.display = "none";
-        if (currentSector !== 'salon') {
-          setSector('salon');
+        // Logo exclusivo de terraza
+        if (terraceLogoOverlay) {
+          if (cfg.terraceLogoUrl) {
+            terraceLogoOverlay.src = cfg.terraceLogoUrl;
+            terraceLogoOverlay.alt = cfg.terraceEventName ? ("Logo de " + cfg.terraceEventName) : "Logo Terrace Soul";
+            terraceLogoOverlay.style.display = "block";
+          } else {
+            terraceLogoOverlay.src = "";
+            terraceLogoOverlay.style.display = "none";
+          }
         }
-      } else if (sectorMode === 'terrace_soul') {
-        sectorTabsWrap.style.display = "none";
-        if (currentSector !== 'terraza') {
-          setSector('terraza');
+
+        // Fecha en recuadro verde de terraza
+        if (terraceDateBadge) {
+          const fechaTxt = cfg.terraceDate || (cfg.headingText ? (cfg.headingText + (cfg.eventDate ? ' ' + cfg.eventDate : '')) : cfg.eventDate);
+          if (fechaTxt) {
+            terraceDateBadge.textContent = fechaTxt;
+            terraceDateBadge.style.display = "flex";
+          } else {
+            terraceDateBadge.style.display = "none";
+          }
         }
+
+        if (legendEl) legendEl.textContent = "Sector TERRACE SOUL (al aire libre): mesas 1 a 19 y mesas A, B, C, D, E";
       } else {
-        // 'ambos'
-        sectorTabsWrap.style.display = "flex";
+        if (mapImgEl) mapImgEl.src = "Gemini_Generated_Image_pxpekipxpekipxpe.png";
+        if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "";
+        if (terraceLogoOverlay) terraceLogoOverlay.style.display = "none";
+        if (terraceDateBadge) terraceDateBadge.style.display = "none";
+
+        const cfg = currentEventKey === 'fecha1' ? configFecha1 : configFecha2;
+        if (mapBgLayerEl) {
+          if (cfg.bgUrl) {
+            mapBgLayerEl.style.backgroundImage = `url("${cfg.bgUrl}")`;
+            mapBgLayerEl.style.display = "";
+          } else {
+            mapBgLayerEl.style.backgroundImage = "none";
+          }
+        }
+        cargarLogoEvento();
+        if (legendEl) legendEl.textContent = "Sector MAIN STAGE: mesas 1 a 20 y mesas B, C, D";
       }
-    }
 
-    if(esDoble){
-      singleHeadingWrap.style.display = "none";
-      eventTabsWrap.style.display = "inline-flex";
-      eventTabsWrap.style.flexDirection = (modo === 'ambas_2_1') ? 'row-reverse' : 'row';
-
-      tabPublicFecha1Title.textContent = configFecha1.headingText || "DOMINGO 11";
-      tabPublicFecha1Date.textContent = configFecha1.eventDate !== undefined ? configFecha1.eventDate : "OCT";
-      tabPublicFecha2Title.textContent = configFecha2.headingText || "SÁBADO 10";
-      tabPublicFecha2Date.textContent = configFecha2.eventDate !== undefined ? configFecha2.eventDate : "OCT";
-
-      tabPublicFecha1.classList.toggle('active', currentEventKey === 'fecha1');
-      tabPublicFecha2.classList.toggle('active', currentEventKey === 'fecha2');
-    }else{
-      singleHeadingWrap.style.display = "block";
-      eventTabsWrap.style.display = "none";
-
-      ultraVipHeading.childNodes[0].textContent = cfg.headingText || (currentEventKey === 'fecha1' ? "ULTRA VIP" : "SEGUNDA FECHA");
-      ultraVipHeading.style.fontSize = cfg.headingSize ? cfg.headingSize + "px" : "17px";
-      ultraVipHeading.style.fontFamily = cfg.headingFont || "'Bebas Neue', sans-serif";
-      const dateNode = ultraVipHeading.querySelector('.event-date');
-      if(dateNode) dateNode.remove();
-      if(cfg.eventDate){
-        const date = document.createElement('span');
-        date.className = 'event-date';
-        date.textContent = cfg.eventDate;
-        ultraVipHeading.appendChild(date);
+      if (overlay && overlay.classList.contains("open")) {
+        cerrarModal();
       }
-    }
-  }
 
-  function cargarLogoEvento(){
-    if(!firebaseDb) return;
-    firebaseDb.collection("config").doc("ultraVip").onSnapshot(doc=>{
-      configFecha1 = doc.exists ? doc.data() : {};
-      aplicarConfiguracionActiva();
-    });
-    firebaseDb.collection("config").doc("ultraVip_fecha2").onSnapshot(doc=>{
-      configFecha2 = doc.exists ? doc.data() : {};
-      aplicarConfiguracionActiva();
-    });
-  }
-
-  function getActiveStorageKey() {
-    return "mesas-estado-" + currentEventKey;
-  }
-
-  function switchPublicEvent(key){
-    userHasChosenEvent = true;
-    if(currentEventKey === key) return;
-    currentEventKey = key;
-    if(overlay && overlay.classList.contains("open")) {
-      cerrarModal();
-    }
-    aplicarConfiguracionActiva();
-    escucharReservas();
-  }
-
-  function escucharReservas(){
-    if(!firebaseDb) return;
-    if(reservasUnsub){
-      reservasUnsub();
-      reservasUnsub = null;
-    }
-    const colName = getActiveReservasCollection();
-    estado = {};
-    renderMesas();
-    actualizarUltraVip();
-    actualizarContador();
-
-    // Mostrar indicador de carga mientras llega el primer snapshot
-    const loadingEl = document.getElementById("mapLoadingOverlay");
-    if(loadingEl) loadingEl.classList.remove("hidden");
-
-    reservasUnsub = firebaseDb.collection(colName).onSnapshot(snapshot => {
-      // Ocultar el loading al recibir datos
-      if(loadingEl) loadingEl.classList.add("hidden");
-      estado = {};
-      snapshot.forEach(doc => { estado[doc.id] = doc.data(); });
       renderMesas();
       actualizarUltraVip();
       actualizarContador();
-    }, err => {
-      // También ocultar en caso de error para no dejar el spinner colgado
-      if(loadingEl) loadingEl.classList.add("hidden");
-      console.error("Error escuchando " + colName, err);
-    });
-  }
+    }
 
-  async function cargarEstado(){
-    const storageKey = getActiveStorageKey();
-    try{
-      if(firebaseDb){
-        const snapshot = await firebaseDb.collection(getActiveReservasCollection()).get();
-        estado = {};
-        snapshot.forEach(doc => { estado[doc.id] = doc.data(); });
-        return;
+    const STORAGE_KEY = "mesas-estado";
+    const planoMesas = document.getElementById("plano-mesas");
+    const ultraVipReserveBtn = document.getElementById("ultraVipReserveBtn");
+    const ultraVipHeading = document.getElementById("ultraVipHeading");
+    const singleHeadingWrap = document.getElementById("singleHeadingWrap");
+    const eventTabsWrap = document.getElementById("eventTabsWrap");
+    const tabPublicFecha1 = document.getElementById("tabPublicFecha1");
+    const tabPublicFecha2 = document.getElementById("tabPublicFecha2");
+    const tabPublicFecha1Title = document.getElementById("tabPublicFecha1Title");
+    const tabPublicFecha1Date = document.getElementById("tabPublicFecha1Date");
+    const tabPublicFecha2Title = document.getElementById("tabPublicFecha2Title");
+    const tabPublicFecha2Date = document.getElementById("tabPublicFecha2Date");
+
+    let currentEventKey = 'fecha1';
+    let configFecha1 = {};
+    let configFecha2 = {};
+    let reservasUnsub = null;
+
+    function getActiveReservasCollection() {
+      return currentEventKey === 'fecha1' ? 'reservas' : 'reservas_fecha2';
+    }
+
+    const eventLogoOverlay = document.getElementById("eventLogoOverlay");
+    const mapImg = document.getElementById("mapImg");
+    if (mapImg) mapImg.src = "Gemini_Generated_Image_pxpekipxpekipxpe.png";
+    const overlay = document.getElementById("overlay");
+    const senaView = document.getElementById("senaView");
+    const confirmView = document.getElementById("confirmView");
+    const mesaEyebrow = document.getElementById("mesaEyebrow");
+    const nameInput = document.getElementById("nameInput");
+    const contactInput = document.getElementById("contactInput");
+    const captchaDisplay = document.getElementById("captchaDisplay");
+    const captchaInput = document.getElementById("captchaInput");
+    const confirmationText = document.getElementById("confirmationText");
+    const toast = document.getElementById("toast");
+    const freeTablesCount = document.getElementById("freeTablesCount");
+    const captureMode = new URLSearchParams(window.location.search).get("capture") === "admin";
+
+    let estado = {};       // { "1": {status:"ocupada", ts:...}, ... }
+    let mesaActual = null;
+    let currentCaptcha = "";
+
+    function generateCaptcha() {
+      currentCaptcha = Math.floor(10000 + Math.random() * 90000).toString();
+      captchaDisplay.textContent = currentCaptcha;
+      captchaInput.value = "";
+    }
+    const DISPUTE_MS = 15 * 60 * 1000;
+    const RATE_LIMIT_MS = 10 * 60 * 1000;
+    const RATE_LIMIT_MAX = 2;
+    const RATE_LIMIT_KEY = "mesas-dispute-attempts";
+    const DEVICE_ID_KEY = "cubano-device-id";
+
+    function getDeviceId() {
+      let id = localStorage.getItem(DEVICE_ID_KEY);
+      if (!id) {
+        id = "dev-" + Math.random().toString(36).substring(2, 15) + Date.now();
+        localStorage.setItem(DEVICE_ID_KEY, id);
       }
-      if(window.storage && window.storage.get){
-        const res = await window.storage.get(storageKey, true);
-        estado = res && res.value ? JSON.parse(res.value) : {};
-      }else{
-        estado = JSON.parse(localStorage.getItem(storageKey) || "{}");
+      return id;
+    }
+
+    function getMyActiveDispute() {
+      const key = "my-dispute-" + currentEventKey;
+      const myDispute = JSON.parse(localStorage.getItem(key) || "null");
+      if (myDispute && myDispute.expiresAt > Date.now()) {
+        return myDispute;
       }
-    }catch(e){
-      try{ estado = JSON.parse(localStorage.getItem(storageKey) || "{}"); }catch(_){ estado = {}; }
-    }
-  }
-
-  async function guardarEstado(){
-    const storageKey = getActiveStorageKey();
-    try{
-      if(firebaseDb && mesaActual && estado[mesaActual]){
-        await firebaseDb.collection(getActiveReservasCollection()).doc(mesaActual).set(estado[mesaActual]);
-        return true;
-      }
-      const value = JSON.stringify(estado);
-      if(window.storage && window.storage.set){
-        await window.storage.set(storageKey, value, true);
-      }else{
-        localStorage.setItem(storageKey, value);
-      }
-      return true;
-    }catch(e){
-      try{
-        localStorage.setItem(storageKey, JSON.stringify(estado));
-        return true;
-      }catch(_){ return false; }
-    }
-  }
-
-  function renderMesas(){
-    planoMesas.querySelectorAll(".table-btn").forEach(b=>b.remove());
-
-    // Calcular tamaño cuadrado exacto basado en el ancho del mapa
-    const mapWidth = planoMesas.offsetWidth;
-    const isTerraza = currentSector === 'terraza';
-    const btnSize = mapWidth * (isTerraza ? 0.056 : 0.078);
-    const activeTables = getActiveSectorTables();
-
-    activeTables.forEach(t=>{
-      const reserva = estado[t.id];
-      const activa = reservaActiva(reserva);
-      const isIngresada = activa && reserva.status === "ingresada";
-      const isVentaEnPuerta = isIngresada && (reserva.nombre === "Venta en Puerta" || reserva.masterAction);
-      const approved = activa && ["aprobada", "ocupada", "vendida"].includes(reserva.status);
-      const pending = activa && ["pendiente", "disputa", "comprobante_subido", "pendiente_revision"].includes(reserva.status);
-      const blocked = approved || pending || isIngresada;
-
-      const btn = document.createElement("button");
-      let statusClass = "";
-      if (isIngresada) {
-        statusClass = (isMaster && isVentaEnPuerta) ? " ingresada-master" : " ingresada";
-      } else if (approved) {
-        statusClass = " approved";
-      } else if (pending) {
-        statusClass = " pending";
-      }
-
-      btn.className = "table-btn" + (isTerraza ? " terraza-btn" : "") + statusClass;
-      btn.style.left = t.x + "%";
-      btn.style.top = t.y + "%";
-
-      // Forzar tamaño cuadrado en píxeles para que la captura no falle
-      btn.style.width = btnSize + "px";
-      btn.style.height = btnSize + "px";
-
-      const labelText = t.num || t.id;
-      btn.innerHTML = (approved || isIngresada) ? '<span class="x-mark">X</span>' : '<span class="table-label">' + labelText + '</span>';
-      btn.setAttribute("aria-label", "Mesa " + labelText + (isIngresada ? " (ingresada)" : approved ? " (aprobada)" : pending ? " (pendiente de aprobacion)" : " (libre)"));
-
-      if(!blocked){
-        btn.addEventListener("click", ()=> abrirMesa(t.id));
-      }
-      planoMesas.appendChild(btn);
-    });
-    actualizarContador();
-  }
-
-  function actualizarUltraVip(){
-    if (currentSector === 'terraza') {
-      if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "none";
-      return;
-    }
-    if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "";
-
-    const reserva = estado["ULTRA VIP"];
-    const active = reservaActiva(reserva);
-
-    const isIngresada = active && reserva.status === "ingresada";
-    const isVentaEnPuerta = isIngresada && (reserva.nombre === "Venta en Puerta" || reserva.masterAction);
-    const confirmed = active && ["aprobada", "ocupada", "vendida"].includes(reserva.status);
-    const dispute = active && ["pendiente", "disputa", "comprobante_subido", "pendiente_revision"].includes(reserva.status);
-
-    ultraVipReserveBtn.classList.toggle("dispute", dispute);
-    ultraVipReserveBtn.classList.toggle("confirmed", (confirmed || isIngresada));
-
-    // Si está ingresada y es maestro, color azul. Si no, rojo (como vendida)
-    if (isIngresada) {
-      ultraVipReserveBtn.style.color = (isMaster && isVentaEnPuerta) ? "var(--blue)" : "var(--red)";
-    } else {
-      ultraVipReserveBtn.style.color = "";
+      return null;
     }
 
-    ultraVipReserveBtn.textContent = isIngresada ? (isMaster && isVentaEnPuerta ? "EN PUERTA" : "INGRESADA") : confirmed ? "RESERVADO" : dispute ? "DISPUTA" : "RESERVAR";
-  }
-
-  ultraVipReserveBtn.addEventListener("click", ()=>{
-    const reserva = estado["ULTRA VIP"];
-    if(reservaActiva(reserva)){ showToast("ULTRA VIP ya está en disputa o reservado."); return; }
-    abrirMesa("ULTRA VIP");
-  });
-
-  function abrirMesa(id){
-    if (!isMaster) {
-      const active = getMyActiveDispute();
-      if (active && active.mesaId !== id) {
-        showToast("Ya tenés la mesa " + active.mesaId + " en proceso. Esperá a que venza o confirmala.");
-        return;
-      }
+    function reservaActiva(reserva) {
+      if (!reserva) return false;
+      if (reserva.status === "disputa" && Number.isFinite(reserva.expiresAt) && reserva.expiresAt <= Date.now()) return false;
+      return ["pendiente", "disputa", "aprobada", "ocupada", "comprobante_subido", "pendiente_revision", "vendida", "ingresada"].includes(reserva.status);
     }
 
-    mesaActual = id;
-    const isTerrazaMesa = id.startsWith("T-");
-    const mesaDisplayNum = isTerrazaMesa ? id.replace("T-", "") : id;
-    mesaEyebrow.textContent = isTerrazaMesa ? ("MESA " + mesaDisplayNum + " · TERRACE SOUL") : (id === "ULTRA VIP" ? "ULTRA VIP · MAIN STAGE" : ("MESA " + id + " · MAIN STAGE"));
-
-    if (isMaster) {
-      document.getElementById("masterPanel").style.display = "block";
-      document.getElementById("standardForm").style.display = "none";
-      document.getElementById("standardBtnRow").style.display = "none";
-      document.getElementById("modalTitle").textContent = "Control Maestro";
-
-      const current = estado[id];
-      const masterNameInput = document.getElementById("masterNameInput");
-      const masterNoteInput = document.getElementById("masterNoteInput");
-
-      masterNameInput.value = current?.nombre || "";
-      masterNoteInput.value = current?.masterNote || "";
-
-      // Inicializar módulo de excepción para Admin / Asistente
-      const isEx = !!(current?.esExcepcion || current?.excepcion);
-      document.getElementById("masterIsExcepcion").checked = isEx;
-      document.getElementById("masterExcepcionFields").style.display = isEx ? "block" : "none";
-      document.getElementById("masterExPersonas").value = current?.cantidadPersonas || 4;
-      document.getElementById("masterExTotal").value = current?.precioTotal || current?.montoTotal || "";
-      document.getElementById("masterExDrinksPct").value = (current?.porcentajeConsumo !== undefined && current?.porcentajeConsumo !== null) ? current.porcentajeConsumo : "";
-      document.getElementById("masterExSena").value = current?.montoSenado || "";
-      updateMasterExPreview();
-
-      // Highlight current status in buttons
-      document.querySelectorAll(".btn-master").forEach(btn => {
-        const isActive = (current && current.status === btn.dataset.status) || (!current && btn.dataset.status === 'libre');
-        btn.classList.toggle("active", isActive);
-      });
-    } else {
-      document.getElementById("masterPanel").style.display = "none";
-      document.getElementById("standardForm").style.display = "block";
-      document.getElementById("standardBtnRow").style.display = "flex";
-      document.getElementById("modalTitle").textContent = "Señá tu mesa";
-      nameInput.value = "";
-      contactInput.value = "";
-      currentPeopleCount = 4;
-      updateModalPricingDisplay();
-      generateCaptcha();
+    function actualizarContador() {
+      const activeTables = getActiveSectorTables();
+      const ocupadas = activeTables.filter(t => reservaActiva(estado[t.id])).length;
+      const libres = Math.max(0, activeTables.length - ocupadas);
+      freeTablesCount.textContent = libres + (libres === 1 ? " mesa libre" : " mesas libres");
     }
 
-    senaView.style.display = "block";
-    confirmView.classList.remove("show");
-    overlay.classList.add("open");
-  }
+    async function capturarMapaPublico() {
+      if (!captureMode || typeof html2canvas !== "function") return;
+      try {
+        // Esperar a que todo cargue bien
+        await new Promise(resolve => setTimeout(resolve, 4000));
 
-  function cerrarModal(){
-    overlay.classList.remove("open");
-    mesaActual = null;
-  }
-
-  function updateMasterExPreview() {
-    const totalEl = document.getElementById("masterExTotal");
-    const drinksPctEl = document.getElementById("masterExDrinksPct");
-    const senaEl = document.getElementById("masterExSena");
-    if (!totalEl) return;
-
-    const total = parseInt(totalEl.value) || 0;
-    const drinksPct = parseInt(drinksPctEl.value) || 0;
-    const sena = parseInt(senaEl.value) || 0;
-    const drinksVal = Math.round((total * drinksPct) / 100);
-    const saldo = Math.max(0, total - sena);
-    const pctAbonado = total > 0 ? Math.round((sena / total) * 100) : 0;
-    const pctSaldo = total > 0 ? Math.max(0, 100 - pctAbonado) : 0;
-
-    const elDrinks = document.getElementById("masterExDrinksPreview");
-    const elAbonado = document.getElementById("masterExAbonadoPreview");
-    const elSaldo = document.getElementById("masterExSaldoPreview");
-
-    if (elDrinks) elDrinks.textContent = "$" + drinksVal.toLocaleString('es-AR') + " (" + drinksPct + "%)";
-    if (elAbonado) elAbonado.textContent = "$" + sena.toLocaleString('es-AR') + " (" + pctAbonado + "%)";
-    if (elSaldo) elSaldo.textContent = "$" + saldo.toLocaleString('es-AR') + " (" + pctSaldo + "%)";
-  }
-
-  // Eventos para selector de cantidad de personas
-  const btnMinus = document.getElementById("btnPeopleMinus");
-  const btnPlus = document.getElementById("btnPeoplePlus");
-  if (btnMinus) {
-    btnMinus.addEventListener("click", () => {
-      if (currentPeopleCount > 1) {
-        currentPeopleCount--;
-        updateModalPricingDisplay();
-      }
-    });
-  }
-  if (btnPlus) {
-    btnPlus.addEventListener("click", () => {
-      if (currentPeopleCount < 10) {
-        currentPeopleCount++;
-        updateModalPricingDisplay();
-      }
-    });
-  }
-
-  document.getElementById("cancelBtn").addEventListener("click", cerrarModal);
-  document.getElementById("closeConfirmBtn").addEventListener("click", ()=>{
-    cerrarModal();
-  });
-
-  document.getElementById("copyBtn").addEventListener("click", async ()=>{
-    const btn = document.getElementById("copyBtn");
-    try{
-      await navigator.clipboard.writeText("cubanobar");
-    }catch(e){
-      const ta = document.createElement("textarea");
-      ta.value = "cubanobar";
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      document.body.removeChild(ta);
-    }
-    btn.textContent = "Copiado";
-    btn.classList.add("copied");
-    setTimeout(()=>{ btn.textContent = "Copiar"; btn.classList.remove("copied"); }, 1600);
-  });
-
-  document.getElementById("finalizarBtn").addEventListener("click", async ()=>{
-    if(!mesaActual) return;
-    const nombre = nameInput.value.trim();
-    const contacto = contactInput.value.trim();
-
-    // Limpiar errores anteriores
-    nameInput.classList.remove("input-error");
-    contactInput.classList.remove("input-error");
-    captchaInput.classList.remove("input-error");
-
-    if(!nombre){
-      nameInput.classList.add("input-error");
-      nameInput.focus();
-      showToast("Ingresá el nombre o alias de la reserva.");
-      return;
-    }
-    if(!/^\d{10}$/.test(normalizarWhatsapp(contacto))){
-      contactInput.classList.add("input-error");
-      contactInput.focus();
-      showToast("Ingresá los 10 dígitos de tu WhatsApp (sin 0 ni 15).");
-      return;
-    }
-    if(captchaInput.value.trim() !== currentCaptcha){
-      captchaInput.classList.add("input-error");
-      captchaInput.focus();
-      showToast("El código no coincide. Intentá de nuevo.");
-      return;
-    }
-
-    if(!rateLimitAllows()){
-      showToast("Alcanzaste el límite temporal de intentos. Probá más tarde.");
-      return;
-    }
-    const btn = document.getElementById("finalizarBtn");
-    btn.disabled = true;
-    btn.textContent = "Confirmando...";
-
-    // re-chequear estado por si otra persona la reservó mientras tanto
-    await cargarEstado();
-    if(reservaActiva(estado[mesaActual])){
-      btn.disabled = false;
-      btn.textContent = "Finalizar";
-      renderMesas();
-      cerrarModal();
-      showToast("⚡ Esta mesa acaba de ser tomada. El mapa ya está actualizado — elegí otra.");
-      return;
-    }
-
-    const now = Date.now();
-    const pricingCalc = updateModalPricingDisplay();
-    let ok = false;
-    if(USE_SECURE_RESERVATION && firebaseFunctions){
-      try{
-        await firebaseFunctions.httpsCallable("createDispute")({
-          mesaId: mesaActual,
-          nombre,
-          contacto: normalizarWhatsapp(contacto),
-          verificationToken: whatsappVerificationToken,
-          deviceId: getDeviceId()
+        const canvas = await html2canvas(planoMesas, {
+          backgroundColor: "#060608",
+          useCORS: true,
+          allowTaint: true,
+          scale: 2,
+          logging: false
         });
-      }catch(_){
-        btn.disabled = false;
-        btn.textContent = "Finalizar";
-        showToast("No se pudo validar la solicitud. Probá de nuevo.");
-        return;
+
+        const dataUrl = canvas.toDataURL("image/png");
+        document.getElementById("capturePreviewImg").src = dataUrl;
+        document.getElementById("capturePreviewOverlay").classList.add("show");
+
+      } catch (e) {
+        console.error("Error capturando:", e);
       }
-      const isTerrazaMesa = mesaActual.startsWith("T-");
-      estado[mesaActual] = { 
-        status:"disputa", 
-        nombre, 
-        contacto, 
-        ts: now, 
-        expiresAt: now + DISPUTE_MS,
-        cantidadPersonas: currentPeopleCount,
-        precioTotal: pricingCalc.totalMesa,
-        porcentajeConsumo: pricingCalc.pct,
-        montoConsumoCredito: pricingCalc.consumoCredito,
-        montoSenado: pricingCalc.senaAmount,
-        saldoPuerta: pricingCalc.saldoPuerta,
-        sector: isTerrazaMesa ? "terrace_soul" : "main_stage",
-        numeroMesa: isTerrazaMesa ? mesaActual.replace("T-", "") : mesaActual
-      };
-      ok = true;
-    }else{
-      const isTerrazaMesa = mesaActual.startsWith("T-");
-      estado[mesaActual] = { 
-        status:"disputa", 
-        nombre, 
-        contacto, 
-        ts: now, 
-        expiresAt: now + DISPUTE_MS,
-        cantidadPersonas: currentPeopleCount,
-        precioTotal: pricingCalc.totalMesa,
-        porcentajeConsumo: pricingCalc.pct,
-        montoConsumoCredito: pricingCalc.consumoCredito,
-        montoSenado: pricingCalc.senaAmount,
-        saldoPuerta: pricingCalc.saldoPuerta,
-        sector: isTerrazaMesa ? "terrace_soul" : "main_stage",
-        numeroMesa: isTerrazaMesa ? mesaActual.replace("T-", "") : mesaActual
-      };
-      ok = await guardarEstado();
     }
 
-    btn.disabled = false;
-    btn.textContent = "Finalizar";
+    document.getElementById("closePreviewBtn").addEventListener("click", () => {
+      document.getElementById("capturePreviewOverlay").classList.remove("show");
+    });
 
-    if(ok){
-      localStorage.setItem("my-dispute-" + currentEventKey, JSON.stringify({ mesaId: mesaActual, expiresAt: now + DISPUTE_MS }));
-      recordAttempt();
+    document.getElementById("downloadPreviewBtn").addEventListener("click", async () => {
+      const dataUrl = document.getElementById("capturePreviewImg").src;
+      const fileName = 'mapa-cubano.png';
+
+      // Intentar usar File System Access API para "Guardar como"
+      if ('showSaveFilePicker' in window) {
+        try {
+          const handle = await window.showSaveFilePicker({
+            suggestedName: fileName,
+            types: [{
+              description: 'Imagen PNG',
+              accept: { 'image/png': ['.png'] },
+            }],
+          });
+          const response = await fetch(dataUrl);
+          const blob = await response.blob();
+          const writable = await handle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+          showToast("Imagen guardada correctamente");
+          return;
+        } catch (e) {
+          if (e.name === 'AbortError') return;
+          console.error("Error con showSaveFilePicker:", e);
+        }
+      }
+
+      // Fallback al método tradicional de descarga
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = fileName;
+      link.click();
+      showToast("Descarga iniciada");
+    });
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function normalizarWhatsapp(value) { return value.trim().replace(/[\s().-]/g, ""); }
+
+    function getRecentAttempts() {
+      try {
+        const attempts = JSON.parse(localStorage.getItem(RATE_LIMIT_KEY) || "[]");
+        return attempts.filter(timestamp => Number.isFinite(timestamp) && timestamp > Date.now() - RATE_LIMIT_MS);
+      } catch (_) { return []; }
+    }
+
+    function rateLimitAllows() { return getRecentAttempts().length < RATE_LIMIT_MAX; }
+
+    function recordAttempt() {
+      localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify([...getRecentAttempts(), Date.now()]));
+    }
+
+    // Super User Logic
+    let masterClicks = 0;
+    let masterTimer = null;
+    let userRole = null;
+    let isMaster = false;
+
+    let userHasChosenEvent = false;
+
+    function aplicarConfiguracionActiva() {
+      const modo = configFecha1.modoFechas || (configFecha1.dobleFechaActiva ? 'ambas_1_2' : 'fecha1');
+      const esDoble = modo.startsWith('ambas');
+
+      if (esDoble) {
+        if (!userHasChosenEvent) {
+          const defaultKey = (modo === 'ambas_2_1') ? 'fecha2' : 'fecha1';
+          if (currentEventKey !== defaultKey) {
+            currentEventKey = defaultKey;
+            escucharReservas();
+          }
+        }
+      } else {
+        const targetKey = (modo === 'fecha2') ? 'fecha2' : 'fecha1';
+        if (currentEventKey !== targetKey) {
+          currentEventKey = targetKey;
+          escucharReservas();
+        }
+      }
+
+      const cfg = currentEventKey === 'fecha1' ? configFecha1 : configFecha2;
+
+      const mapBgLayer = document.getElementById("mapBgLayer");
+
+      if (currentSector === 'terraza') {
+        if (eventLogoOverlay) eventLogoOverlay.style.display = "none";
+        if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "none";
+
+        if (terraceLogoOverlay) {
+          if (cfg.terraceLogoUrl) {
+            terraceLogoOverlay.src = cfg.terraceLogoUrl;
+            terraceLogoOverlay.alt = cfg.terraceEventName ? ("Logo de " + cfg.terraceEventName) : "Logo Terrace Soul";
+            terraceLogoOverlay.style.display = "block";
+          } else {
+            terraceLogoOverlay.src = "";
+            terraceLogoOverlay.style.display = "none";
+          }
+        }
+
+        if (terraceDateBadge) {
+          const fechaTxt = cfg.terraceDate || (cfg.headingText ? (cfg.headingText + (cfg.eventDate ? ' ' + cfg.eventDate : '')) : cfg.eventDate);
+          if (fechaTxt) {
+            terraceDateBadge.textContent = fechaTxt;
+            terraceDateBadge.style.display = "flex";
+          } else {
+            terraceDateBadge.style.display = "none";
+          }
+        }
+
+        if (mapBgLayer) {
+          const terraceBg = cfg.terraceBgUrl || cfg.bgUrl;
+          if (terraceBg) {
+            mapBgLayer.style.backgroundImage = `url("${terraceBg}")`;
+            mapBgLayer.style.display = "";
+          } else {
+            mapBgLayer.style.backgroundImage = "none";
+            mapBgLayer.style.display = "none";
+          }
+        }
+      } else {
+        if (terraceLogoOverlay) terraceLogoOverlay.style.display = "none";
+        if (terraceDateBadge) terraceDateBadge.style.display = "none";
+        if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "";
+
+        eventLogoOverlay.src = cfg.logoUrl || "";
+        eventLogoOverlay.alt = cfg.eventName ? "Logo de " + cfg.eventName : "Logo del evento ULTRA VIP";
+        eventLogoOverlay.style.display = cfg.logoUrl ? "block" : "none";
+
+        if (mapBgLayer) {
+          if (cfg.bgUrl) {
+            mapBgLayer.style.backgroundImage = `url("${cfg.bgUrl}")`;
+            mapBgLayer.style.display = "";
+          } else {
+            mapBgLayer.style.backgroundImage = "none";
+          }
+        }
+      }
+
+      // Configuración de sectores disponibles en esta fecha: 'ambos' | 'main_stage' | 'terrace_soul'
+      const sectorTabsWrap = document.getElementById("sectorTabsWrap");
+      const sectorMode = cfg.sectoresHabilitados || 'ambos';
+      if (sectorTabsWrap) {
+        if (sectorMode === 'main_stage') {
+          sectorTabsWrap.style.display = "none";
+          if (currentSector !== 'salon') {
+            setSector('salon');
+          }
+        } else if (sectorMode === 'terrace_soul') {
+          sectorTabsWrap.style.display = "none";
+          if (currentSector !== 'terraza') {
+            setSector('terraza');
+          }
+        } else {
+          // 'ambos'
+          sectorTabsWrap.style.display = "flex";
+        }
+      }
+
+      if (esDoble) {
+        singleHeadingWrap.style.display = "none";
+        eventTabsWrap.style.display = "inline-flex";
+        eventTabsWrap.style.flexDirection = (modo === 'ambas_2_1') ? 'row-reverse' : 'row';
+
+        tabPublicFecha1Title.textContent = configFecha1.headingText || "DOMINGO 11";
+        tabPublicFecha1Date.textContent = configFecha1.eventDate !== undefined ? configFecha1.eventDate : "OCT";
+        tabPublicFecha2Title.textContent = configFecha2.headingText || "SÁBADO 10";
+        tabPublicFecha2Date.textContent = configFecha2.eventDate !== undefined ? configFecha2.eventDate : "OCT";
+
+        tabPublicFecha1.classList.toggle('active', currentEventKey === 'fecha1');
+        tabPublicFecha2.classList.toggle('active', currentEventKey === 'fecha2');
+      } else {
+        singleHeadingWrap.style.display = "block";
+        eventTabsWrap.style.display = "none";
+
+        ultraVipHeading.childNodes[0].textContent = cfg.headingText || (currentEventKey === 'fecha1' ? "ULTRA VIP" : "SEGUNDA FECHA");
+        ultraVipHeading.style.fontSize = cfg.headingSize ? cfg.headingSize + "px" : "17px";
+        ultraVipHeading.style.fontFamily = cfg.headingFont || "'Bebas Neue', sans-serif";
+        const dateNode = ultraVipHeading.querySelector('.event-date');
+        if (dateNode) dateNode.remove();
+        if (cfg.eventDate) {
+          const date = document.createElement('span');
+          date.className = 'event-date';
+          date.textContent = cfg.eventDate;
+          ultraVipHeading.appendChild(date);
+        }
+      }
+    }
+
+    function cargarLogoEvento() {
+      if (!firebaseDb) return;
+      firebaseDb.collection("config").doc("ultraVip").onSnapshot(doc => {
+        configFecha1 = doc.exists ? doc.data() : {};
+        aplicarConfiguracionActiva();
+      });
+      firebaseDb.collection("config").doc("ultraVip_fecha2").onSnapshot(doc => {
+        configFecha2 = doc.exists ? doc.data() : {};
+        aplicarConfiguracionActiva();
+      });
+    }
+
+    function getActiveStorageKey() {
+      return "mesas-estado-" + currentEventKey;
+    }
+
+    function switchPublicEvent(key) {
+      userHasChosenEvent = true;
+      if (currentEventKey === key) return;
+      currentEventKey = key;
+      if (overlay && overlay.classList.contains("open")) {
+        cerrarModal();
+      }
+      aplicarConfiguracionActiva();
+      escucharReservas();
+    }
+
+    function escucharReservas() {
+      if (!firebaseDb) return;
+      if (reservasUnsub) {
+        reservasUnsub();
+        reservasUnsub = null;
+      }
+      const colName = getActiveReservasCollection();
+      estado = {};
       renderMesas();
       actualizarUltraVip();
-      senaView.style.display = "none";
-      const displayLabel = mesaActual.startsWith("T-") ? ("Mesa " + mesaActual.replace("T-", "") + " (Sector TERRACE SOUL)") : ("la mesa " + mesaActual + " (MAIN STAGE)");
-      confirmationText.textContent = displayLabel + " quedó en disputa por 15 minutos a nombre de " + nombre + " (" + currentPeopleCount + " personas). Enviá el comprobante de la seña a tu RRPP antes del vencimiento.";
-      confirmView.classList.add("show");
-    }else{
-      showToast("No se pudo guardar. Probá de nuevo.");
+      actualizarContador();
+
+      // Mostrar indicador de carga mientras llega el primer snapshot
+      const loadingEl = document.getElementById("mapLoadingOverlay");
+      if (loadingEl) loadingEl.classList.remove("hidden");
+
+      reservasUnsub = firebaseDb.collection(colName).onSnapshot(snapshot => {
+        // Ocultar el loading al recibir datos
+        if (loadingEl) loadingEl.classList.add("hidden");
+        estado = {};
+        snapshot.forEach(doc => { estado[doc.id] = doc.data(); });
+        renderMesas();
+        actualizarUltraVip();
+        actualizarContador();
+      }, err => {
+        // También ocultar en caso de error para no dejar el spinner colgado
+        if (loadingEl) loadingEl.classList.add("hidden");
+        console.error("Error escuchando " + colName, err);
+      });
     }
-  });
 
-  overlay.addEventListener("click", (e)=>{
-    if(e.target === overlay) cerrarModal();
-  });
-
-  async function init(){
-    await cargarEstado();
-    renderMesas();
-    actualizarUltraVip();
-    cargarLogoEvento();
-
-    // Master Access Listener (7 clicks)
-    document.getElementById("masterBrand").addEventListener("click", () => {
-      masterClicks++;
-      if (masterTimer) clearTimeout(masterTimer);
-      masterTimer = setTimeout(() => { masterClicks = 0; }, 3000);
-
-      if (masterClicks === 7) {
-        if (isMaster) {
-          showToast("Ya estás en modo maestro.");
-        } else {
-          // Si ya está logueado pero no es master, mostramos el modal de todos modos
-          document.getElementById("loginModal").classList.add("show");
+    async function cargarEstado() {
+      const storageKey = getActiveStorageKey();
+      try {
+        if (firebaseDb) {
+          const snapshot = await firebaseDb.collection(getActiveReservasCollection()).get();
+          estado = {};
+          snapshot.forEach(doc => { estado[doc.id] = doc.data(); });
+          return;
         }
-        masterClicks = 0;
+        if (window.storage && window.storage.get) {
+          const res = await window.storage.get(storageKey, true);
+          estado = res && res.value ? JSON.parse(res.value) : {};
+        } else {
+          estado = JSON.parse(localStorage.getItem(storageKey) || "{}");
+        }
+      } catch (e) {
+        try { estado = JSON.parse(localStorage.getItem(storageKey) || "{}"); } catch (_) { estado = {}; }
       }
+    }
+
+    async function guardarEstado() {
+      const storageKey = getActiveStorageKey();
+      try {
+        if (firebaseDb && mesaActual && estado[mesaActual]) {
+          await firebaseDb.collection(getActiveReservasCollection()).doc(mesaActual).set(estado[mesaActual]);
+          return true;
+        }
+        const value = JSON.stringify(estado);
+        if (window.storage && window.storage.set) {
+          await window.storage.set(storageKey, value, true);
+        } else {
+          localStorage.setItem(storageKey, value);
+        }
+        return true;
+      } catch (e) {
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(estado));
+          return true;
+        } catch (_) { return false; }
+      }
+    }
+
+    function renderMesas() {
+      planoMesas.querySelectorAll(".table-btn").forEach(b => b.remove());
+
+      // Calcular tamaño cuadrado exacto basado en el ancho del mapa
+      const mapWidth = planoMesas.offsetWidth;
+      const isTerraza = currentSector === 'terraza';
+      const btnSize = mapWidth * (isTerraza ? 0.056 : 0.078);
+      const activeTables = getActiveSectorTables();
+
+      activeTables.forEach(t => {
+        const reserva = estado[t.id];
+        const activa = reservaActiva(reserva);
+        const isIngresada = activa && reserva.status === "ingresada";
+        const isVentaEnPuerta = isIngresada && (reserva.nombre === "Venta en Puerta" || reserva.masterAction);
+        const approved = activa && ["aprobada", "ocupada", "vendida"].includes(reserva.status);
+        const pending = activa && ["pendiente", "disputa", "comprobante_subido", "pendiente_revision"].includes(reserva.status);
+        const blocked = approved || pending || isIngresada;
+
+        const btn = document.createElement("button");
+        let statusClass = "";
+        if (isIngresada) {
+          statusClass = (isMaster && isVentaEnPuerta) ? " ingresada-master" : " ingresada";
+        } else if (approved) {
+          statusClass = " approved";
+        } else if (pending) {
+          statusClass = " pending";
+        }
+
+        btn.className = "table-btn" + (isTerraza ? " terraza-btn" : "") + statusClass;
+        btn.style.left = t.x + "%";
+        btn.style.top = t.y + "%";
+
+        // Forzar tamaño cuadrado en píxeles para que la captura no falle
+        btn.style.width = btnSize + "px";
+        btn.style.height = btnSize + "px";
+
+        const labelText = t.num || t.id;
+        btn.innerHTML = (approved || isIngresada) ? '<span class="x-mark">X</span>' : '<span class="table-label">' + labelText + '</span>';
+        btn.setAttribute("aria-label", "Mesa " + labelText + (isIngresada ? " (ingresada)" : approved ? " (aprobada)" : pending ? " (pendiente de aprobacion)" : " (libre)"));
+
+        if (!blocked) {
+          btn.addEventListener("click", () => abrirMesa(t.id));
+        }
+        planoMesas.appendChild(btn);
+      });
+      actualizarContador();
+    }
+
+    function actualizarUltraVip() {
+      if (currentSector === 'terraza') {
+        if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "none";
+        return;
+      }
+      if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "";
+
+      const reserva = estado["ULTRA VIP"];
+      const active = reservaActiva(reserva);
+
+      const isIngresada = active && reserva.status === "ingresada";
+      const isVentaEnPuerta = isIngresada && (reserva.nombre === "Venta en Puerta" || reserva.masterAction);
+      const confirmed = active && ["aprobada", "ocupada", "vendida"].includes(reserva.status);
+      const dispute = active && ["pendiente", "disputa", "comprobante_subido", "pendiente_revision"].includes(reserva.status);
+
+      ultraVipReserveBtn.classList.toggle("dispute", dispute);
+      ultraVipReserveBtn.classList.toggle("confirmed", (confirmed || isIngresada));
+
+      // Si está ingresada y es maestro, color azul. Si no, rojo (como vendida)
+      if (isIngresada) {
+        ultraVipReserveBtn.style.color = (isMaster && isVentaEnPuerta) ? "var(--blue)" : "var(--red)";
+      } else {
+        ultraVipReserveBtn.style.color = "";
+      }
+
+      ultraVipReserveBtn.textContent = isIngresada ? (isMaster && isVentaEnPuerta ? "EN PUERTA" : "INGRESADA") : confirmed ? "RESERVADO" : dispute ? "DISPUTA" : "RESERVAR";
+    }
+
+    ultraVipReserveBtn.addEventListener("click", () => {
+      const reserva = estado["ULTRA VIP"];
+      if (reservaActiva(reserva)) { showToast("ULTRA VIP ya está en disputa o reservado."); return; }
+      abrirMesa("ULTRA VIP");
     });
 
-    document.getElementById("cancelMasterLogin").addEventListener("click", () => {
-      document.getElementById("loginModal").classList.remove("show");
+    function abrirMesa(id) {
+      if (!isMaster) {
+        const active = getMyActiveDispute();
+        if (active && active.mesaId !== id) {
+          showToast("Ya tenés la mesa " + active.mesaId + " en proceso. Esperá a que venza o confirmala.");
+          return;
+        }
+      }
+
+      mesaActual = id;
+      const isTerrazaMesa = id.startsWith("T-");
+      const mesaDisplayNum = isTerrazaMesa ? id.replace("T-", "") : id;
+      mesaEyebrow.textContent = isTerrazaMesa ? ("MESA " + mesaDisplayNum + " · TERRACE SOUL") : (id === "ULTRA VIP" ? "ULTRA VIP · MAIN STAGE" : ("MESA " + id + " · MAIN STAGE"));
+
+      if (isMaster) {
+        document.getElementById("masterPanel").style.display = "block";
+        document.getElementById("standardForm").style.display = "none";
+        document.getElementById("standardBtnRow").style.display = "none";
+        document.getElementById("modalTitle").textContent = "Control Maestro";
+
+        const current = estado[id];
+        const masterNameInput = document.getElementById("masterNameInput");
+        const masterNoteInput = document.getElementById("masterNoteInput");
+
+        masterNameInput.value = current?.nombre || "";
+        masterNoteInput.value = current?.masterNote || "";
+
+        // Inicializar módulo de excepción para Admin / Asistente
+        const isEx = !!(current?.esExcepcion || current?.excepcion);
+        document.getElementById("masterIsExcepcion").checked = isEx;
+        document.getElementById("masterExcepcionFields").style.display = isEx ? "block" : "none";
+        document.getElementById("masterExPersonas").value = current?.cantidadPersonas || 4;
+        document.getElementById("masterExTotal").value = current?.precioTotal || current?.montoTotal || "";
+        document.getElementById("masterExDrinksPct").value = (current?.porcentajeConsumo !== undefined && current?.porcentajeConsumo !== null) ? current.porcentajeConsumo : "";
+        document.getElementById("masterExSena").value = current?.montoSenado || "";
+        updateMasterExPreview();
+
+        // Highlight current status in buttons
+        document.querySelectorAll(".btn-master").forEach(btn => {
+          const isActive = (current && current.status === btn.dataset.status) || (!current && btn.dataset.status === 'libre');
+          btn.classList.toggle("active", isActive);
+        });
+      } else {
+        document.getElementById("masterPanel").style.display = "none";
+        document.getElementById("standardForm").style.display = "block";
+        document.getElementById("standardBtnRow").style.display = "flex";
+        document.getElementById("modalTitle").textContent = "Señá tu mesa";
+        nameInput.value = "";
+        contactInput.value = "";
+        currentPeopleCount = 4;
+        updateModalPricingDisplay();
+        generateCaptcha();
+      }
+
+      senaView.style.display = "block";
+      confirmView.classList.remove("show");
+      overlay.classList.add("open");
+    }
+
+    function cerrarModal() {
+      overlay.classList.remove("open");
+      mesaActual = null;
+    }
+
+    function updateMasterExPreview() {
+      const totalEl = document.getElementById("masterExTotal");
+      const drinksPctEl = document.getElementById("masterExDrinksPct");
+      const senaEl = document.getElementById("masterExSena");
+      if (!totalEl) return;
+
+      const total = parseInt(totalEl.value) || 0;
+      const drinksPct = parseInt(drinksPctEl.value) || 0;
+      const sena = parseInt(senaEl.value) || 0;
+      const drinksVal = Math.round((total * drinksPct) / 100);
+      const saldo = Math.max(0, total - sena);
+      const pctAbonado = total > 0 ? Math.round((sena / total) * 100) : 0;
+      const pctSaldo = total > 0 ? Math.max(0, 100 - pctAbonado) : 0;
+
+      const elDrinks = document.getElementById("masterExDrinksPreview");
+      const elAbonado = document.getElementById("masterExAbonadoPreview");
+      const elSaldo = document.getElementById("masterExSaldoPreview");
+
+      if (elDrinks) elDrinks.textContent = "$" + drinksVal.toLocaleString('es-AR') + " (" + drinksPct + "%)";
+      if (elAbonado) elAbonado.textContent = "$" + sena.toLocaleString('es-AR') + " (" + pctAbonado + "%)";
+      if (elSaldo) elSaldo.textContent = "$" + saldo.toLocaleString('es-AR') + " (" + pctSaldo + "%)";
+    }
+
+    // Eventos para selector de cantidad de personas
+    const btnMinus = document.getElementById("btnPeopleMinus");
+    const btnPlus = document.getElementById("btnPeoplePlus");
+    if (btnMinus) {
+      btnMinus.addEventListener("click", () => {
+        if (currentPeopleCount > 1) {
+          currentPeopleCount--;
+          updateModalPricingDisplay();
+        }
+      });
+    }
+    if (btnPlus) {
+      btnPlus.addEventListener("click", () => {
+        if (currentPeopleCount < 10) {
+          currentPeopleCount++;
+          updateModalPricingDisplay();
+        }
+      });
+    }
+
+    document.getElementById("cancelBtn").addEventListener("click", cerrarModal);
+    document.getElementById("closeConfirmBtn").addEventListener("click", () => {
+      cerrarModal();
     });
 
-    document.getElementById("doMasterLogin").addEventListener("click", async () => {
-      const email = document.getElementById("masterEmail").value.trim().toLowerCase();
-      const pass = document.getElementById("masterPass").value;
-      if (!email || !pass) {
-        showToast("Completá todos los campos.");
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      const btn = document.getElementById("copyBtn");
+      try {
+        await navigator.clipboard.writeText("cubanobar");
+      } catch (e) {
+        const ta = document.createElement("textarea");
+        ta.value = "cubanobar";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      btn.textContent = "Copiado";
+      btn.classList.add("copied");
+      setTimeout(() => { btn.textContent = "Copiar"; btn.classList.remove("copied"); }, 1600);
+    });
+
+    document.getElementById("finalizarBtn").addEventListener("click", async () => {
+      if (!mesaActual) return;
+      const nombre = nameInput.value.trim();
+      const contacto = contactInput.value.trim();
+
+      // Limpiar errores anteriores
+      nameInput.classList.remove("input-error");
+      contactInput.classList.remove("input-error");
+      captchaInput.classList.remove("input-error");
+
+      if (!nombre) {
+        nameInput.classList.add("input-error");
+        nameInput.focus();
+        showToast("Ingresá el nombre o alias de la reserva.");
+        return;
+      }
+      if (!/^\d{10}$/.test(normalizarWhatsapp(contacto))) {
+        contactInput.classList.add("input-error");
+        contactInput.focus();
+        showToast("Ingresá los 10 dígitos de tu WhatsApp (sin 0 ni 15).");
+        return;
+      }
+      if (captchaInput.value.trim() !== currentCaptcha) {
+        captchaInput.classList.add("input-error");
+        captchaInput.focus();
+        showToast("El código no coincide. Intentá de nuevo.");
         return;
       }
 
-      const btn = document.getElementById("doMasterLogin");
+      if (!rateLimitAllows()) {
+        showToast("Alcanzaste el límite temporal de intentos. Probá más tarde.");
+        return;
+      }
+      const btn = document.getElementById("finalizarBtn");
       btn.disabled = true;
-      btn.textContent = "Verificando...";
+      btn.textContent = "Confirmando...";
 
-      try {
-        await auth.signInWithEmailAndPassword(email, pass);
-        document.getElementById("loginModal").classList.remove("show");
-        document.getElementById("masterEmail").value = "";
-        document.getElementById("masterPass").value = "";
-      } catch(e) {
-        console.error("Login Error:", e);
-        showToast("Error: " + e.message);
-      } finally {
+      // re-chequear estado por si otra persona la reservó mientras tanto
+      await cargarEstado();
+      if (reservaActiva(estado[mesaActual])) {
         btn.disabled = false;
-        btn.textContent = "Ingresar";
+        btn.textContent = "Finalizar";
+        renderMesas();
+        cerrarModal();
+        showToast("⚡ Esta mesa acaba de ser tomada. El mapa ya está actualizado — elegí otra.");
+        return;
+      }
+
+      const now = Date.now();
+      const pricingCalc = updateModalPricingDisplay();
+      let ok = false;
+      if (USE_SECURE_RESERVATION && firebaseFunctions) {
+        try {
+          await firebaseFunctions.httpsCallable("createDispute")({
+            mesaId: mesaActual,
+            nombre,
+            contacto: normalizarWhatsapp(contacto),
+            verificationToken: whatsappVerificationToken,
+            deviceId: getDeviceId()
+          });
+        } catch (_) {
+          btn.disabled = false;
+          btn.textContent = "Finalizar";
+          showToast("No se pudo validar la solicitud. Probá de nuevo.");
+          return;
+        }
+        const isTerrazaMesa = mesaActual.startsWith("T-");
+        estado[mesaActual] = {
+          status: "disputa",
+          nombre,
+          contacto,
+          ts: now,
+          expiresAt: now + DISPUTE_MS,
+          cantidadPersonas: currentPeopleCount,
+          precioTotal: pricingCalc.totalMesa,
+          porcentajeConsumo: pricingCalc.pct,
+          montoConsumoCredito: pricingCalc.consumoCredito,
+          montoSenado: pricingCalc.senaAmount,
+          saldoPuerta: pricingCalc.saldoPuerta,
+          sector: isTerrazaMesa ? "terrace_soul" : "main_stage",
+          numeroMesa: isTerrazaMesa ? mesaActual.replace("T-", "") : mesaActual
+        };
+        ok = true;
+      } else {
+        const isTerrazaMesa = mesaActual.startsWith("T-");
+        estado[mesaActual] = {
+          status: "disputa",
+          nombre,
+          contacto,
+          ts: now,
+          expiresAt: now + DISPUTE_MS,
+          cantidadPersonas: currentPeopleCount,
+          precioTotal: pricingCalc.totalMesa,
+          porcentajeConsumo: pricingCalc.pct,
+          montoConsumoCredito: pricingCalc.consumoCredito,
+          montoSenado: pricingCalc.senaAmount,
+          saldoPuerta: pricingCalc.saldoPuerta,
+          sector: isTerrazaMesa ? "terrace_soul" : "main_stage",
+          numeroMesa: isTerrazaMesa ? mesaActual.replace("T-", "") : mesaActual
+        };
+        ok = await guardarEstado();
+      }
+
+      btn.disabled = false;
+      btn.textContent = "Finalizar";
+
+      if (ok) {
+        localStorage.setItem("my-dispute-" + currentEventKey, JSON.stringify({ mesaId: mesaActual, expiresAt: now + DISPUTE_MS }));
+        recordAttempt();
+        renderMesas();
+        actualizarUltraVip();
+        senaView.style.display = "none";
+        const displayLabel = mesaActual.startsWith("T-") ? ("Mesa " + mesaActual.replace("T-", "") + " (Sector TERRACE SOUL)") : ("la mesa " + mesaActual + " (MAIN STAGE)");
+        confirmationText.textContent = displayLabel + " quedó en disputa por 15 minutos a nombre de " + nombre + " (" + currentPeopleCount + " personas). Enviá el comprobante de la seña a tu RRPP antes del vencimiento.";
+        confirmView.classList.add("show");
+      } else {
+        showToast("No se pudo guardar. Probá de nuevo.");
       }
     });
 
-    if (auth) {
-      auth.onAuthStateChanged(async (user) => {
-        console.log("Auth State (Map):", user ? user.email : "Logged out");
-        if (user && firebaseDb) {
-          try {
-            const userDoc = await firebaseDb.collection("users").doc(user.email.toLowerCase()).get();
-            if (userDoc.exists) {
-              const role = userDoc.data().role;
-              userRole = role;
-              isMaster = (role === "admin" || role === "assistant");
-              document.getElementById("masterLogoutBtn").style.display = isMaster ? "block" : "none";
-              document.getElementById("legendIngresada").style.display = isMaster ? "inline-block" : "none";
-              if (isMaster) showToast(role === "assistant" ? "Modo Asistente ACTIVADO" : "Modo Maestro ACTIVADO");
-            } else {
-              userRole = null;
-              isMaster = false;
-              document.getElementById("masterLogoutBtn").style.display = "none";
-              showToast("El usuario no tiene rol asignado.");
-            }
-          } catch(e) {
-            console.error("Error fetching role:", e);
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) cerrarModal();
+    });
+
+    async function init() {
+      await cargarEstado();
+      renderMesas();
+      actualizarUltraVip();
+      cargarLogoEvento();
+
+      // Master Access Listener (7 clicks)
+      document.getElementById("masterBrand").addEventListener("click", () => {
+        masterClicks++;
+        if (masterTimer) clearTimeout(masterTimer);
+        masterTimer = setTimeout(() => { masterClicks = 0; }, 3000);
+
+        if (masterClicks === 7) {
+          if (isMaster) {
+            showToast("Ya estás en modo maestro.");
+          } else {
+            // Si ya está logueado pero no es master, mostramos el modal de todos modos
+            document.getElementById("loginModal").classList.add("show");
           }
-        } else {
-          userRole = null;
-          isMaster = false;
-          document.getElementById("masterLogoutBtn").style.display = "none";
+          masterClicks = 0;
         }
-        renderMesas();
-        actualizarUltraVip();
       });
-    }
 
-    document.getElementById("masterLogoutBtn").addEventListener("click", () => {
-      if (auth) auth.signOut();
-      userRole = null;
-      isMaster = false;
-      showToast("Sesión cerrada");
-    });
-
-    // Eventos de Solapas de Doble Fecha
-    if (tabPublicFecha1) {
-      tabPublicFecha1.addEventListener("click", () => switchPublicEvent('fecha1'));
-    }
-    if (tabPublicFecha2) {
-      tabPublicFecha2.addEventListener("click", () => switchPublicEvent('fecha2'));
-    }
-
-    // Eventos de Solapas de Sector (Salón vs Terraza)
-    const tabSectorSalon = document.getElementById("tabSectorSalon");
-    const tabSectorTerraza = document.getElementById("tabSectorTerraza");
-    if (tabSectorSalon) {
-      tabSectorSalon.addEventListener("click", () => setSector("salon"));
-    }
-    if (tabSectorTerraza) {
-      tabSectorTerraza.addEventListener("click", () => setSector("terraza"));
-    }
-
-    // Listeners para módulo de excepción maestro
-    const chkEx = document.getElementById("masterIsExcepcion");
-    if (chkEx) {
-      chkEx.addEventListener("change", (e) => {
-        const fields = document.getElementById("masterExcepcionFields");
-        if (fields) fields.style.display = e.target.checked ? "block" : "none";
-        updateMasterExPreview();
+      document.getElementById("cancelMasterLogin").addEventListener("click", () => {
+        document.getElementById("loginModal").classList.remove("show");
       });
-    }
-    ["masterExTotal", "masterExDrinksPct", "masterExSena", "masterExPersonas"].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.addEventListener("input", updateMasterExPreview);
-    });
 
-    // Master Action Buttons
-    document.querySelectorAll(".btn-master").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        if (!mesaActual || !firebaseDb) return;
-        const newStatus = btn.dataset.status;
-        const masterName = document.getElementById("masterNameInput").value.trim();
-        const masterNote = document.getElementById("masterNoteInput").value.trim();
-        const targetCol = getActiveReservasCollection();
+      document.getElementById("doMasterLogin").addEventListener("click", async () => {
+        const email = document.getElementById("masterEmail").value.trim().toLowerCase();
+        const pass = document.getElementById("masterPass").value;
+        if (!email || !pass) {
+          showToast("Completá todos los campos.");
+          return;
+        }
+
+        const btn = document.getElementById("doMasterLogin");
+        btn.disabled = true;
+        btn.textContent = "Verificando...";
 
         try {
-          if (newStatus === "libre") {
-            await firebaseDb.collection(targetCol).doc(mesaActual).delete();
-          } else {
-            const isEx = !!document.getElementById("masterIsExcepcion")?.checked;
-            let exPayload = {};
-            if (isEx) {
-              const exPersonas = parseInt(document.getElementById("masterExPersonas")?.value) || 4;
-              const exTotal = parseInt(document.getElementById("masterExTotal")?.value) || 0;
-              const exDrinksPct = parseInt(document.getElementById("masterExDrinksPct")?.value) || 0;
-              const exDrinksVal = Math.round((exTotal * exDrinksPct) / 100);
-              const exSena = parseInt(document.getElementById("masterExSena")?.value) || 0;
-              const exSaldo = Math.max(0, exTotal - exSena);
-              const exPctAbonado = exTotal > 0 ? Math.round((exSena / exTotal) * 100) : 0;
-              const exPctSaldo = exTotal > 0 ? Math.max(0, 100 - exPctAbonado) : 0;
-              const currentEmail = auth?.currentUser?.email || (userRole === "assistant" ? "asistente" : "admin");
-              const responsable = (userRole === "assistant" ? `Asistente (${currentEmail})` : `Admin (${currentEmail})`);
-
-              exPayload = {
-                esExcepcion: true,
-                excepcion: true,
-                responsableExcepcion: responsable,
-                cantidadPersonas: exPersonas,
-                precioTotal: exTotal,
-                montoTotal: exTotal,
-                porcentajeConsumo: exDrinksPct,
-                montoConsumoCredito: exDrinksVal,
-                montoConsumicion: exDrinksVal,
-                montoSenado: exSena,
-                saldoPuerta: exSaldo,
-                porcentajeAbonado: exPctAbonado,
-                porcentajeSaldo: exPctSaldo
-              };
-            } else {
-              exPayload = {
-                esExcepcion: false,
-                excepcion: false
-              };
-            }
-
-            const isTerrazaMesa = mesaActual.startsWith("T-");
-            await firebaseDb.collection(targetCol).doc(mesaActual).set({
-              status: newStatus,
-              nombre: masterName || (userRole === "assistant" ? "Asignado por Asistente" : "Asignado por Admin"),
-              masterNote: masterNote || "",
-              contacto: estado[mesaActual]?.contacto || "0000000000",
-              ts: estado[mesaActual]?.ts || Date.now(),
-              expiresAt: newStatus === "disputa" ? Date.now() + DISPUTE_MS : null,
-              masterAction: true,
-              sector: isTerrazaMesa ? "terraza" : "salon",
-              numeroMesa: isTerrazaMesa ? mesaActual.replace("T-", "") : mesaActual,
-              ...exPayload
-            }, { merge: true });
-          }
-          showToast("Estado actualizado.");
-          cerrarModal();
-        } catch(e) {
-          showToast("Error al actualizar.");
+          await auth.signInWithEmailAndPassword(email, pass);
+          document.getElementById("loginModal").classList.remove("show");
+          document.getElementById("masterEmail").value = "";
+          document.getElementById("masterPass").value = "";
+        } catch (e) {
+          console.error("Login Error:", e);
+          showToast("Error: " + e.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Ingresar";
         }
       });
-    });
 
-    // Asegurar que las mesas se vean bien si cambia el tamaño de la ventana
-    window.addEventListener('resize', renderMesas);
-
-    if(firebaseDb){
-      escucharReservas();
-
-      // Lógica de limpieza silenciosa (Parche para plan gratuito)
-      setInterval(() => {
-        const now = Date.now();
-        const targetCol = getActiveReservasCollection();
-        Object.entries(estado).forEach(async ([mesaId, reserva]) => {
-          if (reserva.status === "disputa" && reserva.expiresAt && reserva.expiresAt <= now) {
+      if (auth) {
+        auth.onAuthStateChanged(async (user) => {
+          console.log("Auth State (Map):", user ? user.email : "Logged out");
+          if (user && firebaseDb) {
             try {
-              await firebaseDb.collection(targetCol).doc(mesaId).delete();
-            } catch(e) { /* Falló el borrado (quizás ya lo borró otro o no tiene permiso aún) */ }
+              const userDoc = await firebaseDb.collection("users").doc(user.email.toLowerCase()).get();
+              if (userDoc.exists) {
+                const role = userDoc.data().role;
+                userRole = role;
+                isMaster = (role === "admin" || role === "assistant");
+                document.getElementById("masterLogoutBtn").style.display = isMaster ? "block" : "none";
+                document.getElementById("legendIngresada").style.display = isMaster ? "inline-block" : "none";
+                if (isMaster) showToast(role === "assistant" ? "Modo Asistente ACTIVADO" : "Modo Maestro ACTIVADO");
+              } else {
+                userRole = null;
+                isMaster = false;
+                document.getElementById("masterLogoutBtn").style.display = "none";
+                showToast("El usuario no tiene rol asignado.");
+              }
+            } catch (e) {
+              console.error("Error fetching role:", e);
+            }
+          } else {
+            userRole = null;
+            isMaster = false;
+            document.getElementById("masterLogoutBtn").style.display = "none";
+          }
+          renderMesas();
+          actualizarUltraVip();
+        });
+      }
+
+      document.getElementById("masterLogoutBtn").addEventListener("click", () => {
+        if (auth) auth.signOut();
+        userRole = null;
+        isMaster = false;
+        showToast("Sesión cerrada");
+      });
+
+      // Eventos de Solapas de Doble Fecha
+      if (tabPublicFecha1) {
+        tabPublicFecha1.addEventListener("click", () => switchPublicEvent('fecha1'));
+      }
+      if (tabPublicFecha2) {
+        tabPublicFecha2.addEventListener("click", () => switchPublicEvent('fecha2'));
+      }
+
+      // Eventos de Solapas de Sector (Salón vs Terraza)
+      const tabSectorSalon = document.getElementById("tabSectorSalon");
+      const tabSectorTerraza = document.getElementById("tabSectorTerraza");
+      if (tabSectorSalon) {
+        tabSectorSalon.addEventListener("click", () => setSector("salon"));
+      }
+      if (tabSectorTerraza) {
+        tabSectorTerraza.addEventListener("click", () => setSector("terraza"));
+      }
+
+      // Listeners para módulo de excepción maestro
+      const chkEx = document.getElementById("masterIsExcepcion");
+      if (chkEx) {
+        chkEx.addEventListener("change", (e) => {
+          const fields = document.getElementById("masterExcepcionFields");
+          if (fields) fields.style.display = e.target.checked ? "block" : "none";
+          updateMasterExPreview();
+        });
+      }
+      ["masterExTotal", "masterExDrinksPct", "masterExSena", "masterExPersonas"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener("input", updateMasterExPreview);
+      });
+
+      // Master Action Buttons
+      document.querySelectorAll(".btn-master").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          if (!mesaActual || !firebaseDb) return;
+          const newStatus = btn.dataset.status;
+          const masterName = document.getElementById("masterNameInput").value.trim();
+          const masterNote = document.getElementById("masterNoteInput").value.trim();
+          const targetCol = getActiveReservasCollection();
+
+          try {
+            if (newStatus === "libre") {
+              await firebaseDb.collection(targetCol).doc(mesaActual).delete();
+            } else {
+              const isEx = !!document.getElementById("masterIsExcepcion")?.checked;
+              let exPayload = {};
+              if (isEx) {
+                const exPersonas = parseInt(document.getElementById("masterExPersonas")?.value) || 4;
+                const exTotal = parseInt(document.getElementById("masterExTotal")?.value) || 0;
+                const exDrinksPct = parseInt(document.getElementById("masterExDrinksPct")?.value) || 0;
+                const exDrinksVal = Math.round((exTotal * exDrinksPct) / 100);
+                const exSena = parseInt(document.getElementById("masterExSena")?.value) || 0;
+                const exSaldo = Math.max(0, exTotal - exSena);
+                const exPctAbonado = exTotal > 0 ? Math.round((exSena / exTotal) * 100) : 0;
+                const exPctSaldo = exTotal > 0 ? Math.max(0, 100 - exPctAbonado) : 0;
+                const currentEmail = auth?.currentUser?.email || (userRole === "assistant" ? "asistente" : "admin");
+                const responsable = (userRole === "assistant" ? `Asistente (${currentEmail})` : `Admin (${currentEmail})`);
+
+                exPayload = {
+                  esExcepcion: true,
+                  excepcion: true,
+                  responsableExcepcion: responsable,
+                  cantidadPersonas: exPersonas,
+                  precioTotal: exTotal,
+                  montoTotal: exTotal,
+                  porcentajeConsumo: exDrinksPct,
+                  montoConsumoCredito: exDrinksVal,
+                  montoConsumicion: exDrinksVal,
+                  montoSenado: exSena,
+                  saldoPuerta: exSaldo,
+                  porcentajeAbonado: exPctAbonado,
+                  porcentajeSaldo: exPctSaldo
+                };
+              } else {
+                exPayload = {
+                  esExcepcion: false,
+                  excepcion: false
+                };
+              }
+
+              const isTerrazaMesa = mesaActual.startsWith("T-");
+              await firebaseDb.collection(targetCol).doc(mesaActual).set({
+                status: newStatus,
+                nombre: masterName || (userRole === "assistant" ? "Asignado por Asistente" : "Asignado por Admin"),
+                masterNote: masterNote || "",
+                contacto: estado[mesaActual]?.contacto || "0000000000",
+                ts: estado[mesaActual]?.ts || Date.now(),
+                expiresAt: newStatus === "disputa" ? Date.now() + DISPUTE_MS : null,
+                masterAction: true,
+                sector: isTerrazaMesa ? "terraza" : "salon",
+                numeroMesa: isTerrazaMesa ? mesaActual.replace("T-", "") : mesaActual,
+                ...exPayload
+              }, { merge: true });
+            }
+            showToast("Estado actualizado.");
+            cerrarModal();
+          } catch (e) {
+            showToast("Error al actualizar.");
           }
         });
-      }, 15000); // Revisar cada 15 segundos
-    }
-  }
-  init();
-  capturarMapaPublico();
-
-  // Registro de Service Worker para PWA
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch((err) => {
-        console.log('SW registration note:', err);
       });
-    });
-  }
 
-  // Lógica de invitación a instalar PWA
-  let deferredInstallPrompt;
-  const pwaBanner = document.getElementById('pwaInstallBanner');
-  const pwaInstallBtn = document.getElementById('pwaInstallBtn');
-  const pwaDismissBtn = document.getElementById('pwaDismissBtn');
-  const pwaInstructionText = document.getElementById('pwaInstructionText');
+      // Asegurar que las mesas se vean bien si cambia el tamaño de la ventana
+      window.addEventListener('resize', renderMesas);
 
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-  const isDismissed = sessionStorage.getItem('pwa_prompt_dismissed');
+      if (firebaseDb) {
+        escucharReservas();
 
-  if (!isStandalone && !isDismissed) {
-    // Para Android / Chrome
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredInstallPrompt = e;
-      if (pwaBanner) pwaBanner.classList.remove('hidden');
-    });
+        // Lógica de limpieza silenciosa (Parche para plan gratuito)
+        setInterval(() => {
+          const now = Date.now();
+          const targetCol = getActiveReservasCollection();
+          Object.entries(estado).forEach(async ([mesaId, reserva]) => {
+            if (reserva.status === "disputa" && reserva.expiresAt && reserva.expiresAt <= now) {
+              try {
+                await firebaseDb.collection(targetCol).doc(mesaId).delete();
+              } catch (e) { /* Falló el borrado (quizás ya lo borró otro o no tiene permiso aún) */ }
+            }
+          });
+        }, 15000); // Revisar cada 15 segundos
+      }
+    }
+    init();
+    capturarMapaPublico();
 
-    if (pwaInstallBtn) {
-      pwaInstallBtn.addEventListener('click', async () => {
-        if (deferredInstallPrompt) {
-          deferredInstallPrompt.prompt();
-          const { outcome } = await deferredInstallPrompt.userChoice;
-          if (outcome === 'accepted') {
-            if (pwaBanner) pwaBanner.classList.add('hidden');
+    // Registro de Service Worker para PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch((err) => {
+          console.log('SW registration note:', err);
+        });
+      });
+    }
+
+    // Lógica de invitación a instalar PWA
+    let deferredInstallPrompt;
+    const pwaBanner = document.getElementById('pwaInstallBanner');
+    const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+    const pwaDismissBtn = document.getElementById('pwaDismissBtn');
+    const pwaInstructionText = document.getElementById('pwaInstructionText');
+
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    const isDismissed = sessionStorage.getItem('pwa_prompt_dismissed');
+
+    if (!isStandalone && !isDismissed) {
+      // Para Android / Chrome
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        if (pwaBanner) pwaBanner.classList.remove('hidden');
+      });
+
+      if (pwaInstallBtn) {
+        pwaInstallBtn.addEventListener('click', async () => {
+          if (deferredInstallPrompt) {
+            deferredInstallPrompt.prompt();
+            const { outcome } = await deferredInstallPrompt.userChoice;
+            if (outcome === 'accepted') {
+              if (pwaBanner) pwaBanner.classList.add('hidden');
+            }
+            deferredInstallPrompt = null;
+          } else {
+            showToast("Tocá el botón Compartir y seleccioná 'Agregar al inicio'");
           }
-          deferredInstallPrompt = null;
-        } else {
-          showToast("Tocá el botón Compartir y seleccioná 'Agregar al inicio'");
-        }
-      });
-    }
+        });
+      }
 
-    if (pwaDismissBtn) {
-      pwaDismissBtn.addEventListener('click', () => {
-        if (pwaBanner) pwaBanner.classList.add('hidden');
-        sessionStorage.setItem('pwa_prompt_dismissed', '1');
-      });
-    }
+      if (pwaDismissBtn) {
+        pwaDismissBtn.addEventListener('click', () => {
+          if (pwaBanner) pwaBanner.classList.add('hidden');
+          sessionStorage.setItem('pwa_prompt_dismissed', '1');
+        });
+      }
 
-    // Detectar iOS Safari para mostrarle la guía
-    const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-    if (isIos && !isStandalone) {
-      setTimeout(() => {
-        if (pwaBanner && !sessionStorage.getItem('pwa_prompt_dismissed')) {
-          if (pwaInstructionText) pwaInstructionText.textContent = "Tocá Compartir y 'Agregar al inicio'";
-          if (pwaInstallBtn) pwaInstallBtn.textContent = "¿Cómo?";
-          pwaBanner.classList.remove('hidden');
-        }
-      }, 3000);
+      // Detectar iOS Safari para mostrarle la guía
+      const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+      if (isIos && !isStandalone) {
+        setTimeout(() => {
+          if (pwaBanner && !sessionStorage.getItem('pwa_prompt_dismissed')) {
+            if (pwaInstructionText) pwaInstructionText.textContent = "Tocá Compartir y 'Agregar al inicio'";
+            if (pwaInstallBtn) pwaInstallBtn.textContent = "¿Cómo?";
+            pwaBanner.classList.remove('hidden');
+          }
+        }, 3000);
+      }
     }
-  }
-</script>
+  </script>
 
   <!-- Banner flotante para invitación a instalar PWA -->
   <div id="pwaInstallBanner" class="pwa-install-banner hidden" role="dialog" aria-label="Instalar aplicación">
@@ -2356,4 +2980,5 @@
     </div>
   </div>
 </body>
+
 </html>

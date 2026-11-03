@@ -10,8 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #09090c;
-      --card: #111116;
+      --bg: #060608;
+      --card: #0e0e14;
       --gold: #ffbd3e;
       --green: #10b981;
       --red: #e11d48;
@@ -21,26 +21,28 @@
       --line: rgba(255, 255, 255, 0.08);
       --grey-line: rgba(255, 255, 255, 0.14);
     }
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0;
       background: var(--bg);
       color: var(--text);
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
+      overflow-x: hidden;
     }
     .top-bar {
       padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #0d0d12;
+      background: rgba(13, 13, 18, 0.95);
+      backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--line);
       position: sticky;
       top: 0;
       z-index: 40;
     }
-    .brand { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; }
+    .brand { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; }
     .brand span { color: var(--gold); }
     .badge {
       background: rgba(16, 185, 129, 0.15);
@@ -50,61 +52,217 @@
       border-radius: 20px;
       font-size: 11px;
       font-weight: 800;
+      letter-spacing: 0.5px;
     }
     .btn-logout {
       background: transparent;
       border: 1px solid var(--grey-line);
       color: #fff;
-      padding: 5px 12px;
+      padding: 6px 14px;
       border-radius: 6px;
       font-size: 12px;
+      font-weight: 600;
       cursor: pointer;
+      transition: background 0.2s;
     }
+    .btn-logout:hover { background: rgba(255, 255, 255, 0.08); }
 
-    .container { max-width: 600px; margin: 16px auto; padding: 0 16px; }
+    .main-wrap {
+      max-width: 520px;
+      margin: 14px auto 50px;
+      padding: 0 14px;
+    }
 
     /* Buscador */
     .search-box {
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       display: flex;
       gap: 10px;
     }
     .search-box input {
       flex: 1;
-      background: #060608;
+      background: #0d0d14;
       border: 1px solid var(--grey-line);
       border-radius: 10px;
       padding: 12px 16px;
       color: #fff;
-      font-size: 15px;
+      font-size: 14.5px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-box input:focus {
+      border-color: var(--gold);
     }
 
-    /* Grid de mesas */
-    .tables-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-      gap: 10px;
+    /* Resultados rápidos de búsqueda */
+    .quick-results {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
     }
-    .card-mesa {
-      background: var(--card);
+    .quick-card {
+      background: #13131c;
       border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 14px 10px;
-      text-align: center;
+      border-radius: 8px;
+      padding: 8px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       cursor: pointer;
-      transition: transform 0.15s, border-color 0.2s;
+      transition: background 0.15s, border-color 0.15s;
     }
-    .card-mesa:active { transform: scale(0.96); }
-    .card-mesa.libre { border-color: rgba(16, 185, 129, 0.4); }
-    .card-mesa.aprobada { border-color: rgba(59, 130, 246, 0.6); background: rgba(59, 130, 246, 0.08); }
-    .card-mesa.ingresada { border-color: rgba(225, 29, 72, 0.5); opacity: 0.6; }
+    .quick-card:hover {
+      background: #1b1b26;
+      border-color: var(--gold);
+    }
 
-    .mesa-num { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: #fff; }
-    .mesa-titular { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px; }
-    .mesa-pill { font-size: 9.5px; font-weight: 800; padding: 2px 6px; border-radius: 8px; text-transform: uppercase; margin-top: 6px; display: inline-block; }
-    .mesa-pill.p-libre { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-    .mesa-pill.p-aprobada { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
-    .mesa-pill.p-ingresada { background: rgba(225, 29, 72, 0.2); color: #e11d48; }
+    /* Leyenda */
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+    .dot.free { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .dot.pending { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+    .dot.approved { background: var(--red); box-shadow: 0 0 6px var(--red); }
+    .dot.ingresada { background: var(--blue); box-shadow: 0 0 6px var(--blue); }
+
+    /* Plano Mesas Container */
+    .map-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 900 / 1600;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: #09090c;
+      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
+      user-select: none;
+    }
+    .map-bg-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      pointer-events: none;
+    }
+    #mapImg {
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    /* Logo overlay */
+    .map-frame .terrace-logo-overlay {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 1.5%;
+      width: 78% !important;
+      height: 21% !important;
+      max-width: 78%;
+      max-height: 21%;
+      z-index: 5;
+      display: none;
+      object-fit: contain;
+      object-position: bottom center;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.85));
+    }
+
+    /* Fecha badge */
+    .terrace-date-badge {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 70.3%;
+      width: auto;
+      min-width: 38%;
+      max-width: 70%;
+      height: 5.8%;
+      z-index: 5;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      border-radius: 8px;
+      border: 1.5px solid rgba(255, 189, 62, 0.6);
+      background: rgba(8, 8, 12, 0.92);
+      color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(14px, 3.2vw, 22px);
+      letter-spacing: 2px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.85);
+      text-transform: uppercase;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* Botones de Mesas */
+    .table-btn {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      width: 5.6%;
+      height: 3.15%;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      background: linear-gradient(145deg, #66f5bf, #16b878 55%, #08734b);
+      color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(10px, 2.2vw, 13px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      z-index: 10;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .table-btn:hover {
+      transform: translate(-50%, -50%) scale(1.15);
+      z-index: 25;
+    }
+    .table-btn:active {
+      transform: translate(-50%, -50%) scale(0.95);
+    }
+    .table-btn.pending {
+      background: linear-gradient(145deg, #ffcf58, #b66a08 55%, #613000);
+      border-color: #ffbd3e;
+      box-shadow: 0 0 8px rgba(255, 189, 62, 0.5);
+    }
+    .table-btn.approved {
+      background: linear-gradient(145deg, #ff5b66, #d20e21 55%, #70000a);
+      border-color: #ff2d3d;
+      box-shadow: 0 0 8px rgba(225, 29, 72, 0.5);
+    }
+    .table-btn.ingresada {
+      background: linear-gradient(145deg, #58a6ff, #0a56ad 55%, #002e61);
+      border-color: #3b82f6;
+      box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+    }
+    .table-btn.highlight {
+      animation: pulseGlow 0.8s infinite alternate ease-in-out;
+      z-index: 30;
+      border: 2px solid #fff;
+    }
+    @keyframes pulseGlow {
+      0% { transform: translate(-50%, -50%) scale(1.15); box-shadow: 0 0 12px #ffbd3e; }
+      100% { transform: translate(-50%, -50%) scale(1.45); box-shadow: 0 0 25px #ffbd3e, 0 0 35px #ffbd3e; }
+    }
 
     /* Modal de Cobro */
     .modal-overlay {
@@ -128,6 +286,7 @@
       padding: 24px;
       max-height: 90vh;
       overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
     }
     .saldo-box {
       background: rgba(255, 189, 62, 0.12);
@@ -138,7 +297,7 @@
       margin: 16px 0;
     }
     .saldo-label { font-size: 12px; color: var(--gold); text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
-    .saldo-val { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: #fff; }
+    .saldo-val { font-family: 'Bebas Neue', sans-serif; font-size: 38px; color: #fff; letter-spacing: 1px; }
 
     .voucher-box {
       background: rgba(16, 185, 129, 0.1);
@@ -159,14 +318,19 @@
       border: none;
       width: 100%;
       margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
     .btn-cash { background: #10b981; color: #000; }
     .btn-transf { background: #3b82f6; color: #fff; }
-    .btn-cancel { background: rgba(255, 255, 255, 0.1); color: #fff; }
+    .btn-cancel { background: rgba(255, 255, 255, 0.1); color: #fff; margin-top: 6px; }
 
     /* Login */
     .login-wrap { max-width: 360px; margin: 15vh auto; padding: 24px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
-    .login-wrap h1 { margin: 0 0 16px; font-size: 22px; text-align: center; }
+    .login-wrap h1 { margin: 0 0 16px; font-size: 22px; text-align: center; font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; }
+    .login-wrap h1 span { color: var(--gold); }
     .login-wrap input { width: 100%; background: #060608; border: 1px solid var(--grey-line); border-radius: 8px; padding: 12px; color: #fff; margin-bottom: 12px; box-sizing: border-box; }
     .login-wrap button { width: 100%; padding: 12px; background: var(--gold); color: #000; font-weight: 800; border: none; border-radius: 8px; cursor: pointer; }
   </style>
@@ -189,39 +353,72 @@
       <button type="button" class="btn-logout" id="btnLogout">Salir</button>
     </header>
 
-    <main class="container">
+    <main class="main-wrap">
       <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Buscar por número o nombre de cliente...">
+        <input type="text" id="searchInput" placeholder="🔍 Buscar por número de mesa o nombre de cliente...">
       </div>
 
-      <div class="tables-grid" id="tablesGrid">
-        <!-- Render dinámico de mesas -->
+      <div id="quickResults" class="quick-results" style="display: none;"></div>
+
+      <div class="legend">
+        <span class="legend-item"><span class="dot free"></span>Libre</span>
+        <span class="legend-item"><span class="dot pending"></span>Señada</span>
+        <span class="legend-item"><span class="dot approved"></span>Vendida</span>
+        <span class="legend-item"><span class="dot ingresada"></span>Dentro</span>
+      </div>
+
+      <!-- Mapa Interactivo de la Terraza -->
+      <div class="map-frame" id="plano-mesas">
+        <div id="mapBgLayer" class="map-bg-layer"></div>
+        <img id="terraceLogoOverlay" class="terrace-logo-overlay" alt="Logo Joseo Terrace">
+        <div id="terraceDateBadge" class="terrace-date-badge" aria-label="Fecha del evento"></div>
+        <img id="mapImg" src="terraza.png" alt="Plano Terraza Joseo">
+        <!-- Los botones de las mesas se inyectan acá sobre el mapa -->
       </div>
     </main>
   </div>
 
-  <!-- Modal Cobro en Puerta -->
+  <!-- Modal de Cobro / Puerta -->
   <div class="modal-overlay" id="cobroModal">
     <div class="modal-box">
-      <h2 id="modalMesaTitle" style="margin: 0 0 4px; font-size: 20px;">MESA --</h2>
-      <div id="modalTitular" style="color: var(--muted); font-size: 13px; margin-bottom: 12px;">Cliente: —</div>
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+        <h2 id="modalMesaTitle" style="margin: 0; font-size: 24px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1.5px;">MESA --</h2>
+        <span id="modalStatusBadge" style="font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px;">ESTADO</span>
+      </div>
+      <p id="modalTitular" style="margin: 0 0 14px; font-size: 13px; color: var(--muted);">Cliente: --</p>
 
       <div class="saldo-box">
         <div class="saldo-label">Saldo a cobrar en puerta</div>
         <div class="saldo-val" id="saldoMontoDisplay">$0</div>
-        <div id="senaPreviaText" style="font-size: 11.5px; color: var(--muted); margin-top: 4px;">Seña previa: $0</div>
+        <div id="senaPreviaText" style="font-size: 12px; color: var(--muted); margin-top: 4px;">Seña previa: $0</div>
       </div>
 
       <div class="voucher-box" id="voucherBox">
-        <div class="voucher-title">🍾 Entregar Vouchers / Bebidas:</div>
-        <div id="voucherContent" style="font-weight: 600;">Ninguna bebida asignada</div>
+        <div class="voucher-title">🍹 Consumo / Vouchers a Entregar:</div>
+        <div id="voucherContent" style="color: #fff; font-weight: 600;">--</div>
       </div>
 
-      <div style="font-size: 12px; color: var(--muted); margin-bottom: 12px; text-align: center;">Registrar cobro de saldo y marcar ingreso:</div>
+      <div id="modalNotaBox" style="font-size: 12px; color: var(--muted); margin-bottom: 14px; display: none;">
+        <strong>Nota:</strong> <span id="modalNotaText"></span>
+      </div>
 
-      <button type="button" class="btn-pay btn-cash" id="btnCobroEfectivo">💵 Cobrado en EFECTIVO</button>
-      <button type="button" class="btn-pay btn-transf" id="btnCobroTransferencia">💳 Cobrado por TRANSFERENCIA</button>
-      <button type="button" class="btn-pay btn-cancel" id="btnCancelCobro">Volver</button>
+      <div id="cobroActions">
+        <button type="button" class="btn-pay btn-cash" id="btnCobroEfectivo">
+          💵 Cobrar Saldo en Efectivo (Marcar Ingreso)
+        </button>
+        <button type="button" class="btn-pay btn-transf" id="btnCobroTransferencia">
+          💳 Cobrar Saldo con Transferencia (Marcar Ingreso)
+        </button>
+        <button type="button" class="btn-pay btn-cash" id="btnMarcarIngresadaDirecta" style="background: var(--blue); color:#fff; display:none;">
+          ✅ Marcar Ingreso Directo (Saldo $0)
+        </button>
+      </div>
+
+      <div id="yaIngresadaNotice" style="display:none; text-align:center; padding: 12px; background: rgba(59, 130, 246, 0.15); border: 1px solid var(--blue); border-radius: 8px; font-size: 13px; color: #93c5fd; margin-bottom: 8px;">
+        ℹ️ Esta mesa ya ingresó al evento.
+      </div>
+
+      <button type="button" class="btn-pay btn-cancel" id="btnCancelCobro">Cerrar</button>
     </div>
   </div>
 
@@ -234,6 +431,11 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
 
+    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+      db.useEmulator("localhost", 8085);
+      auth.useEmulator("http://localhost:9099");
+    }
+
     const loginView = document.getElementById("loginView");
     const bolApp = document.getElementById("bolApp");
     const loginEmail = document.getElementById("loginEmail");
@@ -241,11 +443,40 @@
     const btnLogin = document.getElementById("btnLogin");
     const loginError = document.getElementById("loginError");
     const btnLogout = document.getElementById("btnLogout");
-    const tablesGrid = document.getElementById("tablesGrid");
-    const searchInput = document.getElementById("searchInput");
 
+    const planoMesas = document.getElementById("plano-mesas");
+    const mapBgLayer = document.getElementById("mapBgLayer");
+    const terraceLogoOverlay = document.getElementById("terraceLogoOverlay");
+    const terraceDateBadge = document.getElementById("terraceDateBadge");
+    const searchInput = document.getElementById("searchInput");
+    const quickResults = document.getElementById("quickResults");
+
+    // Coordenadas exactas de mesas en Terraza (terraza.png)
     const TABLES_TERRAZA = [
-      'T-1','T-2','T-3','T-4','T-5','T-6','T-7','T-8','T-9','T-10','T-11','T-12','T-13','T-14','T-15','T-16','T-17','T-18','T-19','T-A','T-B','T-C','T-D','T-E'
+      { id:"T-3",  num:"3",  x:10.9, y:35.4 },
+      { id:"T-4",  num:"4",  x:18.9, y:34.6 },
+      { id:"T-5",  num:"5",  x:26.8, y:34.6 },
+      { id:"T-6",  num:"6",  x:49.8, y:36.9 },
+      { id:"T-7",  num:"7",  x:37.7, y:41.9 },
+      { id:"T-A",  num:"A",  x:23.9, y:45.9 },
+      { id:"T-B",  num:"B",  x:36.8, y:45.9 },
+      { id:"T-C",  num:"C",  x:50.0, y:45.9 },
+      { id:"T-D",  num:"D",  x:36.8, y:52.5 },
+      { id:"T-E",  num:"E",  x:50.1, y:52.5 },
+      { id:"T-2",  num:"2",  x:11.4, y:43.4 },
+      { id:"T-1",  num:"1",  x:11.7, y:50.9 },
+      { id:"T-8",  num:"8",  x:19.0, y:52.8 },
+      { id:"T-16", num:"16", x:73.0, y:34.2 },
+      { id:"T-17", num:"17", x:77.9, y:40.6 },
+      { id:"T-18", num:"18", x:77.9, y:45.9 },
+      { id:"T-19", num:"19", x:77.9, y:50.9 },
+      { id:"T-15", num:"15", x:90.6, y:41.4 },
+      { id:"T-9",  num:"9",  x:30.3, y:64.8 },
+      { id:"T-10", num:"10", x:39.7, y:64.8 },
+      { id:"T-11", num:"11", x:48.7, y:64.8 },
+      { id:"T-12", num:"12", x:57.7, y:64.8 },
+      { id:"T-13", num:"13", x:81.7, y:64.8 },
+      { id:"T-14", num:"14", x:90.0, y:64.8 }
     ];
 
     let reservasData = {};
@@ -292,56 +523,118 @@
     });
 
     function iniciarEscuchas() {
+      // 1. Escuchar diseño de Joseo (config/joseo)
+      db.collection("config").doc("joseo").onSnapshot(doc => {
+        if (!doc.exists) return;
+        const c = doc.data();
+        if (c.bgUrl) {
+          mapBgLayer.style.backgroundImage = `url("${c.bgUrl}")`;
+        } else {
+          mapBgLayer.style.backgroundImage = "";
+        }
+        if (c.logoUrl) {
+          terraceLogoOverlay.src = c.logoUrl;
+          terraceLogoOverlay.style.display = "block";
+        } else {
+          terraceLogoOverlay.style.display = "none";
+        }
+        if (c.eventDate) {
+          terraceDateBadge.textContent = c.eventDate;
+          terraceDateBadge.style.display = "flex";
+        } else {
+          terraceDateBadge.style.display = "none";
+        }
+      });
+
+      // 2. Escuchar reservas de Joseo (reservas_joseo)
       db.collection("reservas_joseo").onSnapshot(snapshot => {
         reservasData = {};
         snapshot.forEach(doc => {
           reservasData[doc.id] = doc.data();
         });
-        renderGrid();
+        renderMap();
       });
     }
 
-    function renderGrid() {
-      tablesGrid.innerHTML = "";
+    function renderMap() {
+      // Eliminar botones viejos
+      planoMesas.querySelectorAll(".table-btn").forEach(b => b.remove());
       const query = searchInput.value.trim().toLowerCase();
+      quickResults.innerHTML = "";
+      let matches = 0;
 
-      TABLES_TERRAZA.forEach(id => {
-        const r = reservasData[id] || {};
-        const num = id.replace("T-", "");
+      TABLES_TERRAZA.forEach(table => {
+        const r = reservasData[table.id] || {};
         const nombre = r.nombre || "";
         const status = r.status || "libre";
+        const isIngresada = status === "ingresada";
+        const isApproved = ["aprobada", "confirmada", "vendida", "ocupada"].includes(status);
+        const isPending = ["disputa", "pendiente", "seña", "sena"].includes(status);
 
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "table-btn" + (isIngresada ? " ingresada" : isApproved ? " approved" : isPending ? " pending" : "");
+        btn.style.left = table.x + "%";
+        btn.style.top = table.y + "%";
+        btn.textContent = table.num;
+        btn.setAttribute("data-id", table.id);
+
+        // Búsqueda
+        let isMatch = false;
         if (query) {
-          const matchNum = num.toLowerCase().includes(query);
+          const matchNum = table.num.toLowerCase() === query || ("mesa " + table.num.toLowerCase()) === query;
           const matchNombre = nombre.toLowerCase().includes(query);
-          if (!matchNum && !matchNombre) return;
+          if (matchNum || matchNombre) {
+            isMatch = true;
+            btn.classList.add("highlight");
+            matches++;
+
+            // Agregar a resultados rápidos
+            const ex = r.excepcion || {};
+            const saldo = ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : (r.saldoPuerta || 0);
+            const qRow = document.createElement("div");
+            qRow.className = "quick-card";
+            qRow.innerHTML = `
+              <div>
+                <strong style="color:var(--gold); font-family:'Bebas Neue',sans-serif; font-size:18px;">MESA ${table.num}</strong>
+                <span style="color:#fff; font-size:13px; margin-left:8px;">${nombre || 'Sin nombre'}</span>
+              </div>
+              <div style="text-align:right;">
+                <span style="font-size:12px; color:${saldo > 0 ? 'var(--gold)' : 'var(--green)'}; font-weight:700;">
+                  ${isIngresada ? 'DENTRO' : (saldo > 0 ? 'Resta: $' + saldo.toLocaleString('es-AR') : 'PAGADA')}
+                </span>
+              </div>
+            `;
+            qRow.addEventListener("click", () => abrirCobroModal(table.id));
+            quickResults.appendChild(qRow);
+          }
         }
 
-        const card = document.createElement("div");
-        card.className = "card-mesa " + (status === "ingresada" ? "ingresada" : (r.nombre ? "aprobada" : "libre"));
-
-        card.innerHTML = `
-          <div class="mesa-num">${num}</div>
-          <div class="mesa-titular">${nombre || 'Sin reserva'}</div>
-          <div><span class="mesa-pill p-${status === 'ingresada' ? 'ingresada' : (r.nombre ? 'aprobada' : 'libre')}">${status}</span></div>
-        `;
-
-        card.addEventListener("click", () => abrirCobroModal(id));
-        tablesGrid.appendChild(card);
+        btn.addEventListener("click", () => abrirCobroModal(table.id));
+        planoMesas.appendChild(btn);
       });
+
+      quickResults.style.display = (query && matches > 0) ? "flex" : "none";
     }
 
-    searchInput.addEventListener("input", renderGrid);
+    searchInput.addEventListener("input", renderMap);
 
     // Modal de Cobro
     const cobroModal = document.getElementById("cobroModal");
     const modalMesaTitle = document.getElementById("modalMesaTitle");
+    const modalStatusBadge = document.getElementById("modalStatusBadge");
     const modalTitular = document.getElementById("modalTitular");
     const saldoMontoDisplay = document.getElementById("saldoMontoDisplay");
     const senaPreviaText = document.getElementById("senaPreviaText");
+    const voucherBox = document.getElementById("voucherBox");
     const voucherContent = document.getElementById("voucherContent");
+    const modalNotaBox = document.getElementById("modalNotaBox");
+    const modalNotaText = document.getElementById("modalNotaText");
+    const cobroActions = document.getElementById("cobroActions");
     const btnCobroEfectivo = document.getElementById("btnCobroEfectivo");
     const btnCobroTransferencia = document.getElementById("btnCobroTransferencia");
+    const btnMarcarIngresadaDirecta = document.getElementById("btnMarcarIngresadaDirecta");
+    const yaIngresadaNotice = document.getElementById("yaIngresadaNotice");
     const btnCancelCobro = document.getElementById("btnCancelCobro");
 
     function abrirCobroModal(id) {
@@ -349,17 +642,70 @@
       const num = id.replace("T-", "");
       const r = reservasData[id] || {};
       const ex = r.excepcion || {};
+      const status = r.status || "libre";
 
       modalMesaTitle.textContent = "MESA " + num;
-      modalTitular.textContent = "Cliente: " + (r.nombre || "Sin nombre") + (r.contacto ? " (" + r.contacto + ")" : "");
+      modalTitular.textContent = "Cliente: " + (r.nombre || "Sin reserva asignada") + (r.contacto ? " — " + r.contacto : "");
 
-      const saldo = ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : 0;
+      // Badge de estado
+      modalStatusBadge.textContent = status.toUpperCase();
+      if (status === "ingresada") {
+        modalStatusBadge.style.background = "rgba(59, 130, 246, 0.2)";
+        modalStatusBadge.style.color = "var(--blue)";
+      } else if (["aprobada", "confirmada", "vendida", "ocupada"].includes(status)) {
+        modalStatusBadge.style.background = "rgba(225, 29, 72, 0.2)";
+        modalStatusBadge.style.color = "var(--red)";
+      } else if (["pendiente", "disputa", "seña", "sena"].includes(status)) {
+        modalStatusBadge.style.background = "rgba(255, 189, 62, 0.2)";
+        modalStatusBadge.style.color = "var(--gold)";
+      } else {
+        modalStatusBadge.style.background = "rgba(16, 185, 129, 0.2)";
+        modalStatusBadge.style.color = "var(--green)";
+      }
+
+      const saldo = ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : (r.saldoPuerta !== undefined ? r.saldoPuerta : 0);
       const sena = ex.senaPactada !== undefined ? ex.senaPactada : (r.montoSenado || 0);
 
-      saldoMontoDisplay.textContent = "$" + saldo.toLocaleString("es-AR");
-      senaPreviaText.textContent = "Seña previa registrada: $" + sena.toLocaleString("es-AR");
+      saldoMontoDisplay.textContent = "$" + Number(saldo).toLocaleString("es-AR");
+      senaPreviaText.textContent = "Seña previa: $" + Number(sena).toLocaleString("es-AR");
 
-      voucherContent.textContent = ex.bebidas ? ex.bebidas : "Sin bebidas bonificadas registradas";
+      // Vouchers
+      const bebidas = ex.bebidas || (r.vouchersBebida ? (r.vouchersBebida + " vouchers de bebida") : "");
+      if (bebidas) {
+        voucherContent.textContent = bebidas;
+        voucherBox.style.display = "block";
+      } else {
+        voucherContent.textContent = "Sin vouchers ni bebidas registradas";
+        voucherBox.style.display = "block";
+      }
+
+      // Nota
+      const nota = ex.nota || r.nota || "";
+      if (nota) {
+        modalNotaText.textContent = nota;
+        modalNotaBox.style.display = "block";
+      } else {
+        modalNotaBox.style.display = "none";
+      }
+
+      // Visibilidad de botones según estado y saldo
+      if (status === "ingresada") {
+        cobroActions.style.display = "none";
+        yaIngresadaNotice.style.display = "block";
+      } else {
+        cobroActions.style.display = "block";
+        yaIngresadaNotice.style.display = "none";
+
+        if (saldo === 0) {
+          btnCobroEfectivo.style.display = "none";
+          btnCobroTransferencia.style.display = "none";
+          btnMarcarIngresadaDirecta.style.display = "block";
+        } else {
+          btnCobroEfectivo.style.display = "block";
+          btnCobroTransferencia.style.display = "block";
+          btnMarcarIngresadaDirecta.style.display = "none";
+        }
+      }
 
       cobroModal.classList.add("open");
     }
@@ -373,10 +719,11 @@
       if (!activeMesaId) return;
       const r = reservasData[activeMesaId] || {};
       const ex = r.excepcion || {};
-      const saldo = ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : 0;
+      const saldo = ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : (r.saldoPuerta !== undefined ? r.saldoPuerta : 0);
 
       btnCobroEfectivo.disabled = true;
       btnCobroTransferencia.disabled = true;
+      btnMarcarIngresadaDirecta.disabled = true;
 
       try {
         // 1. Actualizar mesa en reservas_joseo
@@ -388,8 +735,8 @@
           cobradoPor: auth.currentUser.email
         }, { merge: true });
 
-        // 2. Registrar en caja_joseo
-        if (saldo > 0) {
+        // 2. Registrar en caja_joseo si hubo cobro
+        if (saldo > 0 && medioPago !== "sin_cobro") {
           await db.collection("caja_joseo").add({
             mesaId: activeMesaId,
             monto: saldo,
@@ -403,17 +750,19 @@
 
         cobroModal.classList.remove("open");
         activeMesaId = null;
-        alert("✅ Ingreso confirmado y cobro de $" + saldo.toLocaleString("es-AR") + " registrado.");
+        alert("✅ Ingreso confirmado." + (saldo > 0 ? " Cobro de $" + Number(saldo).toLocaleString("es-AR") + " registrado." : ""));
       } catch (err) {
         alert("Error al registrar cobro: " + err.message);
       } finally {
         btnCobroEfectivo.disabled = false;
         btnCobroTransferencia.disabled = false;
+        btnMarcarIngresadaDirecta.disabled = false;
       }
     }
 
     btnCobroEfectivo.addEventListener("click", () => registrarCobro("efectivo"));
     btnCobroTransferencia.addEventListener("click", () => registrarCobro("transferencia"));
+    btnMarcarIngresadaDirecta.addEventListener("click", () => registrarCobro("sin_cobro"));
   </script>
 </body>
 </html>

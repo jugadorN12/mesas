@@ -318,6 +318,9 @@
   <script>
     firebase.initializeApp({apiKey:"AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY",authDomain:"mesas-cubano-bar.firebaseapp.com",projectId:"mesas-cubano-bar",storageBucket:"mesas-cubano-bar.firebasestorage.app",messagingSenderId:"1072135346765",appId:"1:1072135346765:web:e8a6ee5497366a8b1f5a04"});
     const db = firebase.firestore();
+    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+      db.useEmulator("localhost", 8085);
+    }
 
     const TABLES_TERRAZA = [
       { id:"T-3",  num:"3",  x:10.9, y:35.4 },

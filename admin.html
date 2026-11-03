@@ -2233,6 +2233,9 @@
       try {
         secApp = firebase.initializeApp(FB_CONFIG, "JoseoSecAdmin_" + Date.now());
         const secAuth = secApp.auth();
+        if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+          secAuth.useEmulator("http://localhost:9099");
+        }
 
         await secAuth.createUserWithEmailAndPassword(email, pass);
 
