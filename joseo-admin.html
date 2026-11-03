@@ -449,7 +449,7 @@
   <div class="modal-overlay" id="calcModalOverlay">
     <div class="modal-box">
       <h2 id="calcModalTitle" style="font-family:'Bebas Neue',sans-serif; letter-spacing:1.5px; font-size:24px; margin:0 0 4px;">Calculadora — Mesa --</h2>
-      <p style="margin:0 0 16px; font-size:13px; color:var(--muted);">Configurá precios, señas, cobro en puerta y vouchers de bebidas.</p>
+      <p id="calcModalSubtitle" style="margin:0 0 16px; font-size:13px; color:var(--muted);">Configurá precios, señas, cobro en puerta y vouchers de bebidas.</p>
 
       <div class="calc-grid">
         <div>
@@ -612,7 +612,7 @@
           currentRole = role;
           loginView.style.display = "none";
           adminApp.style.display = "block";
-          adminRoleBadge.textContent = role === "admin_joseo" ? "ADMIN JOSEO" : (role === "admin" ? "SUPERADMIN" : "ASISTENTE JOSEO");
+          adminRoleBadge.textContent = role === "admin_joseo" ? "ADMIN JOSEO" : (role === "admin" ? "SUPERADMIN" : "ASISTENTE (SOLO LECTURA)");
 
           personalCard.style.display = (role === "admin_joseo" || role === "admin") ? "block" : "none";
 
@@ -702,6 +702,7 @@
         const saldo = ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : (r.saldoPuerta || 0);
         const sena = ex.senaPactada !== undefined ? ex.senaPactada : (r.montoSenado || 0);
 
+        const isReadOnly = (currentRole === "assistant_joseo");
         const row = document.createElement("div");
         row.className = "mesa-row";
         row.innerHTML = `
@@ -717,7 +718,7 @@
             ${saldo > 0 ? `<span style="color:var(--gold); font-weight:700;">Resta: $${Number(saldo).toLocaleString('es-AR')}</span>` : (r.nombre ? '<span style="color:var(--green)">Pagada</span>' : 'Libre')}
           </div>
           <div style="text-align:right;">
-            <button type="button" class="btn-calc" onclick="abrirCalculadora('${mesaId}')">Calculadora</button>
+            <button type="button" class="btn-calc" onclick="abrirCalculadora('${mesaId}')">${isReadOnly ? 'Ver Detalle' : 'Calculadora'}</button>
           </div>
         `;
         mesasListContainer.appendChild(row);
@@ -751,7 +752,15 @@
     window.abrirCalculadora = function(mesaId) {
       activeMesaId = mesaId;
       const num = mesaId.replace("T-", "");
-      calcModalTitle.textContent = "Calculadora — Mesa " + num;
+      const isReadOnly = (currentRole === "assistant_joseo");
+
+      calcModalTitle.textContent = isReadOnly ? ("Detalle — Mesa " + num) : ("Calculadora — Mesa " + num);
+      const sub = document.getElementById("calcModalSubtitle");
+      if (sub) {
+        sub.textContent = isReadOnly 
+          ? "Consulta de valores, señas y vouchers (modo solo lectura)." 
+          : "Configurá precios, señas, cobro en puerta y vouchers de bebidas.";
+      }
 
       const r = reservasJoseo[mesaId] || {};
       const ex = r.excepcion || {};
@@ -764,6 +773,18 @@
       calcBebidas.value = ex.bebidas || (r.vouchersBebida ? (r.vouchersBebida + " vouchers de bebida") : "");
       calcNota.value = ex.nota || r.nota || "";
 
+      // Deshabilitar campos si es asistente (modo solo lectura)
+      calcNombre.disabled = isReadOnly;
+      calcContacto.disabled = isReadOnly;
+      calcValorTotal.disabled = isReadOnly;
+      calcMontoSena.disabled = isReadOnly;
+      calcPersonas.disabled = isReadOnly;
+      calcBebidas.disabled = isReadOnly;
+      calcNota.disabled = isReadOnly;
+
+      btnSaveCalc.style.display = isReadOnly ? "none" : "block";
+      btnCancelCalc.textContent = isReadOnly ? "Cerrar" : "Cancelar";
+
       recalcularSaldo();
       calcModalOverlay.classList.add("open");
     };
@@ -775,6 +796,11 @@
 
     btnSaveCalc.addEventListener("click", async () => {
       if (!activeMesaId) return;
+
+      if (currentRole === "assistant_joseo") {
+        alert("Tu rol de Asistente es solo de lectura. No puedes modificar reservas.");
+        return;
+      }
 
       const total = Number(calcValorTotal.value) || 0;
       const sena = Number(calcMontoSena.value) || 0;
@@ -822,6 +848,10 @@
     const staffStatus = document.getElementById("staffStatus");
 
     btnCreateStaff.addEventListener("click", async () => {
+      if (currentRole !== "admin_joseo" && currentRole !== "admin") {
+        alert("Solo el Administrador de Joseo tiene potestad para crear cuentas de personal.");
+        return;
+      }
       const email = newStaffEmail.value.trim().toLowerCase();
       const pass = newStaffPassword.value;
       const role = newStaffRole.value;

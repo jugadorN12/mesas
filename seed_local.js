@@ -90,6 +90,9 @@ async function main() {
   await createAuthUser("admin@joseo.com", "123456");
   await setFirestoreUserRole("admin@joseo.com", "admin_joseo", "joseo");
 
+  await createAuthUser("asistente@joseo.com", "123456");
+  await setFirestoreUserRole("asistente@joseo.com", "assistant_joseo", "joseo");
+
   await createAuthUser("boleteria@joseo.com", "123456");
   await setFirestoreUserRole("boleteria@joseo.com", "boleteria_joseo", "joseo");
 

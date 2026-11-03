@@ -76,16 +76,17 @@ service cloud.firestore {
         && request.resource.data.nombre.size() > 0
         && request.resource.data.contacto is string
         && request.resource.data.ts is int)
-        || anyRole(['admin', 'admin_joseo', 'assistant_joseo', 'boleteria_joseo']);
+        || anyRole(['admin', 'admin_joseo', 'boleteria_joseo']);
 
-      allow update: if anyRole(['admin', 'admin_joseo', 'assistant_joseo', 'boleteria_joseo']);
+      allow update: if anyRole(['admin', 'admin_joseo', 'boleteria_joseo']);
 
-      allow delete: if anyRole(['admin', 'admin_joseo', 'assistant_joseo'])
+      allow delete: if anyRole(['admin', 'admin_joseo'])
         || (resource.data.status == 'disputa' && resource.data.expiresAt <= request.time.toMillis());
     }
 
     match /caja_joseo/{movimientoId} {
-      allow read, write: if anyRole(['admin', 'admin_joseo', 'assistant_joseo', 'boleteria_joseo']);
+      allow read: if anyRole(['admin', 'admin_joseo', 'assistant_joseo', 'boleteria_joseo']);
+      allow write: if anyRole(['admin', 'admin_joseo', 'boleteria_joseo']);
     }
   }
 }
