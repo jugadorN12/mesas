@@ -1,13 +1,22 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>Joseo - Panel de Control</title>
+  <meta name="theme-color" content="#ff7700">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Joseo Admin">
+  <link rel="manifest" href="manifest-joseo-admin.json">
+  <link rel="apple-touch-icon" href="icon-joseo-192.png">
   <link rel="stylesheet" href="shared.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap"
+    rel="stylesheet">
   <style>
     :root {
       --bg: #09090c;
@@ -23,7 +32,11 @@
       --line: rgba(255, 255, 255, 0.08);
       --grey-line: rgba(255, 255, 255, 0.14);
     }
-    * { box-sizing: border-box; }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       background: var(--bg);
@@ -31,6 +44,7 @@
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
     }
+
     .top-bar {
       padding: 14px 24px;
       display: flex;
@@ -42,13 +56,18 @@
       top: 0;
       z-index: 40;
     }
+
     .brand {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 24px;
       letter-spacing: 2px;
       color: #fff;
     }
-    .brand span { color: var(--gold); }
+
+    .brand span {
+      color: var(--gold);
+    }
+
     .badge-role {
       font-size: 11px;
       background: rgba(255, 189, 62, 0.15);
@@ -60,6 +79,7 @@
       letter-spacing: 0.5px;
       margin-left: 8px;
     }
+
     .btn-logout {
       background: transparent;
       border: 1px solid var(--grey-line);
@@ -71,7 +91,10 @@
       font-weight: 600;
       transition: background 0.2s;
     }
-    .btn-logout:hover { background: rgba(255, 255, 255, 0.08); }
+
+    .btn-logout:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
 
     .container {
       max-width: 900px;
@@ -88,11 +111,13 @@
       border-radius: 14px;
       padding: 20px 24px;
     }
+
     .card h2 {
       margin: 0 0 6px;
       font-size: 18px;
       color: #fff;
     }
+
     .card p {
       margin: 0 0 16px;
       color: var(--muted);
@@ -111,6 +136,7 @@
       cursor: pointer;
       transition: all 0.2s;
     }
+
     .btn-tab.active {
       background: rgba(255, 189, 62, 0.15);
       border-color: var(--gold);
@@ -129,6 +155,7 @@
       box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
       user-select: none;
     }
+
     .map-bg-layer {
       position: absolute;
       inset: 0;
@@ -138,6 +165,7 @@
       background-repeat: no-repeat;
       pointer-events: none;
     }
+
     #mapImg {
       position: relative;
       z-index: 1;
@@ -215,23 +243,28 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
       transition: transform 0.15s ease;
     }
+
     .table-btn:hover {
       transform: translate(-50%, -50%) scale(1.15);
       z-index: 25;
     }
+
     .table-btn:active {
       transform: translate(-50%, -50%) scale(0.95);
     }
+
     .table-btn.pending {
       background: linear-gradient(145deg, #ffcf58, #b66a08 55%, #613000);
       border-color: #ffbd3e;
       box-shadow: 0 0 8px rgba(255, 189, 62, 0.5);
     }
+
     .table-btn.approved {
       background: linear-gradient(145deg, #ff5b66, #d20e21 55%, #70000a);
       border-color: #ff2d3d;
       box-shadow: 0 0 8px rgba(225, 29, 72, 0.5);
     }
+
     .table-btn.ingresada {
       background: linear-gradient(145deg, #58a6ff, #0a56ad 55%, #002e61);
       border-color: #3b82f6;
@@ -248,12 +281,17 @@
       border-bottom: 1px solid var(--line);
       transition: background 0.15s;
     }
-    .mesa-row:hover { background: var(--card-hover); }
+
+    .mesa-row:hover {
+      background: var(--card-hover);
+    }
+
     .mesa-badge {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 20px;
       color: #fff;
     }
+
     .status-pill {
       display: inline-block;
       font-size: 11px;
@@ -262,10 +300,27 @@
       padding: 3px 8px;
       border-radius: 6px;
     }
-    .status-pill.libre { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-    .status-pill.pendiente { background: rgba(255, 189, 62, 0.15); color: #ffbd3e; }
-    .status-pill.aprobada, .status-pill.confirmada { background: rgba(225, 29, 72, 0.15); color: #e11d48; }
-    .status-pill.ingresada { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+
+    .status-pill.libre {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+    }
+
+    .status-pill.pendiente {
+      background: rgba(255, 189, 62, 0.15);
+      color: #ffbd3e;
+    }
+
+    .status-pill.aprobada,
+    .status-pill.confirmada {
+      background: rgba(225, 29, 72, 0.15);
+      color: #e11d48;
+    }
+
+    .status-pill.ingresada {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+    }
 
     .btn-calc {
       background: rgba(255, 189, 62, 0.15);
@@ -277,7 +332,11 @@
       font-weight: 700;
       cursor: pointer;
     }
-    .btn-calc:hover { background: var(--gold); color: #000; }
+
+    .btn-calc:hover {
+      background: var(--gold);
+      color: #000;
+    }
 
     /* Modal Calculadora */
     .modal-overlay {
@@ -291,7 +350,11 @@
       justify-content: center;
       padding: 16px;
     }
-    .modal-overlay.open { display: flex; }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
     .modal-box {
       width: 100%;
       max-width: 520px;
@@ -302,17 +365,21 @@
       max-height: 90vh;
       overflow-y: auto;
     }
+
     .calc-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
       margin-bottom: 14px;
     }
+
     .calc-grid label {
       display: block;
       margin-bottom: 4px;
     }
-    .calc-grid input, .calc-grid select {
+
+    .calc-grid input,
+    .calc-grid select {
       width: 100%;
       background: #060608;
       border: 1px solid var(--grey-line);
@@ -322,6 +389,7 @@
       font-size: 14px;
       box-sizing: border-box;
     }
+
     .calc-total {
       background: rgba(16, 185, 129, 0.1);
       border: 1px solid #10b981;
@@ -330,8 +398,19 @@
       margin: 16px 0;
       text-align: center;
     }
-    .calc-total h3 { margin: 0 0 4px; font-size: 13px; color: #10b981; text-transform: uppercase; }
-    .calc-total .amount { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #fff; }
+
+    .calc-total h3 {
+      margin: 0 0 4px;
+      font-size: 13px;
+      color: #10b981;
+      text-transform: uppercase;
+    }
+
+    .calc-total .amount {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      color: #fff;
+    }
 
     .btn-action {
       background: var(--gold);
@@ -353,11 +432,32 @@
       border: 1px solid var(--line);
       border-radius: 16px;
     }
-    .login-box h1 { margin: 0 0 8px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; }
-    .login-box h1 span { color: var(--gold); }
-    .login-box input { width: 100%; background: #060608; border: 1px solid var(--grey-line); border-radius: 8px; padding: 12px; color: #fff; margin-bottom: 14px; box-sizing: border-box; }
-    .login-box button { width: 100%; }
-  
+
+    .login-box h1 {
+      margin: 0 0 8px;
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 2px;
+    }
+
+    .login-box h1 span {
+      color: var(--gold);
+    }
+
+    .login-box input {
+      width: 100%;
+      background: #060608;
+      border: 1px solid var(--grey-line);
+      border-radius: 8px;
+      padding: 12px;
+      color: #fff;
+      margin-bottom: 14px;
+      box-sizing: border-box;
+    }
+
+    .login-box button {
+      width: 100%;
+    }
+
     /* Bloques de Configuración y Formularios */
     .config-block {
       background: rgba(255, 255, 255, 0.03);
@@ -366,24 +466,36 @@
       padding: 16px;
       margin-bottom: 14px;
     }
+
     .config-block-title {
       font-size: 13.5px;
       font-weight: 700;
       margin-bottom: 12px;
     }
-    .config-block-title.gold { color: var(--gold); }
-    .config-block-title.green { color: var(--green); }
-    .config-block-title.muted { color: var(--muted); }
+
+    .config-block-title.gold {
+      color: var(--gold);
+    }
+
+    .config-block-title.green {
+      color: var(--green);
+    }
+
+    .config-block-title.muted {
+      color: var(--muted);
+    }
 
     .form-row-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
+
     .form-group {
       display: flex;
       flex-direction: column;
     }
+
     .form-group label {
       font-size: 12px;
       color: var(--muted);
@@ -392,12 +504,15 @@
       line-height: 1.3;
       min-height: 18px;
     }
+
     .form-row-2 .form-group label {
       min-height: 32px;
       display: flex;
       align-items: flex-end;
     }
-    .form-group input, .form-group select {
+
+    .form-group input,
+    .form-group select {
       width: 100%;
       height: 44px;
       background: #060608;
@@ -410,7 +525,9 @@
       outline: none;
       transition: border-color 0.15s;
     }
-    .form-group input:focus, .form-group select:focus {
+
+    .form-group input:focus,
+    .form-group select:focus {
       border-color: var(--gold);
     }
 
@@ -419,17 +536,21 @@
       .container {
         padding: 12px 10px;
       }
+
       .card {
         padding: 14px 12px;
         border-radius: 12px;
       }
+
       .form-row-2 {
         grid-template-columns: 1fr;
         gap: 12px;
       }
+
       .form-row-2 .form-group label {
         min-height: auto;
       }
+
       .mesa-row {
         display: grid;
         grid-template-columns: 78px 1fr auto;
@@ -445,6 +566,7 @@
         border-radius: 8px;
         border: 1px solid var(--line);
       }
+
       .mesa-row .mesa-badge {
         grid-area: badge;
         align-self: center;
@@ -454,6 +576,7 @@
         font-weight: 800;
         letter-spacing: 0.5px;
       }
+
       .mesa-row .mesa-info-col {
         grid-area: info;
         min-width: 0;
@@ -461,32 +584,130 @@
         text-overflow: ellipsis;
         white-space: nowrap;
       }
+
       .mesa-row .mesa-status-col {
         grid-area: status;
         text-align: right;
       }
+
       .mesa-row .mesa-saldo-col {
         grid-area: saldo;
         font-size: 11.5px;
       }
+
       .mesa-row .mesa-action-col {
         grid-area: action;
         text-align: right;
       }
+
       .btn-calc {
         padding: 6px 12px;
         font-size: 11.5px;
       }
     }
+  
+    /* --- Banner de Invitación de Instalación PWA (Joseo) --- */
+    .pwa-install-banner {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 440px;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(16, 16, 20, 0.96);
+      border: 1px solid rgba(255, 119, 0, 0.45);
+      border-radius: 16px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.85), 0 0 24px rgba(255, 119, 0, 0.25);
+      backdrop-filter: blur(12px);
+      animation: pwaSlideUp 0.4s ease;
+    }
+    @keyframes pwaSlideUp {
+      from { transform: translate(-50%, 40px); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+    .pwa-install-banner.hidden {
+      display: none !important;
+    }
+    .pwa-install-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .pwa-install-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    .pwa-install-info strong {
+      display: block;
+      font-size: 13.5px;
+      color: #fff;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+    .pwa-install-info small {
+      display: block;
+      font-size: 11px;
+      color: #8f90a6;
+      margin-top: 3px;
+    }
+    .pwa-install-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .pwa-btn-install {
+      padding: 9px 16px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #ff7700, #ff4500);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255, 119, 0, 0.4);
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+    .pwa-btn-install:active {
+      transform: scale(0.96);
+    }
+    .pwa-btn-install:hover {
+      filter: brightness(1.15);
+    }
+    .pwa-btn-dismiss {
+      background: transparent;
+      border: none;
+      color: #8f90a6;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 6px;
+    }
+    .pwa-btn-dismiss:hover {
+      color: #fff;
+    }
 
   </style>
 </head>
+
 <body>
 
   <!-- Vista Login -->
   <div id="loginView" class="login-box">
     <h1>JOSEO <span>ADMIN</span></h1>
-    <p style="color:var(--muted); font-size:13px; margin:0 0 16px;">Ingresá con tu cuenta autorizada para gestionar las mesas de Joseo.</p>
+    <p style="color:var(--muted); font-size:13px; margin:0 0 16px;">Ingresá con tu cuenta autorizada para gestionar las
+      mesas de Joseo.</p>
     <label for="loginEmail" style="font-size:12px; color:var(--muted);">Email</label>
     <input type="email" id="loginEmail" placeholder="admin@joseo.com">
     <label for="loginPassword" style="font-size:12px; color:var(--muted);">Contraseña</label>
@@ -505,22 +726,32 @@
     <main class="container">
       <!-- Sección Mesas en Vivo con Plano Visual -->
       <section class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+        <div
+          style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
           <div>
             <h2 style="margin:0; font-size:18px;">📊 Mesas en Vivo — Terraza Joseo</h2>
-            <p style="margin:2px 0 0; font-size:12.5px; color:var(--muted);">Tocá cualquier mesa sobre el plano para abrir la calculadora de precios y cargar la reserva.</p>
+            <p style="margin:2px 0 0; font-size:12.5px; color:var(--muted);">Tocá cualquier mesa sobre el plano para
+              abrir la calculadora de precios y cargar la reserva.</p>
           </div>
           <div style="display:flex; gap:6px;">
-            <button type="button" id="btnViewMap" class="btn-tab active" onclick="switchView('map')">🗺️ Plano Visual</button>
-            <button type="button" id="btnViewList" class="btn-tab" onclick="switchView('list')">📋 Lista Resumen</button>
+            <button type="button" id="btnViewMap" class="btn-tab active" onclick="switchView('map')">🗺️ Plano
+              Visual</button>
+            <button type="button" id="btnViewList" class="btn-tab" onclick="switchView('list')">📋 Lista
+              Resumen</button>
           </div>
         </div>
 
-        <div class="legend" style="display:flex; justify-content:center; gap:16px; margin: 12px 0 16px; font-size:12px; color:var(--muted); flex-wrap:wrap;">
-          <span style="display:flex; align-items:center; gap:5px;"><span class="dot free" style="width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);"></span>Libre</span>
-          <span style="display:flex; align-items:center; gap:5px;"><span class="dot pending" style="width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold);"></span>Señada</span>
-          <span style="display:flex; align-items:center; gap:5px;"><span class="dot approved" style="width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 6px var(--red);"></span>Vendida</span>
-          <span style="display:flex; align-items:center; gap:5px;"><span class="dot ingresada" style="width:9px;height:9px;border-radius:50%;background:var(--blue);box-shadow:0 0 6px var(--blue);"></span>Dentro (Puerta)</span>
+        <div class="legend"
+          style="display:flex; justify-content:center; gap:16px; margin: 12px 0 16px; font-size:12px; color:var(--muted); flex-wrap:wrap;">
+          <span style="display:flex; align-items:center; gap:5px;"><span class="dot free"
+              style="width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);"></span>Libre</span>
+          <span style="display:flex; align-items:center; gap:5px;"><span class="dot pending"
+              style="width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold);"></span>Señada</span>
+          <span style="display:flex; align-items:center; gap:5px;"><span class="dot approved"
+              style="width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 6px var(--red);"></span>Vendida</span>
+          <span style="display:flex; align-items:center; gap:5px;"><span class="dot ingresada"
+              style="width:9px;height:9px;border-radius:50%;background:var(--blue);box-shadow:0 0 6px var(--blue);"></span>Dentro
+            (Puerta)</span>
         </div>
 
         <!-- Vista 1: Mapa Interactivo -->
@@ -547,15 +778,18 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr 120px auto; gap: 10px; align-items: flex-end;">
           <div>
             <label style="font-size: 12px; color: var(--muted);">Email del nuevo usuario</label>
-            <input type="email" id="newStaffEmail" placeholder="personal@joseo.com" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+            <input type="email" id="newStaffEmail" placeholder="personal@joseo.com"
+              style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
           </div>
           <div>
             <label style="font-size: 12px; color: var(--muted);">Contraseña (mínimo 6)</label>
-            <input type="password" id="newStaffPassword" placeholder="••••••••" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+            <input type="password" id="newStaffPassword" placeholder="••••••••"
+              style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
           </div>
           <div>
             <label style="font-size: 12px; color: var(--muted);">Rol</label>
-            <select id="newStaffRole" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+            <select id="newStaffRole"
+              style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
               <option value="boleteria_joseo">Boletería</option>
               <option value="assistant_joseo">Asistente</option>
             </select>
@@ -568,7 +802,8 @@
       <!-- Sección Datos de Pago y Contacto de Joseo (Solo Admin) -->
       <section class="card" id="pagoCard" style="display: none;">
         <h2>💳 Configuración de Mesas: Precios, Beneficios de Consumo y Cobro</h2>
-        <p>Configurá el valor estándar de las mesas, el monto de la seña, el reintegro en consumo según horario de llegada y tus datos de pago/WhatsApp.</p>
+        <p>Configurá el valor estándar de las mesas, el monto de la seña, el reintegro en consumo según horario de
+          llegada y tus datos de pago/WhatsApp.</p>
 
         <!-- Bloque 1: Precios de Mesas y Seña -->
         <div class="config-block">
@@ -632,7 +867,8 @@
         </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <button type="button" class="btn-action" id="btnSavePagoConfig" style="width:100%; max-width:320px;">Guardar Precios, Beneficios y Cobro</button>
+          <button type="button" class="btn-action" id="btnSavePagoConfig" style="width:100%; max-width:320px;">Guardar
+            Precios, Beneficios y Cobro</button>
           <span id="pagoConfigStatus" style="font-size: 13px; font-weight:700;"></span>
         </div>
       </section>
@@ -642,8 +878,11 @@
   <!-- Modal Calculadora de Mesa / Excepción -->
   <div class="modal-overlay" id="calcModalOverlay">
     <div class="modal-box">
-      <h2 id="calcModalTitle" style="font-family:'Bebas Neue',sans-serif; letter-spacing:1.5px; font-size:24px; margin:0 0 4px;">Calculadora — Mesa --</h2>
-      <p id="calcModalSubtitle" style="margin:0 0 16px; font-size:13px; color:var(--muted);">Configurá precios, señas, cobro en puerta y vouchers de bebidas.</p>
+      <h2 id="calcModalTitle"
+        style="font-family:'Bebas Neue',sans-serif; letter-spacing:1.5px; font-size:24px; margin:0 0 4px;">Calculadora —
+        Mesa --</h2>
+      <p id="calcModalSubtitle" style="margin:0 0 16px; font-size:13px; color:var(--muted);">Configurá precios, señas,
+        cobro en puerta y vouchers de bebidas.</p>
 
       <div class="calc-grid">
         <div>
@@ -680,7 +919,8 @@
 
       <div>
         <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">Nota interna</label>
-        <input type="text" id="calcNota" placeholder="Ej.: Viene con invitado especial" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px 12px; color:#fff; box-sizing:border-box;">
+        <input type="text" id="calcNota" placeholder="Ej.: Viene con invitado especial"
+          style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px 12px; color:#fff; box-sizing:border-box;">
       </div>
 
       <div class="calc-total">
@@ -689,8 +929,10 @@
       </div>
 
       <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button type="button" class="btn-action" style="background: rgba(255,255,255,0.1); color:#fff; flex:1;" id="btnCancelCalc">Cerrar</button>
-        <button type="button" class="btn-action" style="background: #e11d48; color:#fff; flex:1.2; display:none;" id="btnLiberarMesa">🔓 Liberar Mesa</button>
+        <button type="button" class="btn-action" style="background: rgba(255,255,255,0.1); color:#fff; flex:1;"
+          id="btnCancelCalc">Cerrar</button>
+        <button type="button" class="btn-action" style="background: #e11d48; color:#fff; flex:1.2; display:none;"
+          id="btnLiberarMesa">🔓 Liberar Mesa</button>
         <button type="button" class="btn-action" style="flex:2;" id="btnSaveCalc">Guardar Reserva</button>
       </div>
     </div>
@@ -700,7 +942,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script>
-    const firebaseConfig = {apiKey:"AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY",authDomain:"mesas-cubano-bar.firebaseapp.com",projectId:"mesas-cubano-bar",storageBucket:"mesas-cubano-bar.firebasestorage.app",messagingSenderId:"1072135346765",appId:"1:1072135346765:web:e8a6ee5497366a8b1f5a04"};
+    const firebaseConfig = { apiKey: "AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY", authDomain: "mesas-cubano-bar.firebaseapp.com", projectId: "mesas-cubano-bar", storageBucket: "mesas-cubano-bar.firebasestorage.app", messagingSenderId: "1072135346765", appId: "1:1072135346765:web:e8a6ee5497366a8b1f5a04" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
@@ -732,30 +974,30 @@
 
     // Coordenadas exactas en terraza.png
     const TABLES_TERRAZA = [
-      { id:"T-3",  num:"3",  x:11.1, y:36.3 },
-      { id:"T-4",  num:"4",  x:19.2, y:34.6 },
-      { id:"T-5",  num:"5",  x:26.4, y:34.6 },
-      { id:"T-6",  num:"6",  x:49.3, y:36.9 },
-      { id:"T-7",  num:"7",  x:37.1, y:41.9 },
-      { id:"T-A",  num:"A",  x:24.0, y:46.1 },
-      { id:"T-B",  num:"B",  x:36.8, y:46.1 },
-      { id:"T-C",  num:"C",  x:49.3, y:46.1 },
-      { id:"T-D",  num:"D",  x:36.8, y:52.6 },
-      { id:"T-E",  num:"E",  x:49.3, y:52.6 },
-      { id:"T-2",  num:"2",  x:11.1, y:43.7 },
-      { id:"T-1",  num:"1",  x:11.1, y:50.9 },
-      { id:"T-8",  num:"8",  x:18.6, y:52.8 },
-      { id:"T-16", num:"16", x:72.3, y:34.2 },
-      { id:"T-17", num:"17", x:77.6, y:40.9 },
-      { id:"T-18", num:"18", x:77.4, y:45.9 },
-      { id:"T-19", num:"19", x:77.6, y:50.9 },
-      { id:"T-15", num:"15", x:89.9, y:41.3 },
-      { id:"T-9",  num:"9",  x:30.1, y:64.8 },
-      { id:"T-10", num:"10", x:39.0, y:64.8 },
-      { id:"T-11", num:"11", x:48.0, y:64.9 },
-      { id:"T-12", num:"12", x:57.0, y:64.8 },
-      { id:"T-13", num:"13", x:80.8, y:64.8 },
-      { id:"T-14", num:"14", x:88.4, y:64.8 }
+      { id: "T-3", num: "3", x: 11.1, y: 36.3 },
+      { id: "T-4", num: "4", x: 19.2, y: 34.6 },
+      { id: "T-5", num: "5", x: 26.4, y: 34.6 },
+      { id: "T-6", num: "6", x: 49.3, y: 36.9 },
+      { id: "T-7", num: "7", x: 37.1, y: 41.9 },
+      { id: "T-A", num: "A", x: 24.0, y: 46.1 },
+      { id: "T-B", num: "B", x: 36.8, y: 46.1 },
+      { id: "T-C", num: "C", x: 49.3, y: 46.1 },
+      { id: "T-D", num: "D", x: 36.8, y: 52.6 },
+      { id: "T-E", num: "E", x: 49.3, y: 52.6 },
+      { id: "T-2", num: "2", x: 11.1, y: 43.7 },
+      { id: "T-1", num: "1", x: 11.1, y: 50.9 },
+      { id: "T-8", num: "8", x: 18.6, y: 52.8 },
+      { id: "T-16", num: "16", x: 72.3, y: 34.2 },
+      { id: "T-17", num: "17", x: 77.6, y: 40.9 },
+      { id: "T-18", num: "18", x: 77.4, y: 45.9 },
+      { id: "T-19", num: "19", x: 77.6, y: 50.9 },
+      { id: "T-15", num: "15", x: 89.9, y: 41.3 },
+      { id: "T-9", num: "9", x: 30.1, y: 64.8 },
+      { id: "T-10", num: "10", x: 39.0, y: 64.8 },
+      { id: "T-11", num: "11", x: 48.0, y: 64.9 },
+      { id: "T-12", num: "12", x: 57.0, y: 64.8 },
+      { id: "T-13", num: "13", x: 80.8, y: 64.8 },
+      { id: "T-14", num: "14", x: 88.4, y: 64.8 }
     ];
 
     let currentRole = null;
@@ -763,7 +1005,7 @@
     let configJoseo = {};
     let activeMesaId = null;
 
-    window.switchView = function(view) {
+    window.switchView = function (view) {
       if (view === 'map') {
         adminMapView.style.display = 'block';
         adminListView.style.display = 'none';
@@ -971,7 +1213,7 @@
     calcValorTotal.addEventListener("input", recalcularSaldo);
     calcMontoSena.addEventListener("input", recalcularSaldo);
 
-    window.abrirCalculadora = function(mesaId) {
+    window.abrirCalculadora = function (mesaId) {
       activeMesaId = mesaId;
       const num = mesaId.replace("T-", "");
 
@@ -1199,5 +1441,82 @@
       }
     });
   </script>
+
+  <!-- Banner flotante para invitación a instalar PWA (Admin) -->
+  <div id="pwaAdminInstallBanner" class="pwa-install-banner hidden" role="dialog" aria-label="Instalar panel">
+    <div class="pwa-install-info">
+      <img src="icon-joseo-192.png" alt="Joseo Admin" class="pwa-install-icon">
+      <div>
+        <strong>Panel Joseo Terrace</strong>
+        <small id="pwaAdminInstructionText">Instalá el panel para gestionar en 1 toque</small>
+      </div>
+    </div>
+    <div class="pwa-install-actions">
+      <button id="pwaAdminInstallBtn" type="button" class="pwa-btn-install">Instalar</button>
+      <button id="pwaAdminDismissBtn" type="button" class="pwa-btn-dismiss" aria-label="Cerrar">✕</button>
+    </div>
+  </div>
+
+  <script>
+    // Service Worker y soporte PWA Admin
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => {
+          console.log('SW registration note:', err);
+        });
+      });
+    }
+
+    let deferredAdminInstallPrompt;
+    const pwaAdminBanner = document.getElementById('pwaAdminInstallBanner');
+    const pwaAdminInstallBtn = document.getElementById('pwaAdminInstallBtn');
+    const pwaAdminDismissBtn = document.getElementById('pwaAdminDismissBtn');
+    const pwaAdminInstructionText = document.getElementById('pwaAdminInstructionText');
+
+    const isAdminStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    const isAdminDismissed = sessionStorage.getItem('pwa_admin_prompt_dismissed_joseo');
+
+    if (!isAdminStandalone && !isAdminDismissed) {
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredAdminInstallPrompt = e;
+        if (pwaAdminBanner) pwaAdminBanner.classList.remove('hidden');
+      });
+
+      if (pwaAdminInstallBtn) {
+        pwaAdminInstallBtn.addEventListener('click', async () => {
+          if (deferredAdminInstallPrompt) {
+            deferredAdminInstallPrompt.prompt();
+            const { outcome } = await deferredAdminInstallPrompt.userChoice;
+            if (outcome === 'accepted') {
+              if (pwaAdminBanner) pwaAdminBanner.classList.add('hidden');
+            }
+            deferredAdminInstallPrompt = null;
+          } else {
+            alert("Para instalar en iPhone: tocá el botón Compartir de Safari y seleccioná 'Agregar al inicio'.");
+          }
+        });
+      }
+
+      if (pwaAdminDismissBtn) {
+        pwaAdminDismissBtn.addEventListener('click', () => {
+          if (pwaAdminBanner) pwaAdminBanner.classList.add('hidden');
+          sessionStorage.setItem('pwa_admin_prompt_dismissed_joseo', '1');
+        });
+      }
+
+      const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+      if (isIos && !isAdminStandalone) {
+        setTimeout(() => {
+          if (pwaAdminBanner && !sessionStorage.getItem('pwa_admin_prompt_dismissed_joseo')) {
+            if (pwaAdminInstructionText) pwaAdminInstructionText.textContent = "Tocá Compartir y 'Agregar al inicio'";
+            if (pwaAdminInstallBtn) pwaAdminInstallBtn.textContent = "¿Cómo?";
+            pwaAdminBanner.classList.remove('hidden');
+          }
+        }, 3000);
+      }
+    }
+  </script>
 </body>
+
 </html>

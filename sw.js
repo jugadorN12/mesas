@@ -1,11 +1,15 @@
-// Service Worker para Cubano Bar (PWA)
-const CACHE_NAME = 'cubanobar-v6';
+// Service Worker para Cubano Bar y Joseo Terrace (PWA)
+const CACHE_NAME = 'mesas-v7';
 const STATIC_ASSETS = [
   './shared.css',
   './manifest.json',
   './manifest-admin.json',
+  './manifest-joseo.json',
+  './manifest-joseo-admin.json',
   './icon-192.png',
-  './icon-512.png'
+  './icon-512.png',
+  './icon-joseo-192.png',
+  './icon-joseo-512.png'
 ];
 
 // Instalación: Guardar recursos estáticos en caché

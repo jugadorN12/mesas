@@ -1,0 +1,25 @@
+{
+  "name": "Joseo Terrace — Administración",
+  "short_name": "Joseo Admin",
+  "description": "Panel de administración y control de mesas de Joseo Terrace",
+  "start_url": "/joseo-admin",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#060608",
+  "theme_color": "#ff7700",
+  "icons": [
+    {
+      "src": "icon-joseo-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-joseo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
