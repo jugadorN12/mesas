@@ -12,7 +12,7 @@
     :root {
       --bg: #060608;
       --card: #0e0e14;
-      --gold: #ffbd3e;
+      --gold: #ff7700;
       --green: #10b981;
       --red: #e11d48;
       --blue: #3b82f6;
@@ -199,7 +199,7 @@
       justify-content: center;
       padding: 0 16px;
       border-radius: 8px;
-      border: 1.5px solid rgba(255, 189, 62, 0.6);
+      border: 1.5px solid rgba(255, 119, 0, 0.6);
       background: rgba(8, 8, 12, 0.92);
       color: #fff;
       font-family: 'Bebas Neue', sans-serif;
@@ -240,9 +240,9 @@
       transform: translate(-50%, -50%) scale(0.95);
     }
     .table-btn.pending {
-      background: linear-gradient(145deg, #ffcf58, #b66a08 55%, #613000);
-      border-color: #ffbd3e;
-      box-shadow: 0 0 8px rgba(255, 189, 62, 0.5);
+      background: linear-gradient(145deg, #ffa858, #d45900 55%, #662600);
+      border-color: #ff7700;
+      box-shadow: 0 0 8px rgba(255, 119, 0, 0.5);
     }
     .table-btn.approved {
       background: linear-gradient(145deg, #ff5b66, #d20e21 55%, #70000a);
@@ -260,8 +260,8 @@
       border: 2px solid #fff;
     }
     @keyframes pulseGlow {
-      0% { transform: translate(-50%, -50%) scale(1.15); box-shadow: 0 0 12px #ffbd3e; }
-      100% { transform: translate(-50%, -50%) scale(1.45); box-shadow: 0 0 25px #ffbd3e, 0 0 35px #ffbd3e; }
+      0% { transform: translate(-50%, -50%) scale(1.15); box-shadow: 0 0 12px #ff7700; }
+      100% { transform: translate(-50%, -50%) scale(1.45); box-shadow: 0 0 25px #ff7700, 0 0 35px #ff7700; }
     }
 
     /* Modal de Cobro */
@@ -289,7 +289,7 @@
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
     }
     .saldo-box {
-      background: rgba(255, 189, 62, 0.12);
+      background: rgba(255, 119, 0, 0.12);
       border: 1px solid var(--gold);
       border-radius: 12px;
       padding: 16px;
@@ -332,7 +332,7 @@
     .login-wrap h1 { margin: 0 0 16px; font-size: 22px; text-align: center; font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; }
     .login-wrap h1 span { color: var(--gold); }
     .login-wrap input { width: 100%; background: #060608; border: 1px solid var(--grey-line); border-radius: 8px; padding: 12px; color: #fff; margin-bottom: 12px; box-sizing: border-box; }
-    .login-wrap button { width: 100%; padding: 12px; background: var(--gold); color: #000; font-weight: 800; border: none; border-radius: 8px; cursor: pointer; }
+    .login-wrap button { width: 100%; padding: 12px; background: var(--gold); color: #fff; font-weight: 800; border: none; border-radius: 8px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -663,7 +663,7 @@
         modalStatusBadge.style.background = "rgba(225, 29, 72, 0.2)";
         modalStatusBadge.style.color = "var(--red)";
       } else if (["pendiente", "disputa", "seña", "sena"].includes(status)) {
-        modalStatusBadge.style.background = "rgba(255, 189, 62, 0.2)";
+        modalStatusBadge.style.background = "rgba(255, 119, 0, 0.2)";
         modalStatusBadge.style.color = "var(--gold)";
       } else {
         modalStatusBadge.style.background = "rgba(16, 185, 129, 0.2)";
@@ -706,7 +706,7 @@
         consumoDetalleRegla.textContent = "Aplica reintegro completo del " + pctAplicable + "% del valor total de la mesa ($" + Number(totalMesa).toLocaleString("es-AR") + ").";
       } else {
         consumoBadge.textContent = "🟡 FUERA DE HORARIO (" + horaStr + " hs — DESPUÉS DE LAS " + limite + " AM)";
-        consumoBadge.style.background = "rgba(255, 189, 62, 0.2)";
+        consumoBadge.style.background = "rgba(255, 119, 0, 0.2)";
         consumoBadge.style.color = "var(--gold)";
         consumoMontoCalculado.style.color = "var(--gold)";
         consumoMontoCalculado.textContent = "$" + Number(montoConsumo).toLocaleString("es-AR") + " en consumo (" + pctAplicable + "% reintegro)";

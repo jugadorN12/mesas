@@ -22,8 +22,8 @@
       --bg: #09090c;
       --card: #111116;
       --card-hover: #171720;
-      --gold: #ffbd3e;
-      --gold-dark: #b8860b;
+      --gold: #ff7700;
+      --gold-dark: #cc5500;
       --red: #e11d48;
       --green: #10b981;
       --blue: #3b82f6;
@@ -70,7 +70,7 @@
 
     .badge-role {
       font-size: 11px;
-      background: rgba(255, 189, 62, 0.15);
+      background: rgba(255, 119, 0, 0.15);
       border: 1px solid var(--gold);
       color: var(--gold);
       padding: 4px 10px;
@@ -138,7 +138,7 @@
     }
 
     .btn-tab.active {
-      background: rgba(255, 189, 62, 0.15);
+      background: rgba(255, 119, 0, 0.15);
       border-color: var(--gold);
       color: var(--gold);
     }
@@ -210,7 +210,7 @@
       justify-content: center;
       padding: 0 16px;
       border-radius: 8px;
-      border: 1.5px solid rgba(255, 189, 62, 0.6);
+      border: 1.5px solid rgba(255, 119, 0, 0.6);
       background: rgba(8, 8, 12, 0.92);
       color: #fff;
       font-family: 'Bebas Neue', sans-serif;
@@ -254,9 +254,9 @@
     }
 
     .table-btn.pending {
-      background: linear-gradient(145deg, #ffcf58, #b66a08 55%, #613000);
-      border-color: #ffbd3e;
-      box-shadow: 0 0 8px rgba(255, 189, 62, 0.5);
+      background: linear-gradient(145deg, #ffa858, #d45900 55%, #662600);
+      border-color: #ff7700;
+      box-shadow: 0 0 8px rgba(255, 119, 0, 0.5);
     }
 
     .table-btn.approved {
@@ -307,8 +307,8 @@
     }
 
     .status-pill.pendiente {
-      background: rgba(255, 189, 62, 0.15);
-      color: #ffbd3e;
+      background: rgba(255, 119, 0, 0.15);
+      color: #ff7700;
     }
 
     .status-pill.aprobada,
@@ -323,7 +323,7 @@
     }
 
     .btn-calc {
-      background: rgba(255, 189, 62, 0.15);
+      background: rgba(255, 119, 0, 0.15);
       border: 1px solid var(--gold);
       color: var(--gold);
       padding: 6px 12px;
@@ -1291,7 +1291,7 @@
         btnSavePagoConfig.disabled = true;
         if (pagoConfigStatus) {
           pagoConfigStatus.textContent = "⏳ Guardando...";
-          pagoConfigStatus.style.color = "#ffbd3e";
+          pagoConfigStatus.style.color = "#ff7700";
         }
         try {
           const cfgValorMesa = document.getElementById("cfgValorMesa");
