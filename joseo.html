@@ -847,6 +847,37 @@
       } else if (btnFloatingWa) {
         btnFloatingWa.style.display = "none";
       }
+
+      // Si el modal de reserva está abierto al momento del cambio, actualizar datos en vivo al instante
+      if (typeof modalOverlay !== "undefined" && modalOverlay.classList.contains("open") && selectedTable) {
+        const total = configJoseo.valorMesa !== undefined ? configJoseo.valorMesa : 300000;
+        const sena = configJoseo.montoSena !== undefined ? configJoseo.montoSena : 50000;
+        const saldo = Math.max(0, total - sena);
+        const limite = configJoseo.horarioLimite || "03:00";
+        const pctAntes = configJoseo.porcentajeAntes !== undefined ? configJoseo.porcentajeAntes : 100;
+        const pctDespues = configJoseo.porcentajeDespues !== undefined ? configJoseo.porcentajeDespues : 75;
+        const montoAntes = Math.round((total * pctAntes) / 100);
+        const montoDespues = Math.round((total * pctDespues) / 100);
+
+        if (cardTotalMesa) cardTotalMesa.textContent = "$" + Number(total).toLocaleString("es-AR");
+        if (cardSenaMesa) cardSenaMesa.textContent = "$" + Number(sena).toLocaleString("es-AR");
+        if (cardSaldoPuerta) cardSaldoPuerta.textContent = "$" + Number(saldo).toLocaleString("es-AR");
+        if (txtHoraLimite) txtHoraLimite.textContent = limite + " AM";
+        if (txtPctAntes) txtPctAntes.textContent = pctAntes + "%";
+        if (txtMontoAntes) txtMontoAntes.textContent = "$" + Number(montoAntes).toLocaleString("es-AR");
+        if (txtHoraLimiteDespues) txtHoraLimiteDespues.textContent = limite + " AM";
+        if (txtPctDespues) txtPctDespues.textContent = pctDespues + "%";
+        if (txtMontoDespues) txtMontoDespues.textContent = "$" + Number(montoDespues).toLocaleString("es-AR");
+
+        if (cardBeneficiosExtra) {
+          if (configJoseo.beneficiosExtra) {
+            cardBeneficiosExtra.textContent = "🎁 Extra: " + configJoseo.beneficiosExtra;
+            cardBeneficiosExtra.style.display = "block";
+          } else {
+            cardBeneficiosExtra.style.display = "none";
+          }
+        }
+      }
     });
 
     // Escuchar Reservas de Joseo

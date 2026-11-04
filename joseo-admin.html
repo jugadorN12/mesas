@@ -973,9 +973,25 @@
           </div>
         </div>
 
+        <!-- Bloque 4: Diseño Visual y Fecha del Evento -->
+        <div class="config-block">
+          <div class="config-block-title" style="color: var(--gold);">🎨 Diseño Visual y Fecha del Evento (En Vivo)</div>
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label for="cfgEventDate">Fecha del Evento (Texto del cartelito superior)</label>
+            <input type="text" id="cfgEventDate" placeholder="Ej.: SABADO 21 NOV">
+          </div>
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label for="cfgLogoUrl">URL pública del Logo del Evento (Opcional, formato PNG transparente)</label>
+            <input type="url" id="cfgLogoUrl" placeholder="https://res.cloudinary.com/... o vacío para quitarlo">
+          </div>
+          <div class="form-group">
+            <label for="cfgBgUrl">URL pública del Fondo Temático (Opcional, detrás del plano)</label>
+            <input type="url" id="cfgBgUrl" placeholder="https://res.cloudinary.com/... o vacío para quitarlo">
+          </div>
+        </div>
+
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <button type="button" class="btn-action" id="btnSavePagoConfig" style="width:100%; max-width:320px;">Guardar
-            Precios, Beneficios y Cobro</button>
+          <button type="button" class="btn-action" id="btnSavePagoConfig" style="width:100%; max-width:340px;">Guardar Configuración y Diseño en Vivo</button>
           <span id="pagoConfigStatus" style="font-size: 13px; font-weight:700;"></span>
         </div>
       </section>
@@ -1228,6 +1244,14 @@
 
         if (cfgAlias) cfgAlias.value = c.alias || "";
         if (cfgTitular) cfgTitular.value = c.titular || "";
+
+        const cfgEventDate = document.getElementById("cfgEventDate");
+        const cfgLogoUrl = document.getElementById("cfgLogoUrl");
+        const cfgBgUrl = document.getElementById("cfgBgUrl");
+
+        if (cfgEventDate) cfgEventDate.value = c.eventDate || c.terraceDate || "";
+        if (cfgLogoUrl) cfgLogoUrl.value = c.logoUrl || "";
+        if (cfgBgUrl) cfgBgUrl.value = c.bgUrl || "";
         if (cfgCbu) cfgCbu.value = c.cbu || "";
         if (cfgWhatsapp) cfgWhatsapp.value = c.whatsapp || "";
       });
@@ -1502,6 +1526,10 @@
             titular: cfgTitular ? cfgTitular.value.trim() : "",
             cbu: cfgCbu ? cfgCbu.value.trim() : "",
             whatsapp: cfgWhatsapp ? cfgWhatsapp.value.trim() : "",
+            eventDate: document.getElementById("cfgEventDate") ? document.getElementById("cfgEventDate").value.trim() : "",
+            terraceDate: document.getElementById("cfgEventDate") ? document.getElementById("cfgEventDate").value.trim() : "",
+            logoUrl: document.getElementById("cfgLogoUrl") ? document.getElementById("cfgLogoUrl").value.trim() : "",
+            bgUrl: document.getElementById("cfgBgUrl") ? document.getElementById("cfgBgUrl").value.trim() : "",
             updatedAt: Date.now(),
             updatedBy: auth.currentUser.email
           }, { merge: true });
