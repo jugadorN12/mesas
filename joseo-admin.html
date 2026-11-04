@@ -445,38 +445,75 @@
 
       <!-- Sección Datos de Pago y Contacto de Joseo (Solo Admin) -->
       <section class="card" id="pagoCard" style="display: none;">
-        <h2>💳 Datos de Cobro y Contacto (Transferencias y WhatsApp)</h2>
-        <p>Estos datos se mostrarán a los clientes en el mapa público al reservar su mesa y en el botón de WhatsApp.</p>
+        <h2>💳 Configuración de Mesas: Precios, Beneficios de Consumo y Cobro</h2>
+        <p>Configurá el valor estándar de las mesas, el monto de la seña, el reintegro en consumo según horario de llegada y tus datos de pago/WhatsApp.</p>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-          <div>
-            <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">Alias de transferencia</label>
-            <input type="text" id="cfgAlias" placeholder="joseo.terraza.mp" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
-          </div>
-          <div>
-            <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">Titular de la cuenta</label>
-            <input type="text" id="cfgTitular" placeholder="Joseo Eventos / Nombre del titular" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+        <!-- Bloque 1: Precios de Mesas y Seña -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--grey-line); border-radius: 10px; padding: 14px; margin-bottom: 14px;">
+          <div style="font-size: 13px; font-weight: 700; color: var(--gold); margin-bottom: 10px;">🏷️ Valor de Mesas y Seña</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">Valor total estándar de la mesa ($)</label>
+              <input type="number" id="cfgValorMesa" placeholder="300000" step="5000" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">Monto de seña fija para reservar ($)</label>
+              <input type="number" id="cfgMontoSena" placeholder="50000" step="5000" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+            </div>
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-          <div>
-            <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">CBU / CVU (Opcional)</label>
-            <input type="text" id="cfgCbu" placeholder="00000031000..." style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+        <!-- Bloque 2: Reglas de Beneficios en Consumo por Horario -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--grey-line); border-radius: 10px; padding: 14px; margin-bottom: 14px;">
+          <div style="font-size: 13px; font-weight: 700; color: #10b981; margin-bottom: 10px;">🍹 Beneficios de Consumo por Horario de Ingreso</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 10px;">
+            <div>
+              <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">Horario límite (ej. 03:00)</label>
+              <input type="text" id="cfgHorarioLimite" placeholder="03:00" maxlength="5" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">% Consumo ANTES del horario</label>
+              <input type="number" id="cfgPorcentajeAntes" placeholder="100" min="0" max="100" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">% Consumo DESPUÉS del horario</label>
+              <input type="number" id="cfgPorcentajeDespues" placeholder="75" min="0" max="100" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+            </div>
           </div>
           <div>
-            <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">Monto de seña fija por mesa ($)</label>
-            <input type="number" id="cfgMontoSena" placeholder="50000" step="1000" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+            <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">Beneficios adicionales (opcional)</label>
+            <input type="text" id="cfgBeneficiosExtra" placeholder="Ej.: 4 precintos VIP + atención de mozo" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
           </div>
         </div>
 
-        <div style="margin-bottom: 16px;">
-          <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">Número de WhatsApp para consultas y comprobantes (sin 0 ni 15, ej.: 5491123456789)</label>
-          <input type="tel" id="cfgWhatsapp" placeholder="5491123456789" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+        <!-- Bloque 3: Datos de Transferencia y WhatsApp -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--grey-line); border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+          <div style="font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 10px;">🏦 Datos Bancarios y WhatsApp</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">Alias de transferencia</label>
+              <input type="text" id="cfgAlias" placeholder="joseo.terraza.mp" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">Titular de la cuenta</label>
+              <input type="text" id="cfgTitular" placeholder="Joseo Eventos / Nombre del titular" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">CBU / CVU (Opcional)</label>
+              <input type="text" id="cfgCbu" placeholder="00000031000..." style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="font-size: 12px; color: var(--muted); display:block; margin-bottom:4px;">WhatsApp (con código de país, ej. 5491123456789)</label>
+              <input type="tel" id="cfgWhatsapp" placeholder="5491123456789" style="width:100%; background:#060608; border:1px solid var(--grey-line); border-radius:8px; padding:10px; color:#fff; box-sizing:border-box;">
+            </div>
+          </div>
         </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <button type="button" class="btn-action" id="btnSavePagoConfig">Guardar Datos de Cobro y WhatsApp</button>
+          <button type="button" class="btn-action" id="btnSavePagoConfig">Guardar Precios, Beneficios y Cobro</button>
           <span id="pagoConfigStatus" style="font-size: 12.5px;"></span>
         </div>
       </section>

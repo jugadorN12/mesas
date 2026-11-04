@@ -1500,36 +1500,6 @@
             <button id="saveJoseoDate" type="button" onclick="guardarJoseoDate()">Guardar fecha</button>
           </div>
 
-          <!-- Precios, Beneficios de Consumo y Cobro de Joseo -->
-          <div style="border-top:1px solid rgba(255,255,255,0.08); margin-top:16px; padding-top:14px;">
-            <div style="font-size:13px; font-weight:700; color:var(--gold); margin-bottom:10px;">💳 Precios, Beneficios de Consumo y Cobro (Joseo)</div>
-            
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
-              <label>Valor total estándar de la mesa ($)<input id="joseoValorMesaInput" type="number" placeholder="300000" step="5000"></label>
-              <label>Monto de seña fija para reservar ($)<input id="joseoMontoSenaInput" type="number" placeholder="50000" step="5000"></label>
-            </div>
-
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:10px;">
-              <label>Horario límite (ej. 03:00)<input id="joseoHorarioLimiteInput" type="text" placeholder="03:00" maxlength="5"></label>
-              <label>% Consumo ANTES del horario<input id="joseoPctAntesInput" type="number" placeholder="100" min="0" max="100"></label>
-              <label>% Consumo DESPUÉS del horario<input id="joseoPctDespuesInput" type="number" placeholder="75" min="0" max="100"></label>
-            </div>
-
-            <div style="margin-bottom:10px;">
-              <label>Beneficios adicionales en consumo / mesa<input id="joseoBeneficiosExtraInput" type="text" placeholder="Ej.: 4 precintos VIP + atención de mozo"></label>
-            </div>
-
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
-              <label>Alias de transferencia<input id="joseoAliasInput" type="text" placeholder="joseo.terrace.mp"></label>
-              <label>Titular de la cuenta<input id="joseoTitularInput" type="text" placeholder="Joseo Eventos / Nombre"></label>
-            </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
-              <label>CBU / CVU (Opcional)<input id="joseoCbuInput" type="text" placeholder="00000031000..."></label>
-              <label>Número WhatsApp (ej.: 5491123456789)<input id="joseoWhatsappInput" type="tel" placeholder="5491123456789"></label>
-            </div>
-
-            <button id="saveJoseoPago" type="button" onclick="guardarJoseoPago()" style="background:var(--gold); color:#000; font-weight:700;">Guardar Precios, Beneficios y Cobro</button>
-          </div>
         </div>
 
         <div class="event-status" id="joseoDesignStatus"></div>
@@ -2472,60 +2442,6 @@
       }
     };
 
-    window.guardarJoseoPago = async function() {
-      const valorMesa = Number(document.getElementById('joseoValorMesaInput')?.value) || 300000;
-      const montoSena = Number(document.getElementById('joseoMontoSenaInput')?.value) || 50000;
-      const horarioLimite = document.getElementById('joseoHorarioLimiteInput')?.value.trim() || '03:00';
-      const porcentajeAntes = Number(document.getElementById('joseoPctAntesInput')?.value) || 100;
-      const porcentajeDespues = Number(document.getElementById('joseoPctDespuesInput')?.value) || 75;
-      const beneficiosExtra = document.getElementById('joseoBeneficiosExtraInput')?.value.trim() || '';
-      const alias = document.getElementById('joseoAliasInput')?.value.trim() || '';
-      const titular = document.getElementById('joseoTitularInput')?.value.trim() || '';
-      const cbu = document.getElementById('joseoCbuInput')?.value.trim() || '';
-      const whatsapp = document.getElementById('joseoWhatsappInput')?.value.trim() || '';
-      const status = document.getElementById('joseoDesignStatus');
-      const btn = document.getElementById('saveJoseoPago');
-
-      if (btn) btn.disabled = true;
-      if (status) {
-        status.style.display = 'block';
-        status.style.color = '#ffbd3e';
-        status.textContent = '⏳ Guardando precios, beneficios y cobro...';
-      }
-
-      try {
-        await db.collection('config').doc('joseo').set({
-          valorMesa,
-          montoSena,
-          horarioLimite,
-          porcentajeAntes,
-          porcentajeDespues,
-          beneficiosExtra,
-          alias,
-          titular,
-          cbu,
-          whatsapp,
-          updatedAt: Date.now(),
-          updatedBy: auth.currentUser?.email || 'admin'
-        }, { merge: true });
-
-        if (status) {
-          status.style.color = '#4ade80';
-          status.textContent = '✅ Datos de cobro y WhatsApp guardados correctamente.';
-          setTimeout(() => { if (status) status.textContent = ''; }, 3500);
-        }
-        alert('✅ ¡Datos de cobro y WhatsApp de Joseo guardados con éxito!');
-      } catch (err) {
-        if (status) {
-          status.style.color = '#ff5555';
-          status.textContent = '❌ Error: ' + err.message;
-        }
-        alert('❌ Error al guardar datos de cobro: ' + err.message);
-      } finally {
-        if (btn) btn.disabled = false;
-      }
-    };
-
     window.guardarJoseoDate = async function() {
       const input = document.getElementById('joseoDateInput');
       const status = document.getElementById('joseoDesignStatus');
@@ -2582,28 +2498,6 @@
 
         if (dateIn && document.activeElement !== dateIn) dateIn.value = data.eventDate || '';
 
-        const valorIn = document.getElementById('joseoValorMesaInput');
-        const senaIn = document.getElementById('joseoMontoSenaInput');
-        const horaIn = document.getElementById('joseoHorarioLimiteInput');
-        const pctAntesIn = document.getElementById('joseoPctAntesInput');
-        const pctDespuesIn = document.getElementById('joseoPctDespuesInput');
-        const extraIn = document.getElementById('joseoBeneficiosExtraInput');
-        const aliasIn = document.getElementById('joseoAliasInput');
-        const titularIn = document.getElementById('joseoTitularInput');
-        const cbuIn = document.getElementById('joseoCbuInput');
-        const waIn = document.getElementById('joseoWhatsappInput');
-
-        if (valorIn && document.activeElement !== valorIn) valorIn.value = data.valorMesa !== undefined ? data.valorMesa : 300000;
-        if (senaIn && document.activeElement !== senaIn) senaIn.value = data.montoSena !== undefined ? data.montoSena : 50000;
-        if (horaIn && document.activeElement !== horaIn) horaIn.value = data.horarioLimite || '03:00';
-        if (pctAntesIn && document.activeElement !== pctAntesIn) pctAntesIn.value = data.porcentajeAntes !== undefined ? data.porcentajeAntes : 100;
-        if (pctDespuesIn && document.activeElement !== pctDespuesIn) pctDespuesIn.value = data.porcentajeDespues !== undefined ? data.porcentajeDespues : 75;
-        if (extraIn && document.activeElement !== extraIn) extraIn.value = data.beneficiosExtra || '';
-
-        if (aliasIn && document.activeElement !== aliasIn) aliasIn.value = data.alias || '';
-        if (titularIn && document.activeElement !== titularIn) titularIn.value = data.titular || '';
-        if (cbuIn && document.activeElement !== cbuIn) cbuIn.value = data.cbu || '';
-        if (waIn && document.activeElement !== waIn) waIn.value = data.whatsapp || '';
       });
 
       // Escuchar admins de Joseo registrados
