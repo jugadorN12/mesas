@@ -664,7 +664,8 @@
         const r = reservasData[tableId] || {};
         if (r.status === "ingresada") {
           ingresadasCount++;
-          const cobrado = Number(r.saldoCobradoEnPuerta !== undefined ? r.saldoCobradoEnPuerta : 0);
+          const ex = r.excepcion || {};
+          const cobrado = Number(r.saldoCobradoEnPuerta !== undefined ? r.saldoCobradoEnPuerta : (ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : (r.saldoPuerta || 0)));
           if (cobrado > 0) {
             if (r.medioPagoPuerta === "transferencia") {
               transf += cobrado;

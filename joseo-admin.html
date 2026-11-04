@@ -1251,8 +1251,8 @@
       let restaPuerta = 0;
       let ocupadasCount = 0;
 
-      for (const tableId in reservasData) {
-        const r = reservasData[tableId] || {};
+      for (const tableId in reservasJoseo) {
+        const r = reservasJoseo[tableId] || {};
         const ex = r.excepcion || {};
         const status = r.status || "libre";
 
@@ -1270,7 +1270,7 @@
           }
 
           if (status === "ingresada") {
-            const cobrado = Number(r.saldoCobradoEnPuerta !== undefined ? r.saldoCobradoEnPuerta : 0);
+            const cobrado = Number(r.saldoCobradoEnPuerta !== undefined ? r.saldoCobradoEnPuerta : (ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : (r.saldoPuerta || 0)));
             const puertaMedio = r.medioPagoPuerta || "efectivo";
             if (cobrado > 0) {
               if (puertaMedio === "transferencia") {
