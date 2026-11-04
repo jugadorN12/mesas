@@ -604,6 +604,7 @@
 
     let currentRole = null;
     let reservasJoseo = {};
+    let configJoseo = {};
     let activeMesaId = null;
 
     window.switchView = function(view) {
@@ -692,16 +693,29 @@
           terraceDateBadge.style.display = "none";
         }
 
-        // Cargar datos de cobro
+        // Cargar datos de configuración (precios, beneficios y cobro)
+        configJoseo = c;
+        const cfgValorMesa = document.getElementById("cfgValorMesa");
+        const cfgMontoSena = document.getElementById("cfgMontoSena");
+        const cfgHorarioLimite = document.getElementById("cfgHorarioLimite");
+        const cfgPorcentajeAntes = document.getElementById("cfgPorcentajeAntes");
+        const cfgPorcentajeDespues = document.getElementById("cfgPorcentajeDespues");
+        const cfgBeneficiosExtra = document.getElementById("cfgBeneficiosExtra");
         const cfgAlias = document.getElementById("cfgAlias");
         const cfgTitular = document.getElementById("cfgTitular");
         const cfgCbu = document.getElementById("cfgCbu");
-        const cfgMontoSena = document.getElementById("cfgMontoSena");
         const cfgWhatsapp = document.getElementById("cfgWhatsapp");
+
+        if (cfgValorMesa) cfgValorMesa.value = c.valorMesa !== undefined ? c.valorMesa : 300000;
+        if (cfgMontoSena) cfgMontoSena.value = c.montoSena !== undefined ? c.montoSena : 50000;
+        if (cfgHorarioLimite) cfgHorarioLimite.value = c.horarioLimite || "03:00";
+        if (cfgPorcentajeAntes) cfgPorcentajeAntes.value = c.porcentajeAntes !== undefined ? c.porcentajeAntes : 100;
+        if (cfgPorcentajeDespues) cfgPorcentajeDespues.value = c.porcentajeDespues !== undefined ? c.porcentajeDespues : 75;
+        if (cfgBeneficiosExtra) cfgBeneficiosExtra.value = c.beneficiosExtra || "";
+
         if (cfgAlias) cfgAlias.value = c.alias || "";
         if (cfgTitular) cfgTitular.value = c.titular || "";
         if (cfgCbu) cfgCbu.value = c.cbu || "";
-        if (cfgMontoSena) cfgMontoSena.value = c.montoSena !== undefined ? c.montoSena : 50000;
         if (cfgWhatsapp) cfgWhatsapp.value = c.whatsapp || "";
       });
 
@@ -816,8 +830,10 @@
 
       calcNombre.value = r.nombre || "";
       calcContacto.value = r.contacto || "";
-      calcValorTotal.value = ex.valorPactado !== undefined ? ex.valorPactado : (r.valorTotal || 100000);
-      calcMontoSena.value = ex.senaPactada !== undefined ? ex.senaPactada : (r.montoSenado || 0);
+      const defaultTotal = configJoseo.valorMesa !== undefined ? configJoseo.valorMesa : 300000;
+      const defaultSena = configJoseo.montoSena !== undefined ? configJoseo.montoSena : 50000;
+      calcValorTotal.value = ex.valorPactado !== undefined ? ex.valorPactado : (r.valorTotal !== undefined ? r.valorTotal : defaultTotal);
+      calcMontoSena.value = ex.senaPactada !== undefined ? ex.senaPactada : (r.montoSenado !== undefined ? r.montoSenado : (r.nombre ? 0 : defaultSena));
       calcPersonas.value = ex.personas !== undefined ? ex.personas : 4;
       calcBebidas.value = ex.bebidas || (r.vouchersBebida ? (r.vouchersBebida + " vouchers de bebida") : "");
       calcNota.value = ex.nota || r.nota || "";
@@ -880,17 +896,27 @@
           pagoConfigStatus.style.color = "#ffbd3e";
         }
         try {
+          const cfgValorMesa = document.getElementById("cfgValorMesa");
+          const cfgMontoSena = document.getElementById("cfgMontoSena");
+          const cfgHorarioLimite = document.getElementById("cfgHorarioLimite");
+          const cfgPorcentajeAntes = document.getElementById("cfgPorcentajeAntes");
+          const cfgPorcentajeDespues = document.getElementById("cfgPorcentajeDespues");
+          const cfgBeneficiosExtra = document.getElementById("cfgBeneficiosExtra");
           const cfgAlias = document.getElementById("cfgAlias");
           const cfgTitular = document.getElementById("cfgTitular");
           const cfgCbu = document.getElementById("cfgCbu");
-          const cfgMontoSena = document.getElementById("cfgMontoSena");
           const cfgWhatsapp = document.getElementById("cfgWhatsapp");
 
           await db.collection("config").doc("joseo").set({
+            valorMesa: cfgValorMesa ? (Number(cfgValorMesa.value) || 300000) : 300000,
+            montoSena: cfgMontoSena ? (Number(cfgMontoSena.value) || 50000) : 50000,
+            horarioLimite: cfgHorarioLimite ? (cfgHorarioLimite.value.trim() || "03:00") : "03:00",
+            porcentajeAntes: cfgPorcentajeAntes ? (Number(cfgPorcentajeAntes.value) || 100) : 100,
+            porcentajeDespues: cfgPorcentajeDespues ? (Number(cfgPorcentajeDespues.value) || 75) : 75,
+            beneficiosExtra: cfgBeneficiosExtra ? cfgBeneficiosExtra.value.trim() : "",
             alias: cfgAlias ? cfgAlias.value.trim() : "",
             titular: cfgTitular ? cfgTitular.value.trim() : "",
             cbu: cfgCbu ? cfgCbu.value.trim() : "",
-            montoSena: cfgMontoSena ? (Number(cfgMontoSena.value) || 0) : 50000,
             whatsapp: cfgWhatsapp ? cfgWhatsapp.value.trim() : "",
             updatedAt: Date.now(),
             updatedBy: auth.currentUser.email

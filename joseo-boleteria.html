@@ -394,8 +394,13 @@
       </div>
 
       <div class="voucher-box" id="voucherBox">
-        <div class="voucher-title">🍹 Consumo / Vouchers a Entregar:</div>
-        <div id="voucherContent" style="color: #fff; font-weight: 600;">--</div>
+        <div class="voucher-title">🍹 Consumo y Beneficios a Entregar:</div>
+        <div id="consumoBeneficioBox" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px; margin-bottom: 8px;">
+          <div id="consumoBadge" style="display:inline-block; font-size:11px; font-weight:800; padding:2px 8px; border-radius:4px; margin-bottom:4px;">HORARIO</div>
+          <div id="consumoMontoCalculado" style="font-size:16px; font-weight:800; color:#10b981;">$0 en consumo</div>
+          <div id="consumoDetalleRegla" style="font-size:11.5px; color:var(--muted); margin-top:2px;"></div>
+        </div>
+        <div id="voucherContent" style="color: #fff; font-weight: 600; font-size:13px;">--</div>
       </div>
 
       <div id="modalNotaBox" style="font-size: 12px; color: var(--muted); margin-bottom: 14px; display: none;">
@@ -480,6 +485,7 @@
     ];
 
     let reservasData = {};
+    let configJoseo = {};
     let activeMesaId = null;
 
     btnLogin.addEventListener("click", async () => {
@@ -526,7 +532,8 @@
       // 1. Escuchar diseño de Joseo (config/joseo)
       db.collection("config").doc("joseo").onSnapshot(doc => {
         if (!doc.exists) return;
-        const c = doc.data();
+        configJoseo = doc.data();
+        const c = configJoseo;
         if (c.bgUrl) {
           mapBgLayer.style.backgroundImage = `url("${c.bgUrl}")`;
         } else {
@@ -669,15 +676,53 @@
       saldoMontoDisplay.textContent = "$" + Number(saldo).toLocaleString("es-AR");
       senaPreviaText.textContent = "Seña previa: $" + Number(sena).toLocaleString("es-AR");
 
-      // Vouchers
-      const bebidas = ex.bebidas || (r.vouchersBebida ? (r.vouchersBebida + " vouchers de bebida") : "");
-      if (bebidas) {
-        voucherContent.textContent = bebidas;
-        voucherBox.style.display = "block";
+      // Cálculo dinámico de beneficio de consumo por horario
+      const totalMesa = ex.valorPactado !== undefined ? ex.valorPactado : (r.valorTotal !== undefined ? r.valorTotal : (configJoseo.valorMesa || 300000));
+      const limite = configJoseo.horarioLimite || "03:00";
+      const pctAntes = configJoseo.porcentajeAntes !== undefined ? configJoseo.porcentajeAntes : 100;
+      const pctDespues = configJoseo.porcentajeDespues !== undefined ? configJoseo.porcentajeDespues : 75;
+
+      const now = new Date();
+      const h = now.getHours();
+      const m = now.getMinutes();
+      const [limH, limM] = limite.split(":").map(Number);
+      const horaStr = String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
+
+      // Regla horaria nocturna: antes de las 12hs se compara con el límite, de 12hs a 23hs es antes
+      const esAntes = (h >= 12) || (h < limH) || (h === limH && m < limM);
+      const pctAplicable = esAntes ? pctAntes : pctDespues;
+      const montoConsumo = Math.round((totalMesa * pctAplicable) / 100);
+
+      const consumoBadge = document.getElementById("consumoBadge");
+      const consumoMontoCalculado = document.getElementById("consumoMontoCalculado");
+      const consumoDetalleRegla = document.getElementById("consumoDetalleRegla");
+
+      if (esAntes) {
+        consumoBadge.textContent = "🟢 DENTRO DE HORARIO (" + horaStr + " hs — ANTES DE LAS " + limite + " AM)";
+        consumoBadge.style.background = "rgba(16, 185, 129, 0.2)";
+        consumoBadge.style.color = "var(--green)";
+        consumoMontoCalculado.style.color = "var(--green)";
+        consumoMontoCalculado.textContent = "$" + Number(montoConsumo).toLocaleString("es-AR") + " en consumo (" + pctAplicable + "% reintegro)";
+        consumoDetalleRegla.textContent = "Aplica reintegro completo del " + pctAplicable + "% del valor total de la mesa ($" + Number(totalMesa).toLocaleString("es-AR") + ").";
       } else {
-        voucherContent.textContent = "Sin vouchers ni bebidas registradas";
-        voucherBox.style.display = "block";
+        consumoBadge.textContent = "🟡 FUERA DE HORARIO (" + horaStr + " hs — DESPUÉS DE LAS " + limite + " AM)";
+        consumoBadge.style.background = "rgba(255, 189, 62, 0.2)";
+        consumoBadge.style.color = "var(--gold)";
+        consumoMontoCalculado.style.color = "var(--gold)";
+        consumoMontoCalculado.textContent = "$" + Number(montoConsumo).toLocaleString("es-AR") + " en consumo (" + pctAplicable + "% reintegro)";
+        consumoDetalleRegla.textContent = "Ingresó después de las " + limite + " AM. Aplica el " + pctAplicable + "% del valor total ($" + Number(totalMesa).toLocaleString("es-AR") + ").";
       }
+
+      // Vouchers y notas adicionales
+      const bebidas = ex.bebidas || (r.vouchersBebida ? (r.vouchersBebida + " vouchers de bebida") : "");
+      const extraConfig = configJoseo.beneficiosExtra ? ("✨ " + configJoseo.beneficiosExtra) : "";
+      const extras = [bebidas, extraConfig].filter(Boolean).join(" | ");
+      if (extras) {
+        voucherContent.textContent = extras;
+      } else {
+        voucherContent.textContent = "Sin beneficios extra adicionales.";
+      }
+      voucherBox.style.display = "block";
 
       // Nota
       const nota = ex.nota || r.nota || "";

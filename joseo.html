@@ -333,6 +333,30 @@
       cursor: pointer;
       margin-left: 8px;
     }
+    
+    .mesa-pricing-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--grey-line);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+    .pricing-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+    .pricing-row:last-child { margin-bottom: 0; }
+    .consumo-rule-box {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 10px;
+    }
+
     .btn-wa-comprobante {
       background: #25D366;
       color: #fff;
@@ -388,6 +412,33 @@
       <!-- Paso 1: Ingreso de datos -->
       <div id="modalStep1">
         <p class="sheet-sub">Ingresá tus datos para señar tu mesa en Joseo Terrace.</p>
+
+        <!-- Tarjeta de Valor de Mesa y Beneficios en Consumo -->
+        <div class="mesa-pricing-card">
+          <div class="pricing-row">
+            <span style="color:var(--muted);">Valor total de la mesa:</span>
+            <strong id="cardTotalMesa" style="font-size:15px; color:#fff;">$300.000</strong>
+          </div>
+          <div class="pricing-row">
+            <span style="color:var(--muted);">Monto de seña para reservar:</span>
+            <strong id="cardSenaMesa" style="color:var(--gold); font-size:14px;">$50.000</strong>
+          </div>
+          <div class="pricing-row" style="font-size:12px;">
+            <span style="color:var(--muted);">Saldo a abonar en puerta:</span>
+            <strong id="cardSaldoPuerta" style="color:var(--muted);">$250.000</strong>
+          </div>
+
+          <div class="consumo-rule-box">
+            <div style="font-weight:700; color:#10b981; font-size:12.5px; margin-bottom:4px;">🍹 Reintegro en Consumo (Barra):</div>
+            <div id="cardConsumoAntes" style="font-size:12px; color:#f8fafc; margin-bottom:3px;">
+              • Ingresando antes de las <strong id="txtHoraLimite">03:00 AM</strong>: <strong id="txtPctAntes" style="color:#10b981;">100%</strong> en consumo (<span id="txtMontoAntes">$300.000</span>).
+            </div>
+            <div id="cardConsumoDespues" style="font-size:12px; color:#ffbd3e;">
+              • Ingresando después de las <span id="txtHoraLimiteDespues">03:00 AM</span>: <strong id="txtPctDespues">75%</strong> en consumo (<span id="txtMontoDespues">$225.000</span>).
+            </div>
+            <div id="cardBeneficiosExtra" style="font-size:11.5px; color:var(--muted); margin-top:6px; display:none; border-top:1px dashed rgba(255,255,255,0.1); padding-top:4px;"></div>
+          </div>
+        </div>
 
         <label for="inputNombre">Nombre y Apellido</label>
         <input type="text" id="inputNombre" placeholder="Ej.: Martín Gómez" maxlength="50">
@@ -626,6 +677,47 @@
       modalMesaTitle.textContent = "MESA " + table.num + " — JOSEO TERRACE";
       inputNombre.value = "";
       inputContacto.value = "";
+
+      // Cargar valores de configuración en la tarjeta
+      const total = configJoseo.valorMesa !== undefined ? configJoseo.valorMesa : 300000;
+      const sena = configJoseo.montoSena !== undefined ? configJoseo.montoSena : 50000;
+      const saldo = Math.max(0, total - sena);
+      const limite = configJoseo.horarioLimite || "03:00";
+      const pctAntes = configJoseo.porcentajeAntes !== undefined ? configJoseo.porcentajeAntes : 100;
+      const pctDespues = configJoseo.porcentajeDespues !== undefined ? configJoseo.porcentajeDespues : 75;
+      const montoAntes = Math.round((total * pctAntes) / 100);
+      const montoDespues = Math.round((total * pctDespues) / 100);
+
+      const cardTotalMesa = document.getElementById("cardTotalMesa");
+      const cardSenaMesa = document.getElementById("cardSenaMesa");
+      const cardSaldoPuerta = document.getElementById("cardSaldoPuerta");
+      const txtHoraLimite = document.getElementById("txtHoraLimite");
+      const txtHoraLimiteDespues = document.getElementById("txtHoraLimiteDespues");
+      const txtPctAntes = document.getElementById("txtPctAntes");
+      const txtPctDespues = document.getElementById("txtPctDespues");
+      const txtMontoAntes = document.getElementById("txtMontoAntes");
+      const txtMontoDespues = document.getElementById("txtMontoDespues");
+      const cardBeneficiosExtra = document.getElementById("cardBeneficiosExtra");
+
+      if (cardTotalMesa) cardTotalMesa.textContent = "$" + Number(total).toLocaleString("es-AR");
+      if (cardSenaMesa) cardSenaMesa.textContent = "$" + Number(sena).toLocaleString("es-AR");
+      if (cardSaldoPuerta) cardSaldoPuerta.textContent = "$" + Number(saldo).toLocaleString("es-AR");
+      if (txtHoraLimite) txtHoraLimite.textContent = limite + " AM";
+      if (txtHoraLimiteDespues) txtHoraLimiteDespues.textContent = limite + " AM";
+      if (txtPctAntes) txtPctAntes.textContent = pctAntes + "%";
+      if (txtPctDespues) txtPctDespues.textContent = pctDespues + "%";
+      if (txtMontoAntes) txtMontoAntes.textContent = "$" + Number(montoAntes).toLocaleString("es-AR");
+      if (txtMontoDespues) txtMontoDespues.textContent = "$" + Number(montoDespues).toLocaleString("es-AR");
+
+      if (cardBeneficiosExtra) {
+        if (configJoseo.beneficiosExtra) {
+          cardBeneficiosExtra.textContent = "✨ " + configJoseo.beneficiosExtra;
+          cardBeneficiosExtra.style.display = "block";
+        } else {
+          cardBeneficiosExtra.style.display = "none";
+        }
+      }
+
       modalStep1.style.display = "block";
       modalStep2.style.display = "none";
       modalOverlay.classList.add("open");
@@ -670,13 +762,18 @@
         const cbu = configJoseo.cbu || "";
         const waNumber = (configJoseo.whatsapp || "").replace(/[^0-9]/g, "");
 
+        const totalMesa = configJoseo.valorMesa !== undefined ? configJoseo.valorMesa : 300000;
+        const saldoPuerta = Math.max(0, totalMesa - montoSena);
+
         // Guardar reserva temporal en disputa por 15 minutos
         await db.collection("reservas_joseo").doc(mesaId).set({
           nombre: nombre,
           contacto: contacto,
           status: "disputa",
           sector: "terrace_soul",
+          valorTotal: totalMesa,
           montoSenado: montoSena,
+          saldoPuerta: saldoPuerta,
           ts: Date.now(),
           expiresAt: Date.now() + 15 * 60 * 1000
         });
