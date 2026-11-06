@@ -857,13 +857,17 @@
           allVisitas = [];
           snapshot.forEach(doc => {
             const data = doc.data();
+            const latVal = typeof data.lat === 'number' ? data.lat : (parseFloat(data.lat) || -34.68);
+            const lngVal = typeof data.lng === 'number' ? data.lng : (parseFloat(data.lng) || -58.55);
+            const tsVal = typeof data.timestamp === 'number' ? data.timestamp : (Number(data.timestamp) || 0);
+
             allVisitas.push({
               id: doc.id,
               ciudad: data.ciudad || 'Desconocido',
-              lat: typeof data.lat === 'number' ? data.lat : -34.68,
-              lng: typeof data.lng === 'number' ? data.lng : -58.55,
+              lat: latVal,
+              lng: lngVal,
               fecha: data.fecha || '',
-              timestamp: typeof data.timestamp === 'number' ? data.timestamp : 0,
+              timestamp: tsVal,
               region: data.region || ''
             });
           });
