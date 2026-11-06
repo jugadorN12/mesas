@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#060608">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Cubano Bar — Radar de Visitas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    :root {
+      --bg: #07070a;
+      --card-bg: rgba(18, 18, 24, 0.88);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --red: #ff2d3d;
+      --red-glow: rgba(255, 45, 61, 0.4);
+      --green: #2ee6a6;
+      --green-glow: rgba(46, 230, 166, 0.4);
+      --cyan: #00d2ff;
+      --text: #f5f5f7;
+      --muted: #8e8e9a;
+      --gold: #f5a623;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Topbar */
+    header.topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 14px 20px;
+      background: rgba(10, 10, 14, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 2px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-badge span {
+      color: var(--red);
+    }
+
+    .live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(46, 230, 166, 0.12);
+      border: 1px solid rgba(46, 230, 166, 0.3);
+      color: var(--green);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulseDot 1.8s infinite;
+    }
+
+    @keyframes pulseDot {
+      0% { transform: scale(0.9); opacity: 0.7; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.7; }
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filters-group {
+      display: flex;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn.active {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 0 12px var(--red-glow);
+    }
+
+    .filter-btn:hover:not(.active) {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .btn-logout {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--muted);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-logout:hover {
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* KPI Summary Row */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      padding: 14px 20px;
+      background: rgba(14, 14, 18, 0.6);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .kpi-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 30px;
+      letter-spacing: 1px;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* Main Container */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      flex: 1;
+      height: calc(100vh - 140px);
+      min-height: 500px;
+    }
+
+    @media (max-width: 960px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+    }
+
+    /* Map container */
+    #mapView {
+      width: 100%;
+      height: 100%;
+      min-height: 400px;
+      background: #060608;
+    }
+
+    /* Custom Leaflet Map styling */
+    .leaflet-container {
+      background: #08080c !important;
+      font-family: 'Inter', sans-serif !important;
+    }
+
+    .custom-map-marker {
+      background: rgba(255, 45, 61, 0.35);
+      border: 2px solid var(--red);
+      box-shadow: 0 0 16px var(--red-glow);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 12px;
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    .custom-map-marker:hover {
+      transform: scale(1.18);
+      z-index: 9999 !important;
+    }
+
+    .leaflet-popup-content-wrapper {
+      background: #14141c !important;
+      color: #fff !important;
+      border: 1px solid var(--card-border) !important;
+      border-radius: 10px !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7) !important;
+    }
+
+    .leaflet-popup-tip {
+      background: #14141c !important;
+    }
+
+    .popup-box {
+      padding: 4px;
+    }
+
+    .popup-box h4 {
+      font-size: 15px;
+      margin-bottom: 4px;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .popup-box p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .popup-box .count-badge {
+      display: inline-block;
+      margin-top: 6px;
+      background: rgba(255, 45, 61, 0.2);
+      border: 1px solid rgba(255, 45, 61, 0.4);
+      color: var(--red);
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    /* Sidebar ranking */
+    .sidebar {
+      background: rgba(12, 12, 16, 0.98);
+      border-left: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    .sidebar-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-header h3 {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sidebar-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .sidebar-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .sidebar-tab.active {
+      color: #fff;
+      border-bottom-color: var(--red);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+    }
+
+    .rank-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      margin-bottom: 8px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .rank-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 45, 61, 0.3);
+    }
+
+    .rank-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .rank-badge {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .rank-item:nth-child(1) .rank-badge {
+      background: var(--gold);
+      color: #000;
+    }
+
+    .rank-item:nth-child(2) .rank-badge {
+      background: #c0c0c0;
+      color: #000;
+    }
+
+    .rank-item:nth-child(3) .rank-badge {
+      background: #cd7f32;
+      color: #000;
+    }
+
+    .rank-info {
+      min-width: 0;
+    }
+
+    .rank-city {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .rank-bar-wrap {
+      width: 110px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+
+    .rank-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--red), #ff6b77);
+      border-radius: 2px;
+    }
+
+    .rank-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .rank-count {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 0.5px;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .rank-pct {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    /* Live Feed */
+    .feed-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 12px;
+    }
+
+    .feed-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--red);
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .feed-text {
+      flex: 1;
+    }
+
+    .feed-city {
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .feed-time {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Login overlay */
+    #loginOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 5, 8, 0.96);
+      backdrop-filter: blur(14px);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 380px;
+      background: #111117;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 45, 61, 0.15);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+
+    .login-box h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    .login-box h2 span {
+      color: var(--red);
+    }
+
+    .login-box p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      text-align: left;
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input {
+      width: 100%;
+      background: #181822;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 10px var(--red-glow);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--red);
+      border: none;
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 4px 20px var(--red-glow);
+      transition: 0.2s;
+    }
+
+    .btn-submit:hover {
+      background: #ff4755;
+      transform: translateY(-1px);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    .login-error {
+      margin-top: 12px;
+      color: #ff5252;
+      font-size: 12px;
+      min-height: 18px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Login Modal Obligatorio -->
+  <div id="loginOverlay">
+    <div class="login-box">
+      <h2>CUBANO <span>RADAR</span></h2>
+      <p>Acceso restringido para Dirección General</p>
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Email Administrador</label>
+          <input type="email" id="loginEmail" class="form-input" placeholder="admin@cubanobar.com" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="loginPass" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="submit" id="loginBtn" class="btn-submit">Ingresar al Radar</button>
+        <div id="loginError" class="login-error"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="brand-wrap">
+      <div class="brand-badge">CUBANO <span>RADAR</span></div>
+      <div class="live-pill">
+        <div class="live-dot"></div>
+        <span>EN VIVO</span>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <div class="filters-group">
+        <button class="filter-btn active" data-range="today" onclick="setFilter('today', this)">Hoy</button>
+        <button class="filter-btn" data-range="7d" onclick="setFilter('7d', this)">7 Días</button>
+        <button class="filter-btn" data-range="30d" onclick="setFilter('30d', this)">30 Días</button>
+        <button class="filter-btn" data-range="all" onclick="setFilter('all', this)">Histórico</button>
+      </div>
+      <button class="btn-logout" onclick="logoutAdmin()">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <!-- KPI Row -->
+  <section class="kpi-row">
+    <div class="kpi-card">
+      <span class="kpi-label">Total de Visitas</span>
+      <span class="kpi-val" id="kpiTotal">0</span>
+      <span class="kpi-sub" id="kpiPeriodoText">En el período seleccionado</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Localidades Activas</span>
+      <span class="kpi-val" id="kpiCiudades" style="color: var(--cyan);">0</span>
+      <span class="kpi-sub">Zonas geográficas distintas</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Zona Principal</span>
+      <span class="kpi-val" id="kpiTopCity" style="color: var(--gold); font-size: 24px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">—</span>
+      <span class="kpi-sub" id="kpiTopCitySub">Mayor afluencia detectada</span>
+    </div>
+  </section>
+
+  <!-- Main Grid: Map + Sidebar -->
+  <main class="main-grid">
+    <div id="mapView"></div>
+
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h3>📍 Desglose de Zonas</h3>
+      </div>
+      <div class="sidebar-tabs">
+        <button class="sidebar-tab active" id="tabRankingBtn" onclick="switchSidebarTab('ranking')">Ranking</button>
+        <button class="sidebar-tab" id="tabFeedBtn" onclick="switchSidebarTab('feed')">Últimas Visitas</button>
+      </div>
+
+      <div class="sidebar-content" id="rankingPanel">
+        <div id="rankingList">
+          <div class="empty-state">Esperando datos de visitas...</div>
+        </div>
+      </div>
+
+      <div class="sidebar-content" id="feedPanel" style="display: none;">
+        <div id="feedList">
+          <div class="empty-state">No hay actividad reciente.</div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY",
+      authDomain: "mesas-cubano-bar.firebaseapp.com",
+      projectId: "mesas-cubano-bar",
+      storageBucket: "mesas-cubano-bar.firebasestorage.app",
+      messagingSenderId: "1072135346765",
+      appId: "1:1072135346765:web:e8a6ee5497366a8b1f5a04"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+      db.useEmulator("localhost", 8085);
+      auth.useEmulator("http://localhost:9099");
+    }
+
+    let map = null;
+    let markersLayer = null;
+    let allVisitas = [];
+    let currentFilter = 'today';
+    let markersByCity = {};
+
+    // Inicializar Mapa centrado en Gran Buenos Aires
+    function initMap() {
+      if (map) return;
+      map = L.map('mapView', {
+        zoomControl: true,
+        attributionControl: false
+      }).setView([-34.685, -58.55], 11);
+
+      // CartoDB Dark Matter tiles (elegante, oscuro y rápido)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 18,
+        subdomains: 'abcd'
+      }).addTo(map);
+
+      markersLayer = L.layerGroup().addTo(map);
+    }
+
+    // Auth listener
+    auth.onAuthStateChanged(async (user) => {
+      const loginOverlay = document.getElementById("loginOverlay");
+      const loginError = document.getElementById("loginError");
+
+      if (user) {
+        try {
+          const email = (user.email || "").toLowerCase().trim();
+          const userDoc = await db.collection("users").doc(email).get();
+
+          if (!userDoc.exists) {
+            throw new Error("Usuario no registrado en el sistema.");
+          }
+
+          const role = userDoc.data().role;
+          if (role !== 'admin') {
+            throw new Error("Acceso denegado: Esta vista es exclusiva para la Dirección General.");
+          }
+
+          // Usuario autorizado
+          loginOverlay.style.display = "none";
+          initMap();
+          startVisitasListener();
+
+        } catch (err) {
+          loginOverlay.style.display = "flex";
+          loginError.textContent = err.message || "Error al verificar permisos.";
+          setTimeout(() => auth.signOut(), 3500);
+        }
+      } else {
+        loginOverlay.style.display = "flex";
+      }
+    });
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value.trim();
+      const pass = document.getElementById("loginPass").value;
+      const btn = document.getElementById("loginBtn");
+      const err = document.getElementById("loginError");
+
+      err.textContent = "";
+      btn.disabled = true;
+      btn.textContent = "Verificando...";
+
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+      } catch (error) {
+        err.textContent = "Credenciales incorrectas o problema de conexión.";
+        btn.disabled = false;
+        btn.textContent = "Ingresar al Radar";
+      }
+    }
+
+    function logoutAdmin() {
+      auth.signOut().then(() => {
+        location.reload();
+      });
+    }
+
+    // Listener en tiempo real de visitas
+    let unsubscribeVisitas = null;
+    function startVisitasListener() {
+      if (unsubscribeVisitas) unsubscribeVisitas();
+
+      unsubscribeVisitas = db.collection("visitas_cubano")
+        .orderBy("timestamp", "desc")
+        .limit(2500)
+        .onSnapshot((snapshot) => {
+          allVisitas = [];
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            allVisitas.push({
+              id: doc.id,
+              ciudad: data.ciudad || 'Desconocido',
+              lat: typeof data.lat === 'number' ? data.lat : -34.68,
+              lng: typeof data.lng === 'number' ? data.lng : -58.55,
+              fecha: data.fecha || '',
+              timestamp: typeof data.timestamp === 'number' ? data.timestamp : 0,
+              region: data.region || ''
+            });
+          });
+
+          renderDashboard();
+        }, (err) => {
+          console.error("Error al escuchar visitas:", err);
+        });
+    }
+
+    function setFilter(range, btn) {
+      currentFilter = range;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderDashboard();
+    }
+
+    function getFilteredVisitas() {
+      const now = Date.now();
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+      const todayMs = startOfToday.getTime();
+
+      return allVisitas.filter(v => {
+        if (!v.timestamp) return false;
+        if (currentFilter === 'today') {
+          return v.timestamp >= todayMs;
+        } else if (currentFilter === '7d') {
+          return v.timestamp >= (now - 7 * 86400000);
+        } else if (currentFilter === '30d') {
+          return v.timestamp >= (now - 30 * 86400000);
+        }
+        return true; // 'all'
+      });
+    }
+
+    function renderDashboard() {
+      const visitas = getFilteredVisitas();
+      const total = visitas.length;
+
+      // Actualizar KPIs
+      document.getElementById('kpiTotal').textContent = total;
+
+      // Agrupar por ciudad y ubicación
+      const cityMap = {};
+      visitas.forEach(v => {
+        const cityKey = (v.ciudad || 'Desconocido').trim();
+        if (!cityMap[cityKey]) {
+          cityMap[cityKey] = {
+            ciudad: cityKey,
+            count: 0,
+            lat: v.lat,
+            lng: v.lng,
+            ultimasVisitas: []
+          };
+        }
+        cityMap[cityKey].count += 1;
+        // Mantener coordenadas si la clave previa tenía default
+        if (v.lat && v.lng) {
+          cityMap[cityKey].lat = v.lat;
+          cityMap[cityKey].lng = v.lng;
+        }
+        if (cityMap[cityKey].ultimasVisitas.length < 5) {
+          cityMap[cityKey].ultimasVisitas.push(v);
+        }
+      });
+
+      const ranking = Object.values(cityMap).sort((a, b) => b.count - a.count);
+      const totalCiudades = ranking.length;
+
+      document.getElementById('kpiCiudades').textContent = totalCiudades;
+      if (ranking.length > 0) {
+        const top = ranking[0];
+        const pct = total > 0 ? Math.round((top.count / total) * 100) : 0;
+        document.getElementById('kpiTopCity').textContent = top.ciudad;
+        document.getElementById('kpiTopCitySub').textContent = `${top.count} visitas (${pct}% del total)`;
+      } else {
+        document.getElementById('kpiTopCity').textContent = "—";
+        document.getElementById('kpiTopCitySub').textContent = "Sin visitas en este período";
+      }
+
+      // Renderizar Marcadores en el Mapa
+      renderMapMarkers(ranking, total);
+
+      // Renderizar Ranking lateral
+      renderRankingList(ranking, total);
+
+      // Renderizar Feed de últimas visitas
+      renderFeed(visitas.slice(0, 30));
+    }
+
+    function renderMapMarkers(ranking, total) {
+      if (!map || !markersLayer) return;
+      markersLayer.clearLayers();
+      markersByCity = {};
+
+      if (ranking.length === 0) return;
+
+      const bounds = [];
+
+      ranking.forEach(item => {
+        if (!item.lat || !item.lng) return;
+
+        // Tamaño proporcional entre 24px y 54px
+        const pct = total > 0 ? (item.count / total) : 0;
+        const size = Math.min(54, Math.max(26, Math.round(26 + pct * 60)));
+
+        const customIcon = L.divIcon({
+          className: 'custom-map-marker-wrap',
+          html: `<div class="custom-map-marker" style="width: ${size}px; height: ${size}px;">${item.count}</div>`,
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size / 2]
+        });
+
+        const marker = L.marker([item.lat, item.lng], { icon: customIcon });
+
+        const pctFormatted = total > 0 ? Math.round((item.count / total) * 100) : 0;
+        const popupContent = `
+          <div class="popup-box">
+            <h4>📍 ${escapeHtml(item.ciudad)}</h4>
+            <p>Visitantes detectados en esta zona</p>
+            <div class="count-badge">${item.count} visitas (${pctFormatted}%)</div>
+          </div>
+        `;
+
+        marker.bindPopup(popupContent);
+        marker.addTo(markersLayer);
+
+        markersByCity[item.ciudad] = marker;
+        bounds.push([item.lat, item.lng]);
+      });
+
+      // Si hay marcadores fuera del view inicial, ajustar suavemente
+      if (bounds.length > 0 && currentFilter === 'all') {
+        try {
+          map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+        } catch (_) {}
+      }
+    }
+
+    function renderRankingList(ranking, total) {
+      const container = document.getElementById('rankingList');
+      if (ranking.length === 0) {
+        container.innerHTML = `<div class="empty-state">No se registraron visitas en este período.</div>`;
+        return;
+      }
+
+      let html = '';
+      ranking.forEach((item, index) => {
+        const pct = total > 0 ? Math.round((item.count / total) * 100) : 0;
+        html += `
+          <div class="rank-item" onclick="focusCity('${escapeHtml(item.ciudad)}')">
+            <div class="rank-left">
+              <div class="rank-badge">${index + 1}</div>
+              <div class="rank-info">
+                <div class="rank-city">${escapeHtml(item.ciudad)}</div>
+                <div class="rank-bar-wrap">
+                  <div class="rank-bar-fill" style="width: ${Math.max(6, pct)}%;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="rank-right">
+              <div class="rank-count">${item.count}</div>
+              <div class="rank-pct">${pct}%</div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function renderFeed(visitas) {
+      const container = document.getElementById('feedList');
+      if (visitas.length === 0) {
+        container.innerHTML = `<div class="empty-state">No hay actividad reciente.</div>`;
+        return;
+      }
+
+      let html = '';
+      visitas.forEach(v => {
+        const timeAgo = formatTimeAgo(v.timestamp);
+        html += `
+          <div class="feed-item" onclick="focusCity('${escapeHtml(v.ciudad)}')">
+            <div class="feed-dot"></div>
+            <div class="feed-text">
+              <div class="feed-city">Visita desde ${escapeHtml(v.ciudad)}</div>
+              <div class="feed-time">${timeAgo}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function focusCity(cityName) {
+      const marker = markersByCity[cityName];
+      if (marker && map) {
+        map.setView(marker.getLatLng(), 13, { animate: true });
+        marker.openPopup();
+      }
+    }
+
+    function switchSidebarTab(tab) {
+      const tabRankBtn = document.getElementById('tabRankingBtn');
+      const tabFeedBtn = document.getElementById('tabFeedBtn');
+      const rankPanel = document.getElementById('rankingPanel');
+      const feedPanel = document.getElementById('feedPanel');
+
+      if (tab === 'ranking') {
+        tabRankBtn.classList.add('active');
+        tabFeedBtn.classList.remove('active');
+        rankPanel.style.display = 'block';
+        feedPanel.style.display = 'none';
+      } else {
+        tabFeedBtn.classList.add('active');
+        tabRankBtn.classList.remove('active');
+        feedPanel.style.display = 'block';
+        rankPanel.style.display = 'none';
+      }
+    }
+
+    function formatTimeAgo(ts) {
+      if (!ts) return "Hace un momento";
+      const diffSec = Math.floor((Date.now() - ts) / 1000);
+      if (diffSec < 60) return "Hace unos segundos";
+      const diffMin = Math.floor(diffSec / 60);
+      if (diffMin < 60) return `Hace ${diffMin} min`;
+      const diffHrs = Math.floor(diffMin / 60);
+      if (diffHrs < 24) return `Hace ${diffHrs} h`;
+      const diffDays = Math.floor(diffHrs / 24);
+      return `Hace ${diffDays} día${diffDays > 1 ? 's' : ''}`;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+  </script>
+</body>
+
+</html>

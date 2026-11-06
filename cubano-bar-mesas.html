@@ -1699,6 +1699,41 @@
     } catch (_) { }
     try { if (USE_SECURE_RESERVATION) firebaseFunctions = firebase.app().functions("us-central1"); } catch (_) { }
 
+    // Registro silencioso de procedencia de visitas para radar interno
+    (function registrarVisitaSilenciosa() {
+      try {
+        if (!firebaseDb) return;
+        if (sessionStorage.getItem('cubano_visit_logged')) return;
+
+        fetch('https://ipwho.is/')
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.success) {
+              const ciudad = data.city || 'Desconocido';
+              const lat = (typeof data.latitude === 'number' && !isNaN(data.latitude)) ? data.latitude : -34.68;
+              const lng = (typeof data.longitude === 'number' && !isNaN(data.longitude)) ? data.longitude : -58.55;
+              const hoyStr = new Date().toISOString().slice(0, 10);
+              const nowTs = Date.now();
+
+              firebaseDb.collection("visitas_cubano").add({
+                ciudad: String(ciudad),
+                region: String(data.region || ''),
+                pais: String(data.country || 'Argentina'),
+                lat: Number(lat),
+                lng: Number(lng),
+                postal: String(data.postal || ''),
+                fecha: String(hoyStr),
+                timestamp: Math.floor(nowTs)
+              }).then(() => {
+                sessionStorage.setItem('cubano_visit_logged', '1');
+              }).catch(() => {});
+            }
+          })
+          .catch(() => {});
+      } catch (_) {}
+    })();
+
+
     // ---- Precios y Promociones de Consumo por Día ----
     let currentPeopleCount = 4;
     let pricingConfig = {

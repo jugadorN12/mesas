@@ -66,6 +66,19 @@ service cloud.firestore {
       allow read, write: if anyRole(['admin', 'assistant', 'boleteria']);
     }
 
+    match /visitas_cubano/{visitaId} {
+      allow read: if hasRole('admin');
+
+      allow create: if (request.resource.data.ciudad is string
+        && request.resource.data.lat is number
+        && request.resource.data.lng is number
+        && request.resource.data.timestamp is int
+        && request.resource.data.fecha is string)
+        || hasRole('admin');
+
+      allow update, delete: if hasRole('admin');
+    }
+
     // --- Soporte multi-tenant para cliente 'joseo' ---
 
     match /reservas_joseo/{mesaId} {
