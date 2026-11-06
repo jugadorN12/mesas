@@ -508,6 +508,29 @@
       color: #fff;
     }
 
+    
+    .btn-del-feed {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--muted);
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      margin-left: 6px;
+    }
+    .btn-del-feed:hover {
+      background: rgba(255, 45, 61, 0.25);
+      border-color: var(--red);
+      color: #fff;
+    }
+
     .feed-time {
       font-size: 10px;
       color: var(--muted);
@@ -1057,11 +1080,22 @@
               <div class="feed-city">Visita desde ${escapeHtml(v.ciudad)}</div>
               <div class="feed-time">${timeAgo}</div>
             </div>
+            <button class="btn-del-feed" title="Eliminar este registro" onclick="deleteVisit('${v.id}', event)">✕</button>
           </div>
         `;
       });
 
       container.innerHTML = html;
+    }
+
+        async function deleteVisit(visitaId, event) {
+      if (event) event.stopPropagation();
+      if (!confirm("¿Deseas eliminar este registro de visita?")) return;
+      try {
+        await db.collection("visitas_cubano").doc(visitaId).delete();
+      } catch (err) {
+        alert("Error al eliminar: " + (err.message || err));
+      }
     }
 
     function focusCity(cityName) {
