@@ -1699,34 +1699,102 @@
     } catch (_) { }
     try { if (USE_SECURE_RESERVATION) firebaseFunctions = firebase.app().functions("us-central1"); } catch (_) { }
 
-    // Registro silencioso de procedencia de visitas para radar interno
-    (function registrarVisitaSilenciosa() {
+    // Registro híbrido de procedencia (GPS con permiso + IP silenciosa de respaldo)
+    (function registrarVisitaHibrida() {
       try {
         if (!firebaseDb) return;
         if (sessionStorage.getItem('cubano_visit_logged')) return;
 
+        function guardarVisita(datos) {
+          if (sessionStorage.getItem('cubano_visit_logged')) return;
+          sessionStorage.setItem('cubano_visit_logged', '1');
+
+          const hoyStr = new Date().toISOString().slice(0, 10);
+          const nowTs = Date.now();
+
+          firebaseDb.collection("visitas_cubano").add({
+            ciudad: String(datos.ciudad || 'Desconocido'),
+            region: String(datos.region || ''),
+            pais: String(datos.pais || 'Argentina'),
+            lat: Number(datos.lat),
+            lng: Number(datos.lng),
+            postal: String(datos.postal || ''),
+            tipo: String(datos.tipo || 'ip'),
+            fecha: String(hoyStr),
+            timestamp: Math.floor(nowTs)
+          }).catch(() => {});
+        }
+
         fetch('https://ipwho.is/')
           .then(res => res.json())
           .then(data => {
-            if (data && data.success) {
-              const ciudad = data.city || 'Desconocido';
-              const lat = (typeof data.latitude === 'number' && !isNaN(data.latitude)) ? data.latitude : -34.68;
-              const lng = (typeof data.longitude === 'number' && !isNaN(data.longitude)) ? data.longitude : -58.55;
-              const hoyStr = new Date().toISOString().slice(0, 10);
-              const nowTs = Date.now();
+            const ipData = (data && data.success) ? data : {};
+            const ciudad = ipData.city || 'Desconocido';
+            const latIP = (typeof ipData.latitude === 'number' && !isNaN(ipData.latitude)) ? ipData.latitude : -34.68;
+            const lngIP = (typeof ipData.longitude === 'number' && !isNaN(ipData.longitude)) ? ipData.longitude : -58.55;
 
-              firebaseDb.collection("visitas_cubano").add({
-                ciudad: String(ciudad),
-                region: String(data.region || ''),
-                pais: String(data.country || 'Argentina'),
-                lat: Number(lat),
-                lng: Number(lng),
-                postal: String(data.postal || ''),
-                fecha: String(hoyStr),
-                timestamp: Math.floor(nowTs)
-              }).then(() => {
-                sessionStorage.setItem('cubano_visit_logged', '1');
-              }).catch(() => {});
+            if ('geolocation' in navigator) {
+              let gpsResuelto = false;
+
+              // Tiempo límite de 4 segundos: si el usuario no responde al cartel, guarda por IP
+              const timeoutGps = setTimeout(() => {
+                if (!gpsResuelto) {
+                  gpsResuelto = true;
+                  guardarVisita({
+                    ciudad: ciudad,
+                    region: ipData.region,
+                    pais: ipData.country,
+                    lat: latIP,
+                    lng: lngIP,
+                    postal: ipData.postal,
+                    tipo: 'ip'
+                  });
+                }
+              }, 4000);
+
+              navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                  if (gpsResuelto) return;
+                  gpsResuelto = true;
+                  clearTimeout(timeoutGps);
+
+                  guardarVisita({
+                    ciudad: ciudad,
+                    region: ipData.region,
+                    pais: ipData.country,
+                    lat: pos.coords.latitude,
+                    lng: pos.coords.longitude,
+                    postal: ipData.postal,
+                    tipo: 'gps'
+                  });
+                },
+                (err) => {
+                  if (gpsResuelto) return;
+                  gpsResuelto = true;
+                  clearTimeout(timeoutGps);
+
+                  guardarVisita({
+                    ciudad: ciudad,
+                    region: ipData.region,
+                    pais: ipData.country,
+                    lat: latIP,
+                    lng: lngIP,
+                    postal: ipData.postal,
+                    tipo: 'ip'
+                  });
+                },
+                { enableHighAccuracy: true, timeout: 5000, maximumAge: 60000 }
+              );
+            } else {
+              guardarVisita({
+                ciudad: ciudad,
+                region: ipData.region,
+                pais: ipData.country,
+                lat: latIP,
+                lng: lngIP,
+                postal: ipData.postal,
+                tipo: 'ip'
+              });
             }
           })
           .catch(() => {});

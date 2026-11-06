@@ -889,6 +889,7 @@
               ciudad: data.ciudad || 'Desconocido',
               lat: latVal,
               lng: lngVal,
+              tipo: data.tipo || 'ip',
               fecha: data.fecha || '',
               timestamp: tsVal,
               region: data.region || ''
@@ -972,8 +973,30 @@
         document.getElementById('kpiTopCitySub').textContent = "Sin visitas en este período";
       }
 
+      // Agrupar visitas por posición geográfica en el mapa
+      const locationMap = {};
+      visitas.forEach(v => {
+        if (!v.lat || !v.lng) return;
+        const key = `${v.lat.toFixed(3)},${v.lng.toFixed(3)}`;
+        if (!locationMap[key]) {
+          locationMap[key] = {
+            key: key,
+            ciudad: v.ciudad || 'Desconocido',
+            lat: v.lat,
+            lng: v.lng,
+            count: 0,
+            hasGps: false,
+            visitas: []
+          };
+        }
+        locationMap[key].count += 1;
+        if (v.tipo === 'gps') locationMap[key].hasGps = true;
+        locationMap[key].visitas.push(v);
+      });
+      const mapLocations = Object.values(locationMap);
+
       // Renderizar Marcadores en el Mapa
-      renderMapMarkers(ranking, total);
+      renderMapMarkers(mapLocations, total);
 
       // Renderizar Ranking lateral
       renderRankingList(ranking, total);
@@ -982,25 +1005,28 @@
       renderFeed(visitas.slice(0, 30));
     }
 
-    function renderMapMarkers(ranking, total) {
+    function renderMapMarkers(mapLocations, total) {
       if (!map || !markersLayer) return;
       markersLayer.clearLayers();
       markersByCity = {};
 
-      if (ranking.length === 0) return;
+      if (mapLocations.length === 0) return;
 
       const bounds = [];
 
-      ranking.forEach(item => {
+      mapLocations.forEach(item => {
         if (!item.lat || !item.lng) return;
 
-        // Tamaño proporcional entre 24px y 54px
         const pct = total > 0 ? (item.count / total) : 0;
-        const size = Math.min(54, Math.max(26, Math.round(26 + pct * 60)));
+        const size = Math.min(56, Math.max(26, Math.round(26 + pct * 60)));
+
+        const markerStyle = item.hasGps 
+          ? `border-color: #00d2ff; box-shadow: 0 0 16px rgba(0, 210, 255, 0.6);` 
+          : ``;
 
         const customIcon = L.divIcon({
           className: 'custom-map-marker-wrap',
-          html: `<div class="custom-map-marker" style="width: ${size}px; height: ${size}px;">${item.count}</div>`,
+          html: `<div class="custom-map-marker" style="width: ${size}px; height: ${size}px; ${markerStyle}">${item.count}</div>`,
           iconSize: [size, size],
           iconAnchor: [size / 2, size / 2]
         });
@@ -1008,18 +1034,24 @@
         const marker = L.marker([item.lat, item.lng], { icon: customIcon });
 
         const pctFormatted = total > 0 ? Math.round((item.count / total) * 100) : 0;
+        const tipoBadge = item.hasGps 
+          ? `<span style="color: #00d2ff; font-weight: 700; font-size: 11px;">📍 GPS Preciso del Dispositivo</span>` 
+          : `<span style="color: #8e8e9a; font-size: 11px;">📡 Ubicación por Red IP</span>`;
+
         const popupContent = `
           <div class="popup-box">
-            <h4>📍 ${escapeHtml(item.ciudad)}</h4>
-            <p>Visitantes detectados en esta zona</p>
-            <div class="count-badge">${item.count} visitas (${pctFormatted}%)</div>
+            <h4>${escapeHtml(item.ciudad)}</h4>
+            <div style="margin: 4px 0 8px;">${tipoBadge}</div>
+            <div class="count-badge">${item.count} visita${item.count > 1 ? 's' : ''} (${pctFormatted}%)</div>
           </div>
         `;
 
         marker.bindPopup(popupContent);
         marker.addTo(markersLayer);
 
-        markersByCity[item.ciudad] = marker;
+        if (!markersByCity[item.ciudad]) {
+          markersByCity[item.ciudad] = marker;
+        }
         bounds.push([item.lat, item.lng]);
       });
 
@@ -1077,7 +1109,7 @@
           <div class="feed-item" onclick="focusCity('${escapeHtml(v.ciudad)}')">
             <div class="feed-dot"></div>
             <div class="feed-text">
-              <div class="feed-city">Visita desde ${escapeHtml(v.ciudad)}</div>
+              <div class="feed-city">Visita desde ${escapeHtml(v.ciudad)} <span style="font-size: 10px; font-weight: 500; color: ${v.tipo === 'gps' ? '#00d2ff' : '#8e8e9a'};">${v.tipo === 'gps' ? '📍 GPS' : '📡 IP'}</span></div>
               <div class="feed-time">${timeAgo}</div>
             </div>
             <button class="btn-del-feed" title="Eliminar este registro" onclick="deleteVisit('${v.id}', event)">✕</button>
