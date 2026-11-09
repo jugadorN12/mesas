@@ -490,13 +490,17 @@
   ];
 
   let currentSector = 'salon';
+  let currentBolEvent = 'fecha2';
+  let bolReservasUnsub = null;
+  let config1 = {};
+  let config2 = {};
 
   function getActiveSectorTables() {
     return currentSector === 'terraza' ? TABLES_TERRAZA : TABLES_SALON;
   }
 
-  function setSector(sector) {
-    if (currentSector === sector) return;
+  function setSector(sector, force = false) {
+    if (currentSector === sector && !force) return;
     currentSector = sector;
 
     const tabSalon = document.getElementById("tabSectorSalon");
@@ -510,10 +514,15 @@
 
     const cfg = (currentBolEvent === 'fecha1') ? config1 : config2;
     if (sector === "terraza") {
-      if (mapImgEl) mapImgEl.src = "terraza.png";
+      if (mapImgEl) {
+        if (!mapImgEl.src.endsWith("terraza.png")) {
+          mapImgEl.onload = () => renderMesas();
+          mapImgEl.src = "terraza.png";
+        }
+      }
       if (ultraVipBtn) ultraVipBtn.style.display = "none";
       if (mapBgLayerEl) {
-        const bg = cfg.terraceBgUrl || cfg.bgUrl;
+        const bg = (cfg && (cfg.terraceBgUrl || cfg.bgUrl)) || "";
         if (bg) {
           mapBgLayerEl.style.backgroundImage = `url("${bg}")`;
           mapBgLayerEl.style.display = "";
@@ -523,10 +532,16 @@
         }
       }
     } else {
-      if (mapImgEl) mapImgEl.src = "Gemini_Generated_Image_pxpekipxpekipxpe.png";
+      if (mapImgEl) {
+        if (!mapImgEl.src.endsWith("Gemini_Generated_Image_pxpekipxpekipxpe.png")) {
+          mapImgEl.onload = () => renderMesas();
+          mapImgEl.src = "Gemini_Generated_Image_pxpekipxpekipxpe.png";
+        }
+      }
       if (ultraVipBtn) ultraVipBtn.style.display = "";
       if (mapBgLayerEl) {
-        if (cfg.bgUrl) {
+        const bg = (cfg && cfg.bgUrl) || "";
+        if (bg) {
           mapBgLayerEl.style.backgroundImage = `url("${cfg.bgUrl}")`;
           mapBgLayerEl.style.display = "";
         } else {
@@ -682,10 +697,7 @@
       }
     });
 
-    let currentBolEvent = 'fecha2';
-    let bolReservasUnsub = null;
-    let config1 = {};
-    let config2 = {};
+    // Estado de evento y configuraciones en ámbito general
 
     window.getActiveBolCollection = function() {
       return currentBolEvent === 'fecha1' ? 'reservas' : 'reservas_fecha2';
@@ -720,6 +732,9 @@
 
     function actualizarEventoBoleteria() {
       const nuevoEvento = calcularEventoBoleteria();
+      const eventChanged = (currentBolEvent !== nuevoEvento);
+      currentBolEvent = nuevoEvento;
+
       const banner = document.getElementById('boleteriaEventBanner');
       const title = document.getElementById('boleteriaEventTitle');
 
@@ -729,34 +744,23 @@
         const fechaStr = (cfg.headingText || (nuevoEvento === 'fecha1' ? 'DOMINGO 11' : 'SÁBADO 10')) + (cfg.eventDate ? ' ' + cfg.eventDate : '');
         title.textContent = 'EVENTO: ' + fechaStr;
 
-        const bgLayer = document.getElementById('mapBgLayer');
-        if (bgLayer) {
-          const bg = currentSector === 'terraza' ? (cfg.terraceBgUrl || cfg.bgUrl) : cfg.bgUrl;
-          if (bg) {
-            bgLayer.style.backgroundImage = `url("${bg}")`;
-            bgLayer.style.display = "";
-          } else {
-            bgLayer.style.backgroundImage = "none";
-          }
-        }
-
         const sectorTabsWrap = document.getElementById("sectorTabsWrap");
         const sectorMode = cfg.sectoresHabilitados || 'ambos';
         if (sectorTabsWrap) {
           if (sectorMode === 'main_stage') {
             sectorTabsWrap.style.display = "none";
-            if (currentSector !== 'salon') setSector('salon');
+            setSector('salon', true);
           } else if (sectorMode === 'terrace_soul') {
             sectorTabsWrap.style.display = "none";
-            if (currentSector !== 'terraza') setSector('terraza');
+            setSector('terraza', true);
           } else {
             sectorTabsWrap.style.display = "flex";
+            setSector(currentSector, true);
           }
         }
       }
 
-      if (currentBolEvent !== nuevoEvento || !bolReservasUnsub) {
-        currentBolEvent = nuevoEvento;
+      if (eventChanged || !bolReservasUnsub) {
         listenBoleteriaReservas();
       }
     }
@@ -1555,6 +1559,7 @@
 
   document.getElementById('tabSectorSalon')?.addEventListener('click', () => setSector('salon'));
   document.getElementById('tabSectorTerraza')?.addEventListener('click', () => setSector('terraza'));
+  window.addEventListener('resize', renderMesas);
 </script>
 </body>
 </html>
