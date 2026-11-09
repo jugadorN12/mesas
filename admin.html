@@ -4006,7 +4006,7 @@
 
     let currentNameMapMesa = null;
 
-    function abrirModalNameMap(mesaId) {
+    window.abrirModalNameMap = function(mesaId) {
       currentNameMapMesa = mesaId;
       const r = sharedData[mesaId] || {};
       const modal = document.getElementById('modalNameMap');
@@ -4031,26 +4031,22 @@
 
       modal.style.display = 'flex';
       setTimeout(() => { if (input) input.focus(); }, 100);
-    }
+    };
 
-    function cerrarModalNameMap() {
+    window.cerrarModalNameMap = function() {
       const modal = document.getElementById('modalNameMap');
       if (modal) modal.style.display = 'none';
       currentNameMapMesa = null;
-    }
+    };
 
-    document.querySelectorAll('#adminPosButtons .btn-name-pos').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('#adminPosButtons .btn-name-pos').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const hiddenPos = document.getElementById('modalNameMapPos');
-        if (hiddenPos) hiddenPos.value = btn.dataset.pos;
-      });
-    });
+    window.setAdminPosName = function(pos, btnEl) {
+      const hiddenPos = document.getElementById('modalNameMapPos');
+      if (hiddenPos) hiddenPos.value = pos;
+      document.querySelectorAll('#adminPosButtons .btn-name-pos').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+    };
 
-    document.getElementById('btnCerrarModalNameMap')?.addEventListener('click', cerrarModalNameMap);
-
-    document.getElementById('btnGuardarNameMap')?.addEventListener('click', async () => {
+    window.guardarNameMap = async function() {
       if (!currentNameMapMesa) return;
       const col = getActiveCollection();
       const input = document.getElementById('modalNameMapInput');
@@ -4070,9 +4066,9 @@
       } catch(err) {
         alert('Error al guardar: ' + err.message);
       }
-    });
+    };
 
-    document.getElementById('btnOcultarNameMap')?.addEventListener('click', async () => {
+    window.ocultarNameMap = async function() {
       if (!currentNameMapMesa) return;
       const col = getActiveCollection();
       try {
@@ -4083,7 +4079,7 @@
       } catch(err) {
         alert('Error al ocultar: ' + err.message);
       }
-    });
+    };
     refresh.addEventListener('click', render);
     listenReservas();
     db.collection('caja_movimientos').orderBy('ts', 'desc').onSnapshot(snapshot => {
@@ -4866,32 +4862,32 @@
   </script>
 
   <!-- Modal táctil para configurar Nombre y Posición en Mapa Público -->
-  <div id="modalNameMap" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:99999; align-items:center; justify-content:center; padding:16px;">
-    <div style="background:#15151c; border:1.5px solid #a3e635; border-radius:14px; max-width:380px; width:100%; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.8); color:#f4f2ef;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid #2a2a35; padding-bottom:10px;">
-        <strong style="color:#a3e635; font-size:16px;" id="modalNameMapTitle">🏷️ Nombre en el Mapa</strong>
-        <button type="button" id="btnCerrarModalNameMap" style="background:transparent; border:none; color:#9b9ba5; font-size:24px; cursor:pointer; line-height:1;">&times;</button>
+  <div id="modalNameMap" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:999999; box-sizing:border-box; padding:16px; justify-content:center; align-items:center;">
+    <div style="background:#15151c; border:1.5px solid #a3e635; border-radius:14px; width:100%; max-width:340px; box-sizing:border-box; padding:16px 18px; box-shadow:0 10px 30px rgba(0,0,0,0.9); color:#f4f2ef; margin:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #2a2a35; padding-bottom:8px;">
+        <strong style="color:#a3e635; font-size:15.5px;" id="modalNameMapTitle">🏷️ Nombre en el Mapa</strong>
+        <button type="button" onclick="cerrarModalNameMap()" style="background:transparent; border:none; color:#9b9ba5; font-size:24px; cursor:pointer; line-height:1; padding:0 4px;">&times;</button>
       </div>
 
-      <div style="margin-bottom:14px;">
+      <div style="margin-bottom:12px;">
         <label style="display:block; font-size:11.5px; color:#9b9ba5; margin-bottom:5px; font-weight:bold;">Nombre a mostrar en el mapa:</label>
-        <input type="text" id="modalNameMapInput" placeholder="Ej: Gustavo, Romina, Cristian" style="width:100%; box-sizing:border-box; padding:10px 12px; background:#09090d; color:#fff; border:1px solid #a3e635; border-radius:8px; font-size:14px; font-weight:bold; outline:none;">
+        <input type="text" id="modalNameMapInput" placeholder="Ej: Gustavo, Romina, Cristian" style="width:100%; box-sizing:border-box; padding:9px 12px; background:#09090d; color:#fff; border:1px solid #a3e635; border-radius:8px; font-size:14px; font-weight:bold; outline:none;">
       </div>
 
-      <div style="margin-bottom:18px;">
-        <label style="display:block; font-size:11.5px; color:#9b9ba5; margin-bottom:7px; font-weight:bold;">¿Dónde querés ubicar la etiqueta?:</label>
+      <div style="margin-bottom:16px;">
+        <label style="display:block; font-size:11.5px; color:#9b9ba5; margin-bottom:6px; font-weight:bold;">¿Dónde querés ubicar la etiqueta?:</label>
         <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px;" id="adminPosButtons">
-          <button type="button" class="btn-name-pos active" data-pos="arriba">⬆️ Arriba</button>
-          <button type="button" class="btn-name-pos" data-pos="abajo">⬇️ Abajo</button>
-          <button type="button" class="btn-name-pos" data-pos="izquierda">⬅️ Izq</button>
-          <button type="button" class="btn-name-pos" data-pos="derecha">➡️ Der</button>
+          <button type="button" class="btn-name-pos active" onclick="setAdminPosName('arriba', this)" data-pos="arriba">⬆️ Arriba</button>
+          <button type="button" class="btn-name-pos" onclick="setAdminPosName('abajo', this)" data-pos="abajo">⬇️ Abajo</button>
+          <button type="button" class="btn-name-pos" onclick="setAdminPosName('izquierda', this)" data-pos="izquierda">⬅️ Izq</button>
+          <button type="button" class="btn-name-pos" onclick="setAdminPosName('derecha', this)" data-pos="derecha">➡️ Der</button>
         </div>
         <input type="hidden" id="modalNameMapPos" value="arriba">
       </div>
 
       <div style="display:flex; gap:10px;">
-        <button type="button" id="btnGuardarNameMap" style="flex:2; padding:11px; background:#a3e635; border:none; color:#000; font-weight:800; border-radius:8px; cursor:pointer; font-size:13px; text-transform:uppercase;">GUARDAR EN MAPA</button>
-        <button type="button" id="btnOcultarNameMap" style="flex:1; padding:11px; background:rgba(255,45,61,0.15); border:1px solid #ff2d3d; color:#ff8f97; font-weight:700; border-radius:8px; cursor:pointer; font-size:12px;">OCULTAR</button>
+        <button type="button" onclick="guardarNameMap()" style="flex:2; padding:11px 6px; background:#a3e635; border:none; color:#000; font-weight:800; border-radius:8px; cursor:pointer; font-size:12.5px; text-transform:uppercase;">GUARDAR EN MAPA</button>
+        <button type="button" id="btnOcultarNameMap" onclick="ocultarNameMap()" style="flex:1; padding:11px 6px; background:rgba(255,45,61,0.18); border:1px solid #ff2d3d; color:#ff8f97; font-weight:700; border-radius:8px; cursor:pointer; font-size:12px;">OCULTAR</button>
       </div>
     </div>
   </div>
