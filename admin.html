@@ -2924,6 +2924,7 @@
             ${isPending && r.expiresAt ? `<span class="countdown" data-expires="${r.expiresAt}" data-mesa="${mesa}">--:--</span>` : ''}
           </div>
           <div class="actions">
+            <button style="${r.mostrarNombreEnMapa ? 'background:rgba(163,230,53,0.18); border-color:#a3e635; color:#a3e635; font-weight:bold;' : 'background:transparent; border-color:var(--line); color:var(--muted);'}" data-action="toggle_name_map" data-id="${mesa}" title="Mostrar u ocultar nombre en el mapa público">🏷️ Mapa: ${r.mostrarNombreEnMapa ? escapeHtml(r.nombreEnMapa || 'SÍ') : 'NO'}</button>
             ${isApproved ? `<button data-action="pending" data-id="${mesa}">Volver a disputa</button>` : ''}
             ${r.status === 'pendiente' || isPending ? `<button class="approve" data-action="approve" data-id="${mesa}">Confirmar reserva</button>` : ''}
             ${!isCortesia ? `<button style="background:#5a189a; border-color:#9d4edd; color:#fff;" data-action="cortesia" data-id="${mesa}">🎁 Cortesía</button>` : `<button style="background:#2a2a35; border-color:#5a189a; color:#e0aaff;" data-action="quitar_cortesia" data-id="${mesa}">Quitar cortesía</button>`}
@@ -3219,6 +3220,33 @@
         if(button.dataset.action==='quitar_cortesia') {
           if (!confirm(`¿Quitar el estado de cortesía a la MESA ${id} y volver a dejarla disponible?`)) return;
           await db.collection(col).doc(id).delete();
+        }
+        if(button.dataset.action==='toggle_name_map') {
+          const r = sharedData[id] || {};
+          const yaMostrando = !!r.mostrarNombreEnMapa;
+          if (yaMostrando) {
+            const opcion = confirm(`La mesa ${id} muestra actualmente en el mapa: "${r.nombreEnMapa || r.nombre}".\n\n¿Querés ocultarla del mapa público?\n(Aceptar = Ocultar / Cancelar = Modificar nombre o posición)`);
+            if (opcion) {
+              await db.collection(col).doc(id).update({
+                mostrarNombreEnMapa: false
+              });
+              return;
+            }
+          }
+
+          const sugerido = r.nombreEnMapa || (r.nombre ? r.nombre.trim().split(' ')[0] : 'Invitado');
+          const nuevoNombre = prompt(`Ingresá el nombre que se verá en el mapa para la MESA ${id}:`, sugerido);
+          if (nuevoNombre === null) return;
+          const textoNombre = nuevoNombre.trim() || sugerido;
+
+          const esAbajo = confirm(`¿Ubicar la etiqueta ABAJO de la mesa?\n\n• Aceptar = ABAJO de la mesa\n• Cancelar = ARRIBA de la mesa`);
+          const posElegida = esAbajo ? 'abajo' : 'arriba';
+
+          await db.collection(col).doc(id).update({
+            mostrarNombreEnMapa: true,
+            nombreEnMapa: textoNombre,
+            posicionNombreMapa: posElegida
+          });
         }
       }catch(_){alert('No se pudo actualizar la reserva.');}
     });

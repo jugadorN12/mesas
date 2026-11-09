@@ -699,6 +699,25 @@
       text-shadow: 0 1px 4px #000, 0 0 10px rgba(192, 132, 252, 0.8) !important;
     }
 
+    .table-name-tag {
+      position: absolute;
+      transform: translateX(-50%);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      color: #a3e635;
+      text-shadow: 0 1px 2px #000, 0 0 5px #000;
+      background: rgba(10, 10, 15, 0.78);
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(163, 230, 53, 0.5);
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 10;
+      letter-spacing: 0.3px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+    }
+
     .table-btn .table-label {
       pointer-events: none;
       color: #fff;
@@ -1535,6 +1554,30 @@
             <input class="name-input" id="masterNameInput" type="text" placeholder="Nombre de la reserva"
               style="margin-bottom: 8px;">
             <input class="name-input" id="masterNoteInput" type="text" placeholder="Nota / Medio de pago">
+          </div>
+
+          <!-- Módulo de Nombre Visible en Mapa Público (Admin y Asistente) -->
+          <div
+            style="margin-bottom: 15px; padding: 12px; background: rgba(163, 230, 53, 0.08); border: 1px dashed rgba(163, 230, 53, 0.4); border-radius: 10px;">
+            <label
+              style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; color: #a3e635; cursor: pointer;">
+              <input type="checkbox" id="masterShowNameOnMap"
+                style="transform: scale(1.2); accent-color: #a3e635; cursor: pointer;">
+              🏷️ Mostrar nombre en el mapa público
+            </label>
+            <div id="masterShowNameFields" style="display: none; margin-top: 10px;">
+              <input class="name-input" id="masterDisplayNameInput" type="text"
+                placeholder="Ej: Gustavo, Romina (apodo o primer nombre)"
+                style="padding: 8px 10px; font-size: 12.5px; border-color: rgba(163, 230, 53, 0.5); margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <span style="font-size: 11px; color: var(--grey);">Posición de la etiqueta:</span>
+                <select id="masterPosNameOnMap"
+                  style="background: #111; color: #a3e635; border: 1px solid rgba(163, 230, 53, 0.5); border-radius: 6px; padding: 4px 8px; font-size: 11.5px; font-weight: bold; outline: none; cursor: pointer;">
+                  <option value="arriba">Arriba de la mesa</option>
+                  <option value="abajo">Abajo de la mesa</option>
+                </select>
+              </div>
+            </div>
           </div>
 
           <!-- Módulo de Excepción / Trato Especial (Admin y Asistente) -->
@@ -2472,7 +2515,7 @@
     }
 
     function renderMesas() {
-      planoMesas.querySelectorAll(".table-btn").forEach(b => b.remove());
+      planoMesas.querySelectorAll(".table-btn, .table-name-tag").forEach(b => b.remove());
 
       // Calcular tamaño cuadrado exacto basado en el ancho del mapa
       const mapWidth = planoMesas.offsetWidth;
@@ -2518,6 +2561,24 @@
           btn.addEventListener("click", () => abrirMesa(t.id));
         }
         planoMesas.appendChild(btn);
+
+        // Etiqueta de nombre visible en mapa si está activada
+        if (activa && (reserva.mostrarNombreEnMapa || reserva.mostrarNombre)) {
+          const rawName = (reserva.nombreEnMapa || reserva.nombreVisible || (reserva.nombre ? reserva.nombre.trim().split(' ')[0] : '')).trim();
+          if (rawName) {
+            const tag = document.createElement("div");
+            tag.className = "table-name-tag";
+            tag.textContent = rawName;
+            tag.style.left = `calc(${t.x}% + ${btnSize / 2}px)`;
+            const pos = reserva.posicionNombreMapa || (t.y > 75 ? "arriba" : "abajo");
+            if (pos === "abajo") {
+              tag.style.top = `calc(${t.y}% + ${btnSize + 3}px)`;
+            } else {
+              tag.style.top = `calc(${t.y}% - 19px)`;
+            }
+            planoMesas.appendChild(tag);
+          }
+        }
       });
       actualizarContador();
     }
@@ -2596,6 +2657,21 @@
         document.getElementById("masterExDrinksPct").value = (current?.porcentajeConsumo !== undefined && current?.porcentajeConsumo !== null) ? current.porcentajeConsumo : "";
         document.getElementById("masterExSena").value = current?.montoSenado || "";
         updateMasterExPreview();
+
+        // Inicializar módulo de nombre visible en mapa
+        const isShowName = !!(current?.mostrarNombreEnMapa || current?.mostrarNombre);
+        const showNameCheck = document.getElementById("masterShowNameOnMap");
+        const showNameFields = document.getElementById("masterShowNameFields");
+        const dispNameInput = document.getElementById("masterDisplayNameInput");
+        const posNameSelect = document.getElementById("masterPosNameOnMap");
+        if (showNameCheck) showNameCheck.checked = isShowName;
+        if (showNameFields) showNameFields.style.display = isShowName ? "block" : "none";
+        if (dispNameInput) {
+          dispNameInput.value = current?.nombreEnMapa || current?.nombreVisible || (current?.nombre ? current.nombre.trim().split(' ')[0] : "");
+        }
+        if (posNameSelect) {
+          posNameSelect.value = current?.posicionNombreMapa || "arriba";
+        }
 
         // Highlight current status in buttons
         document.querySelectorAll(".btn-master").forEach(btn => {
@@ -2937,6 +3013,20 @@
         if (el) el.addEventListener("input", updateMasterExPreview);
       });
 
+      // Listeners para módulo de nombre visible en mapa
+      const chkShowName = document.getElementById("masterShowNameOnMap");
+      if (chkShowName) {
+        chkShowName.addEventListener("change", (e) => {
+          const fields = document.getElementById("masterShowNameFields");
+          if (fields) fields.style.display = e.target.checked ? "block" : "none";
+          const dispInput = document.getElementById("masterDisplayNameInput");
+          if (e.target.checked && dispInput && !dispInput.value.trim()) {
+            const mName = document.getElementById("masterNameInput")?.value.trim() || "";
+            dispInput.value = mName ? mName.split(' ')[0] : "";
+          }
+        });
+      }
+
       // Master Action Buttons
       document.querySelectorAll(".btn-master").forEach(btn => {
         btn.addEventListener("click", async () => {
@@ -2945,6 +3035,18 @@
           const masterName = document.getElementById("masterNameInput").value.trim();
           const masterNote = document.getElementById("masterNoteInput").value.trim();
           const targetCol = getActiveReservasCollection();
+
+          const showNameOnMap = !!document.getElementById("masterShowNameOnMap")?.checked;
+          let displayNameOnMap = document.getElementById("masterDisplayNameInput")?.value.trim() || "";
+          if (showNameOnMap && !displayNameOnMap) {
+            displayNameOnMap = masterName ? masterName.split(' ')[0] : "";
+          }
+          const posNameOnMap = document.getElementById("masterPosNameOnMap")?.value || "arriba";
+          const nameOnMapPayload = {
+            mostrarNombreEnMapa: showNameOnMap,
+            nombreEnMapa: displayNameOnMap,
+            posicionNombreMapa: posNameOnMap
+          };
 
           try {
             if (newStatus === "libre") {
@@ -2973,7 +3075,8 @@
                 montoConsumoCredito: 0,
                 porcentajeConsumo: 0,
                 autorizadoPor: currentEmail,
-                cortesiaAt: Date.now()
+                cortesiaAt: Date.now(),
+                ...nameOnMapPayload
               }, { merge: true });
             } else {
               const isEx = !!document.getElementById("masterIsExcepcion")?.checked;
@@ -3023,7 +3126,8 @@
                 masterAction: true,
                 sector: isTerrazaMesa ? "terraza" : "salon",
                 numeroMesa: isTerrazaMesa ? mesaActual.replace("T-", "") : mesaActual,
-                ...exPayload
+                ...exPayload,
+                ...nameOnMapPayload
               }, { merge: true });
             }
             showToast("Estado actualizado.");
