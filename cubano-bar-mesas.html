@@ -2140,8 +2140,9 @@
 
     function reservaActiva(reserva) {
       if (!reserva) return false;
+      if (reserva.status === "cortesia" || reserva.esCortesia) return true;
       if (reserva.status === "disputa" && Number.isFinite(reserva.expiresAt) && reserva.expiresAt <= Date.now()) return false;
-      return ["pendiente", "disputa", "aprobada", "ocupada", "comprobante_subido", "pendiente_revision", "vendida", "ingresada"].includes(reserva.status);
+      return ["pendiente", "disputa", "aprobada", "ocupada", "comprobante_subido", "pendiente_revision", "vendida", "ingresada", "cortesia"].includes(reserva.status);
     }
 
     function actualizarContador() {
