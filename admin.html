@@ -12,7 +12,7 @@
   <title>Cubano Bar | Administracion de mesas</title>
   <link rel="stylesheet" href="shared.css">
   <style>
-    :root{--bg:#09090d;--card:#15151c;--line:#2a2a35;--text:#f4f2ef;--muted:#9b9ba5;--red:#ff2d3d;--amber:#ffbd3e;--gold:#f6b73c;--blue:#58a6ff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 0 0,#321016,transparent 38%),var(--bg);color:var(--text);font:15px Arial,sans-serif}.wrap{max-width:880px;margin:auto;padding:28px 18px 52px}.head{display:flex;justify-content:space-between;gap:16px;align-items:start;border-bottom:1px solid var(--line);padding-bottom:22px}.brand{font-size:26px;font-weight:800;letter-spacing:.5px}.brand b{color:var(--red)}h1{font-size:25px;margin:28px 0 5px}.sub{color:var(--muted);margin:0 0 22px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}.stat strong{display:block;font-size:25px;margin-bottom:4px}.stat span{color:var(--muted);font-size:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}.empty{padding:34px;color:var(--muted);text-align:center}.row{display:grid;grid-template-columns:70px 1fr auto;gap:14px;align-items:center;padding:15px;border-bottom:1px solid var(--line)}.row:last-child{border:0}.mesa{font-weight:800;font-size:20px}.detail{min-width:0}.detail b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.detail small{color:var(--muted)}.badge{display:inline-block;font-size:11px;font-weight:bold;text-transform:uppercase;border-radius:99px;padding:5px 8px;margin-top:5px} .pendiente{background:#3d2b07;color:#ffd878}.aprobada{background:#461016;color:#ff8f97}.ingresada{background:#0a2e4d;color:var(--blue)}.actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:end}
+    :root{--bg:#09090d;--card:#15151c;--line:#2a2a35;--text:#f4f2ef;--muted:#9b9ba5;--red:#ff2d3d;--amber:#ffbd3e;--gold:#f6b73c;--blue:#58a6ff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 0 0,#321016,transparent 38%),var(--bg);color:var(--text);font:15px Arial,sans-serif}.wrap{max-width:880px;margin:auto;padding:28px 18px 52px}.head{display:flex;justify-content:space-between;gap:16px;align-items:start;border-bottom:1px solid var(--line);padding-bottom:22px}.brand{font-size:26px;font-weight:800;letter-spacing:.5px}.brand b{color:var(--red)}h1{font-size:25px;margin:28px 0 5px}.sub{color:var(--muted);margin:0 0 22px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}.stat strong{display:block;font-size:25px;margin-bottom:4px}.stat span{color:var(--muted);font-size:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}.empty{padding:34px;color:var(--muted);text-align:center}.row{display:grid;grid-template-columns:70px 1fr auto;gap:14px;align-items:center;padding:15px;border-bottom:1px solid var(--line)}.row:last-child{border:0}.mesa{font-weight:800;font-size:20px}.detail{min-width:0}.detail b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.detail small{color:var(--muted)}.badge{display:inline-block;font-size:11px;font-weight:bold;text-transform:uppercase;border-radius:99px;padding:5px 8px;margin-top:5px} .pendiente{background:#3d2b07;color:#ffd878}.aprobada{background:#461016;color:#ff8f97}.ingresada{background:#0a2e4d;color:var(--blue)}.cortesia{background:#5a189a;color:#e0aaff;border:1px solid #9d4edd}.actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:end}
     button, .link {
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -465,6 +465,15 @@
       background: linear-gradient(180deg, rgba(88, 166, 255, 0.08) 0%, rgba(16, 18, 25, 0.95) 100%);
       border: 1.5px solid #58a6ff;
       box-shadow: 0 4px 20px rgba(88, 166, 255, 0.1);
+    }
+    .calc-card-cortesia {
+      background: linear-gradient(180deg, rgba(168, 85, 247, 0.08) 0%, rgba(16, 18, 25, 0.95) 100%);
+      border: 1.5px solid #a855f7;
+      box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15);
+    }
+    .calc-pay-card.calc-card-selected.calc-card-cortesia {
+      border: 2px solid #c084fc;
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.4), inset 0 0 15px rgba(168, 85, 247, 0.15);
     }
 
     .calc-pay-header {
@@ -1057,6 +1066,7 @@
       <div class="stat"><strong id="pendingCount">0</strong><span>Pendientes</span></div>
       <div class="stat"><strong id="approvedCount">0</strong><span>Vendidas</span></div>
       <div class="stat"><strong id="ingresadaCount">0</strong><span>Dentro</span></div>
+      <div class="stat" style="border-color:#5a189a;"><strong id="cortesiaCount" style="color:#c084fc;">0</strong><span style="color:#e0aaff;">Cortesías</span></div>
       <div class="stat"><strong id="peopleTotalCount">0</strong><span>Total Personas</span></div>
     </section>
 
@@ -1162,6 +1172,40 @@
             <div class="calc-consumo-tag">
               <span class="calc-consumo-label">🍹 Beneficio en bebidas:</span>
               <span id="transfConsumoVal" class="calc-consumo-value">$80.000</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta Cortesía ($0) -->
+        <div class="calc-pay-card calc-card-cortesia" id="calcCardCortesia" onclick="toggleCalcPayMethod('cortesia')">
+          <div>
+            <div class="calc-pay-header">
+              <span class="calc-pay-badge" style="background:#5a189a; color:#e0aaff;">Forma de pago 3</span>
+              <div class="calc-pay-check-wrap" onclick="event.stopPropagation();">
+                <input type="checkbox" id="calcPayOptCortesia" class="calc-pay-chk" onchange="toggleCalcPayMethod('cortesia', this.checked)">
+                <label for="calcPayOptCortesia">Elegir Cortesía</label>
+              </div>
+            </div>
+            <h3 class="calc-pay-title" style="margin-top:4px; color:#c084fc;">🎁 Cortesía ($0)</h3>
+            <div class="calc-row-item">
+              <span class="calc-row-label">Precio de la mesa:</span>
+              <span class="calc-row-val" style="color:#c084fc;">$0</span>
+            </div>
+            <div class="calc-row-item">
+              <span class="calc-row-label">Seña requerida:</span>
+              <span class="calc-row-val" style="color:#c084fc;">$0</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="calc-highlight-box" style="background:rgba(168, 85, 247, 0.12); border:1px solid #9d4edd;">
+              <div class="calc-highlight-label" style="color:#e0aaff;">Saldo en puerta</div>
+              <div class="calc-highlight-amount" style="color:#c084fc;">$0</div>
+              <div style="font-size:12px; color:#e0aaff; margin-top:4px; font-weight:700;">Mesa bonificada al 100%</div>
+            </div>
+
+            <div class="calc-consumo-tag" style="background:rgba(168, 85, 247, 0.15);">
+              <span class="calc-consumo-label" style="color:#e0aaff;">🟣 Quedará en púrpura en el mapa</span>
             </div>
           </div>
         </div>
@@ -2697,14 +2741,17 @@
         items = allItems.filter(([m]) => m.startsWith('T-'));
       }
 
-      const pending=items.filter(([,r])=>['pendiente','disputa','comprobante_subido','pendiente_revision'].includes(r.status)).length;
-      const approved=items.filter(([,r])=>['aprobada','ocupada','vendida','ingresada'].includes(r.status)).length;
-      const ingresadas=items.filter(([,r])=>r.status==='ingresada').length;
+      const pending=items.filter(([,r])=>['pendiente','disputa','comprobante_subido','pendiente_revision'].includes(r.status) && !r.esCortesia && r.status !== 'cortesia').length;
+      const approved=items.filter(([,r])=>['aprobada','ocupada','vendida'].includes(r.status) && !r.esCortesia && r.status !== 'cortesia').length;
+      const ingresadas=items.filter(([,r])=>r.status==='ingresada' && !r.esCortesia).length;
+      const cortesias=items.filter(([,r])=>r.status==='cortesia' || r.esCortesia).length;
       const totalPeople=items.reduce((sum, [,r]) => sum + (parseInt(r.cantidadPersonas) || 0), 0);
 
       pendingCount.textContent=pending;
       approvedCount.textContent=approved;
       ingresadaCount.textContent=ingresadas;
+      const cortesiaCountEl = document.getElementById('cortesiaCount');
+      if (cortesiaCountEl) cortesiaCountEl.textContent = cortesias;
       peopleTotalCount.textContent=totalPeople;
 
       // Ocultar botón de guardar si no hay items
@@ -2716,10 +2763,12 @@
         const isIngresada = r.status==='ingresada';
         const isPending = ['disputa','pendiente','comprobante_subido','pendiente_revision'].includes(r.status);
 
+        const isCortesia = r.status === 'cortesia' || r.esCortesia;
         let statusLabel = 'En disputa';
         let badgeClass = 'pendiente';
         if (isApproved) { statusLabel = 'Reservada confirmada'; badgeClass = 'aprobada'; }
         if (isIngresada) { statusLabel = 'INGRESADA'; badgeClass = 'ingresada'; }
+        if (isCortesia) { statusLabel = '🎁 CORTESÍA ($0)'; badgeClass = 'cortesia'; }
 
         const node=document.createElement('article');
         node.className='row';
@@ -2877,6 +2926,7 @@
           <div class="actions">
             ${isApproved ? `<button data-action="pending" data-id="${mesa}">Volver a disputa</button>` : ''}
             ${r.status === 'pendiente' || isPending ? `<button class="approve" data-action="approve" data-id="${mesa}">Confirmar reserva</button>` : ''}
+            ${!isCortesia ? `<button style="background:#5a189a; border-color:#9d4edd; color:#fff;" data-action="cortesia" data-id="${mesa}">🎁 Cortesía</button>` : `<button style="background:#2a2a35; border-color:#5a189a; color:#e0aaff;" data-action="quitar_cortesia" data-id="${mesa}">Quitar cortesía</button>`}
             <button class="delete" data-action="delete" data-id="${mesa}">Eliminar</button>
           </div>
         `;
@@ -3138,6 +3188,36 @@
         if(button.dataset.action==='pending')await db.collection(col).doc(id).update({status:'pendiente',approvedAt:null,approvedBy:null,montoSenado:null});
         if(button.dataset.action==='delete') {
           if(!confirm('¿Eliminar esta reserva?')) return;
+          await db.collection(col).doc(id).delete();
+        }
+        if(button.dataset.action==='cortesia') {
+          const r = sharedData[id] || {};
+          const nombreInvitado = prompt(`¿A nombre de quién es la cortesía para la MESA ${id}?`, r.nombre || 'Invitado Especial');
+          if (nombreInvitado === null) return;
+          const isTerrazaMesa = id.startsWith('T-');
+          await db.collection(col).doc(id).set({
+            status: 'cortesia',
+            esCortesia: true,
+            formaPago: 'cortesia',
+            montoTotal: 0,
+            precioTotal: 0,
+            montoSenado: 0,
+            saldoPuerta: 0,
+            montoConsumicion: 0,
+            montoConsumoCredito: 0,
+            porcentajeConsumo: 0,
+            nombre: nombreInvitado || 'Invitado Especial',
+            beneficiario: nombreInvitado || 'Invitado Especial',
+            cantidadPersonas: r.cantidadPersonas || 4,
+            autorizadoPor: auth.currentUser?.email || 'admin',
+            sector: isTerrazaMesa ? 'terraza' : 'salon',
+            numeroMesa: isTerrazaMesa ? id.replace('T-', '') : id,
+            cortesiaAt: Date.now(),
+            ts: r.ts || Date.now()
+          }, { merge: true });
+        }
+        if(button.dataset.action==='quitar_cortesia') {
+          if (!confirm(`¿Quitar el estado de cortesía a la MESA ${id} y volver a dejarla disponible?`)) return;
           await db.collection(col).doc(id).delete();
         }
       }catch(_){alert('No se pudo actualizar la reserva.');}
@@ -3568,8 +3648,10 @@
 
       const cardCash = document.getElementById('calcCardCash');
       const cardTransf = document.getElementById('calcCardTransf');
+      const cardCortesia = document.getElementById('calcCardCortesia');
       const chkCash = document.getElementById('calcPayOptCash');
       const chkTransf = document.getElementById('calcPayOptTransf');
+      const chkCortesia = document.getElementById('calcPayOptCortesia');
 
       if (cardCash) {
         if (calcSelectedPayment === 'efectivo') {
@@ -3587,8 +3669,17 @@
         }
       }
 
+      if (cardCortesia) {
+        if (calcSelectedPayment === 'cortesia') {
+          cardCortesia.classList.add('calc-card-selected');
+        } else {
+          cardCortesia.classList.remove('calc-card-selected');
+        }
+      }
+
       if (chkCash) chkCash.checked = (calcSelectedPayment === 'efectivo');
       if (chkTransf) chkTransf.checked = (calcSelectedPayment === 'transferencia');
+      if (chkCortesia) chkCortesia.checked = (calcSelectedPayment === 'cortesia');
 
       verificarCondicionesReservaCalc();
     };
@@ -3661,14 +3752,21 @@
       const mesaElegida = select.value;
       calcSelectedMesa = mesaElegida;
 
-      const hayMetodo = (calcSelectedPayment === 'efectivo' || calcSelectedPayment === 'transferencia');
+      const hayMetodo = (calcSelectedPayment === 'efectivo' || calcSelectedPayment === 'transferencia' || calcSelectedPayment === 'cortesia');
       const hayMesa = !!mesaElegida;
 
       if (hayMetodo && hayMesa) {
         btnConfirmar.disabled = false;
-        const nombreMetodo = calcSelectedPayment === 'efectivo' ? '💵 Efectivo' : '💳 Transferencia';
-        notice.style.color = '#2ee6a6';
-        notice.textContent = `✅ Listo para confirmar: Mesa ${mesaElegida} con forma de pago ${nombreMetodo}. Al tocar el botón quedará reservada en el mapa.`;
+        if (calcSelectedPayment === 'cortesia') {
+          notice.style.color = '#c084fc';
+          notice.textContent = `🟣 Listo para confirmar: Mesa ${mesaElegida} como CORTESÍA ($0). Al tocar el botón quedará en púrpura en el mapa.`;
+          btnConfirmar.textContent = '💾 Confirmar Cortesía ($0)';
+        } else {
+          const nombreMetodo = calcSelectedPayment === 'efectivo' ? '💵 Efectivo' : '💳 Transferencia';
+          notice.style.color = '#2ee6a6';
+          notice.textContent = `✅ Listo para confirmar: Mesa ${mesaElegida} con forma de pago ${nombreMetodo}. Al tocar el botón quedará reservada en el mapa.`;
+          btnConfirmar.textContent = '💾 Confirmar Reserva';
+        }
       } else {
         btnConfirmar.disabled = true;
         notice.style.color = 'var(--muted)';
@@ -3722,19 +3820,28 @@
           return;
         }
 
-        const textoPago = calcSelectedPayment === 'efectivo' ? 'EFECTIVO' : 'TRANSFERENCIA';
-        const saldoPuerta = calcSelectedPayment === 'efectivo' ? res.enPuerta : res.restoTransferencia;
-        const totalFinal = calcSelectedPayment === 'efectivo' ? res.precioMesa : res.totalTransferencia;
+        let confirmMsg = '';
+        if (calcSelectedPayment === 'cortesia') {
+          confirmMsg = `¿Confirmar MESA ${mesaId} como CORTESÍA ($0)?\n\n` +
+            `• Personas: ${res.personas}\n` +
+            `• Beneficiario: ${cliente || 'Invitado Especial'}\n` +
+            `• Total a cobrar: $0\n\n` +
+            `La mesa cambiará a PÚRPURA en el mapa.`;
+        } else {
+          const textoPago = calcSelectedPayment === 'efectivo' ? 'EFECTIVO' : 'TRANSFERENCIA';
+          const saldoPuerta = calcSelectedPayment === 'efectivo' ? res.enPuerta : res.restoTransferencia;
+          const totalFinal = calcSelectedPayment === 'efectivo' ? res.precioMesa : res.totalTransferencia;
 
-        const confirmMsg = `¿Confirmar reserva inmediata de la MESA ${mesaId}?\n\n` +
-          `• Personas: ${res.personas}\n` +
-          `• Cliente: ${cliente || 'Sin nombre especificado'}\n` +
-          `• Forma de pago: ${textoPago}\n` +
-          `• Seña abonada: ${calcFormatMoney(res.sena)}\n` +
-          `• Saldo en puerta: ${calcFormatMoney(saldoPuerta)}\n` +
-          `• Total: ${calcFormatMoney(totalFinal)}\n` +
-          `• Beneficio en bebidas: ${calcFormatMoney(res.consumo)}\n\n` +
-          `La mesa cambiará a ROJO (reservada) inmediatamente en el mapa.`;
+          confirmMsg = `¿Confirmar reserva inmediata de la MESA ${mesaId}?\n\n` +
+            `• Personas: ${res.personas}\n` +
+            `• Cliente: ${cliente || 'Sin nombre especificado'}\n` +
+            `• Forma de pago: ${textoPago}\n` +
+            `• Seña abonada: ${calcFormatMoney(res.sena)}\n` +
+            `• Saldo en puerta: ${calcFormatMoney(saldoPuerta)}\n` +
+            `• Total: ${calcFormatMoney(totalFinal)}\n` +
+            `• Beneficio en bebidas: ${calcFormatMoney(res.consumo)}\n\n` +
+            `La mesa cambiará a ROJO (reservada) inmediatamente en el mapa.`;
+        }
 
         if (!confirm(confirmMsg)) return;
 
@@ -3745,27 +3852,57 @@
         const userEmail = (auth.currentUser && auth.currentUser.email) ? auth.currentUser.email : 'admin';
         const vendedorLabel = (currentUserRole === 'admin' ? `Admin (${userEmail})` : `Asistente (${userEmail})`);
 
-        const payload = {
-          status: 'aprobada',
-          nombre: cliente || `Cliente Mesa ${mesaId}`,
-          contacto: '',
-          cantidadPersonas: res.personas,
-          formaPago: calcSelectedPayment, // 'efectivo' | 'transferencia'
-          precioTotal: res.precioMesa,
-          montoTotal: totalFinal,
-          montoSenado: res.sena,
-          saldoPuerta: saldoPuerta,
-          montoConsumoCredito: res.consumo,
-          montoConsumicion: res.consumo,
-          porcentajeConsumo: res.precioMesa > 0 ? Math.round((res.consumo / res.precioMesa) * 100) : 80,
-          recargoTransferencia: (calcSelectedPayment === 'transferencia') ? res.recargoTransf : 0,
-          pctRecargo: (calcSelectedPayment === 'transferencia') ? res.pctRecargo : 0,
-          vendedor: vendedorLabel,
-          approvedBy: userEmail,
-          approvedAt: Date.now(),
-          ts: Date.now(),
-          origen: 'calculadora_admin'
-        };
+        let payload = {};
+        if (calcSelectedPayment === 'cortesia') {
+          payload = {
+            status: 'cortesia',
+            esCortesia: true,
+            formaPago: 'cortesia',
+            nombre: cliente || 'Invitado Especial',
+            beneficiario: cliente || 'Invitado Especial',
+            contacto: '',
+            cantidadPersonas: res.personas || 4,
+            precioTotal: 0,
+            montoTotal: 0,
+            montoSenado: 0,
+            saldoPuerta: 0,
+            montoConsumoCredito: 0,
+            montoConsumicion: 0,
+            porcentajeConsumo: 0,
+            recargoTransferencia: 0,
+            pctRecargo: 0,
+            vendedor: vendedorLabel,
+            approvedBy: userEmail,
+            approvedAt: Date.now(),
+            ts: Date.now(),
+            origen: 'calculadora_admin',
+            cortesiaAt: Date.now()
+          };
+        } else {
+          const saldoPuerta = calcSelectedPayment === 'efectivo' ? res.enPuerta : res.restoTransferencia;
+          const totalFinal = calcSelectedPayment === 'efectivo' ? res.precioMesa : res.totalTransferencia;
+          payload = {
+            status: 'aprobada',
+            nombre: cliente || `Cliente Mesa ${mesaId}`,
+            contacto: '',
+            cantidadPersonas: res.personas,
+            formaPago: calcSelectedPayment,
+            precioTotal: res.precioMesa,
+            montoTotal: totalFinal,
+            montoSenado: res.sena,
+            saldoPuerta: saldoPuerta,
+            montoConsumoCredito: res.consumo,
+            montoConsumicion: res.consumo,
+            porcentajeConsumo: res.precioMesa > 0 ? Math.round((res.consumo / res.precioMesa) * 100) : 80,
+            recargoTransferencia: (calcSelectedPayment === 'transferencia') ? res.recargoTransf : 0,
+            pctRecargo: (calcSelectedPayment === 'transferencia') ? res.pctRecargo : 0,
+            vendedor: vendedorLabel,
+            approvedBy: userEmail,
+            approvedAt: Date.now(),
+            ts: Date.now(),
+            origen: 'calculadora_admin'
+          };
+        }
 
         try {
           await db.collection(col).doc(mesaId).set(payload, { merge: true });
@@ -3777,12 +3914,16 @@
           calcSelectedMesa = '';
           const cardCash = document.getElementById('calcCardCash');
           const cardTransf = document.getElementById('calcCardTransf');
+          const cardCortesia = document.getElementById('calcCardCortesia');
           const chkCash = document.getElementById('calcPayOptCash');
           const chkTransf = document.getElementById('calcPayOptTransf');
+          const chkCortesia = document.getElementById('calcPayOptCortesia');
           if (cardCash) cardCash.classList.remove('calc-card-selected');
           if (cardTransf) cardTransf.classList.remove('calc-card-selected');
+          if (cardCortesia) cardCortesia.classList.remove('calc-card-selected');
           if (chkCash) chkCash.checked = false;
           if (chkTransf) chkTransf.checked = false;
+          if (chkCortesia) chkCortesia.checked = false;
 
           actualizarSelectorMesasCalc();
         } catch (err) {

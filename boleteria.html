@@ -111,6 +111,19 @@
   .table-btn.pending{ background:linear-gradient(145deg, #ffcf58, #b66a08 55%, #613000); }
   .table-btn.approved{ background:linear-gradient(145deg, #ff5b66, #d20e21 55%, #70000a); }
   .table-btn.ingresada{ background:linear-gradient(145deg, #58a6ff, #0a56ad 55%, #002e61); }
+  .table-btn.cortesia{
+    background:linear-gradient(145deg, #c084fc, #9333ea 55%, #581c87) !important;
+    border-color:#e9d5ff !important;
+    box-shadow:0 4px 12px rgba(0,0,0,0.5), 0 0 14px rgba(168,85,247,0.7) !important;
+  }
+  .dot.cortesia{ background:#a855f7; box-shadow:0 0 6px rgba(168,85,247,0.6); }
+  .ultra-vip-overlay.cortesia{ color:#c084fc !important; text-shadow:0 1px 4px #000, 0 0 10px rgba(192,132,252,0.8) !important; }
+  .btn-cortesia-action{
+    width:100%; padding:11px 14px; background:rgba(168,85,247,0.14); border:1.5px solid #a855f7;
+    color:#e9d5ff; border-radius:12px; cursor:pointer; font-weight:700; font-size:13px;
+    display:flex; align-items:center; justify-content:center; gap:8px; transition:all .2s ease; margin-bottom:12px;
+  }
+  .btn-cortesia-action:hover{ background:rgba(168,85,247,0.26); border-color:#c084fc; color:#fff; }
   .table-btn .table-label, .table-btn .x-mark{ pointer-events:none; color:#fff; text-shadow:0 1px 3px #000; }
 
   /* Modal */
@@ -263,6 +276,7 @@
       <span><span class="dot pending"></span>Pendiente</span>
       <span><span class="dot approved"></span>Vendida</span>
       <span><span class="dot ingresada"></span>Dentro</span>
+      <span><span class="dot cortesia"></span>Cortesía</span>
     </div>
   </div>
 
@@ -306,6 +320,18 @@
           <button type="button" id="btnTogglePayCash" style="padding:4px 10px; font-size:11px; font-weight:700; border-radius:6px; border:1px solid var(--green); background:rgba(46,230,166,0.15); color:var(--green); cursor:pointer;">💵 Efectivo</button>
           <button type="button" id="btnTogglePayTransf" style="padding:4px 10px; font-size:11px; font-weight:700; border-radius:6px; border:1px solid var(--blue); background:transparent; color:var(--blue); cursor:pointer;">💳 Transferencia</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Cartel Destacado de Mesa de Cortesía -->
+    <div id="modalCortesiaBadge" style="display:none; margin:-10px 0 16px 0; padding:12px 14px; background:rgba(168,85,247,0.12); border:1.5px solid #a855f7; border-radius:12px; font-size:12.5px; line-height:1.55;">
+      <div style="font-weight:800; font-size:13.5px; color:#c084fc; display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+        <span>🎁 MESA DE CORTESÍA / INVITACIÓN ($0)</span>
+        <span style="font-size:11px; background:#581c87; color:#e9d5ff; padding:3px 8px; border-radius:6px; font-weight:bold;">PÚRPURA</span>
+      </div>
+      <div id="modalCortesiaDetails" style="color:var(--white);"></div>
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <button type="button" class="btn-tool" id="btnQuitarCortesia" style="flex:1; border-color:#e0aaff; color:#e0aaff; padding:8px;">🔄 Quitar Cortesía / Dejar Libre</button>
       </div>
     </div>
 
@@ -355,6 +381,9 @@
         </div>
       </div>
 
+      <button type="button" class="btn-cortesia-action" id="btnMarcarCortesia">
+        🎁 Pasar esta Mesa a Cortesía ($0)
+      </button>
       <button class="final-btn" id="confirmIngreso">COBRAR</button>
     </div>
 
@@ -370,6 +399,10 @@
         <button class="btn-pay" data-method="transferencia">
           <span>Transferencia / QR</span>
           <b class="pay-total-val"></b>
+        </button>
+        <button class="btn-pay" data-method="cortesia" style="border-color:#a855f7;">
+          <span style="color:#e9d5ff;">🎁 Cortesía / Invitación Especial</span>
+          <b style="color:#c084fc;">$0</b>
         </button>
         <button class="btn-pay" data-method="mixto">
           <span>Mixto (Efe + Transf)</span>
@@ -429,6 +462,33 @@
     <div id="infoView" style="display:none; text-align:center;">
       <div style="font-size:18px; font-weight:700; color:var(--blue); margin-bottom:10px;">ESTA MESA YA INGRESÓ</div>
       <div id="infoDetails" style="color:var(--grey); font-size:14px; line-height:1.6;"></div>
+      <button type="button" class="btn-cortesia-action" id="btnMarcarCortesiaInfo" style="margin-top:16px;">
+        🎁 Cambiar estado a Cortesía ($0)
+      </button>
+    </div>
+
+    <!-- Formulario para asignar / pasar a Cortesía -->
+    <div id="cortesiaFormView" style="display:none; text-align:left;">
+      <div style="font-size:16px; font-weight:800; color:#c084fc; margin-bottom:4px;">🎁 Asignar Mesa de Cortesía</div>
+      <p style="font-size:12px; color:var(--grey); margin-bottom:14px; line-height:1.5;">Esta mesa quedará de color púrpura en el mapa, con saldo $0 y no afectará la caja.</p>
+      
+      <div class="field-row">
+        <label>Nombre del Invitado / Beneficiario *</label>
+        <input type="text" id="cortesiaBeneficiarioInput" placeholder="Ej: DJ Lucas, Prensa, Amigo de la casa...">
+      </div>
+      <div class="field-row">
+        <label>Cantidad de Personas (Pulseras)</label>
+        <input type="number" id="cortesiaPersonasInput" min="1" max="25" value="4">
+      </div>
+      <div class="field-row">
+        <label>Nota / Autorizado por (Opcional)</label>
+        <input type="text" id="cortesiaNotaInput" placeholder="Ej: Autorizado por Aníbal">
+      </div>
+
+      <button type="button" class="final-btn" id="btnConfirmarGuardarCortesia" style="background:linear-gradient(145deg, #c084fc, #9333ea); color:#fff; box-shadow:0 8px 20px rgba(168,85,247,0.35); margin-top:8px;">
+        CONFIRMAR CORTESÍA (PÚRPURA $0)
+      </button>
+      <button type="button" class="close-btn" id="btnCancelarCortesiaForm" style="margin-top:8px;">Volver</button>
     </div>
 
     <button class="close-btn" id="closeModal">Cerrar</button>
@@ -825,12 +885,13 @@
     getActiveSectorTables().forEach(t => {
       const r = estado[t.id];
       const isActive = r && (r.status !== "disputa" || (Number.isFinite(r.expiresAt) && r.expiresAt > Date.now()));
-      const isIngresada = isActive && r.status === "ingresada";
-      const isApproved = isActive && ["aprobada", "ocupada", "vendida"].includes(r.status);
-      const isPending = isActive && ["disputa", "pendiente", "comprobante_subido", "pendiente_revision"].includes(r.status);
+      const isCortesia = isActive && (r.status === "cortesia" || r.esCortesia);
+      const isIngresada = isActive && r.status === "ingresada" && !isCortesia;
+      const isApproved = isActive && ["aprobada", "ocupada", "vendida"].includes(r.status) && !isCortesia;
+      const isPending = isActive && ["disputa", "pendiente", "comprobante_subido", "pendiente_revision"].includes(r.status) && !isCortesia;
 
       const btn = document.createElement("button");
-      btn.className = "table-btn" + (isTerraza ? " terraza-btn" : "") + (isIngresada ? " ingresada" : isApproved ? " approved" : isPending ? " pending" : "");
+      btn.className = "table-btn" + (isTerraza ? " terraza-btn" : "") + (isCortesia ? " cortesia" : isIngresada ? " ingresada" : isApproved ? " approved" : isPending ? " pending" : "");
       btn.style.left = t.x + "%";
       btn.style.top = t.y + "%";
       btn.style.width = btnSize + "px";
@@ -851,12 +912,13 @@
 
     const r = estado["ULTRA VIP"];
     const isActive = r && (r.status !== "disputa" || (Number.isFinite(r.expiresAt) && r.expiresAt > Date.now()));
-    const isIngresada = isActive && r.status === "ingresada";
-    const isApproved = isActive && ["aprobada", "ocupada", "vendida"].includes(r.status);
-    const isPending = isActive && ["disputa", "pendiente", "comprobante_subido", "pendiente_revision"].includes(r.status);
+    const isCortesia = isActive && (r.status === "cortesia" || r.esCortesia);
+    const isIngresada = isActive && r.status === "ingresada" && !isCortesia;
+    const isApproved = isActive && ["aprobada", "ocupada", "vendida"].includes(r.status) && !isCortesia;
+    const isPending = isActive && ["disputa", "pendiente", "comprobante_subido", "pendiente_revision"].includes(r.status) && !isCortesia;
 
-    btn.className = "ultra-vip-overlay" + (isIngresada ? " ingresada" : isApproved ? " confirmed" : isPending ? " dispute" : "");
-    btn.textContent = isIngresada ? "DENTRO" : isApproved ? "VENDIDA" : isPending ? "PENDIENTE" : "RESERVAR";
+    btn.className = "ultra-vip-overlay" + (isCortesia ? " cortesia" : isIngresada ? " ingresada" : isApproved ? " confirmed" : isPending ? " dispute" : "");
+    btn.textContent = isCortesia ? "CORTESÍA" : isIngresada ? "DENTRO" : isApproved ? "VENDIDA" : isPending ? "PENDIENTE" : "RESERVAR";
     btn.onclick = () => handleTableClick("ULTRA VIP");
   }
 
@@ -938,6 +1000,10 @@
     paymentMethodsView.style.display = 'none';
     mixedPayView.style.display = 'none';
     cashManagerView.style.display = 'none';
+    const cortesiaView = document.getElementById('cortesiaFormView');
+    if (cortesiaView) cortesiaView.style.display = 'none';
+    const cortesiaBadge = document.getElementById('modalCortesiaBadge');
+    if (cortesiaBadge) cortesiaBadge.style.display = 'none';
     promoBadge.style.display = 'none';
     if (exBadge) exBadge.style.display = 'none';
     const calcResBadge = document.getElementById('modalCalcReservaBadge');
@@ -945,6 +1011,43 @@
 
     const hasPactadaEx = !!(r && (r.esExcepcion || r.excepcion));
     const isCalcRes = !!(r && (r.origen === 'calculadora_admin' || r.formaPago || (r.montoTotal && r.saldoPuerta !== undefined && ['aprobada', 'ocupada', 'vendida'].includes(r.status))));
+    const isCortesiaRes = !!(r && (r.status === 'cortesia' || r.esCortesia));
+
+    if (isCortesiaRes) {
+      calcView.style.display = 'block';
+      currentPeople = (r && r.cantidadPersonas) ? parseInt(r.cantidadPersonas) : 4;
+      const countEl = document.getElementById('peopleCount');
+      if (countEl) countEl.value = currentPeople;
+      sub.textContent = "MESA DE CORTESÍA / INVITACIÓN";
+      if (cortesiaBadge) {
+        cortesiaBadge.style.display = 'block';
+        document.getElementById('modalCortesiaDetails').innerHTML = `
+          👤 Beneficiario: <b>${escapeHtml(r.nombre || r.beneficiario || 'Invitado Especial')}</b><br>
+          👥 Personas autorizadas: <b>${r.cantidadPersonas || 4}</b><br>
+          🔑 Autorizado por: <b>${escapeHtml(r.autorizadoPor || 'Admin / Boletería')}</b>
+          ${r.masterNote ? `<br>📝 Nota: <i>${escapeHtml(r.masterNote)}</i>` : ''}
+          ${r.ts ? `<span style="color:var(--grey); font-size:11.5px; display:block; margin-top:4px;">Fecha: ${new Date(r.ts).toLocaleString('es-AR', {dateStyle:'short', timeStyle:'short'})}</span>` : ''}
+        `;
+      }
+      currentBalance = 0;
+      document.getElementById('valTotal').textContent = '0';
+      document.getElementById('valDrinks').textContent = '0';
+      document.getElementById('valPaid').textContent = '0';
+      document.getElementById('valBalance').textContent = '0';
+      const confirmBtn = document.getElementById('confirmIngreso');
+      if (confirmBtn) {
+        confirmBtn.textContent = "CONFIRMAR INGRESO (CORTESÍA $0)";
+        confirmBtn.style.background = "linear-gradient(145deg, #c084fc, #9333ea)";
+        confirmBtn.style.color = "#fff";
+        confirmBtn.style.boxShadow = "0 8px 20px rgba(168,85,247,0.35)";
+      }
+      const btnCort = document.getElementById('btnMarcarCortesia');
+      if (btnCort) btnCort.style.display = 'none';
+      return;
+    } else {
+      const btnCort = document.getElementById('btnMarcarCortesia');
+      if (btnCort) btnCort.style.display = 'flex';
+    }
 
     if (r && r.status === "ingresada") {
       infoView.style.display = 'block';
@@ -1313,6 +1416,11 @@
   });
 
   document.getElementById('confirmIngreso').addEventListener('click', () => {
+    const rCurrent = estado[currentMesa];
+    if (rCurrent && (rCurrent.status === 'cortesia' || rCurrent.esCortesia)) {
+      finalizarCobro('cortesia', 0, 0);
+      return;
+    }
     if (currentBalance === 0) {
       finalizarCobro('completo_adelantado', 0, 0);
       return;
@@ -1358,6 +1466,10 @@
         await finalizarCobro(method, method === 'efectivo' ? actualBalance : 0, method === 'transferencia' ? actualBalance : 0);
         return;
       }
+      if (method === 'cortesia') {
+        abrirFormularioCortesia();
+        return;
+      }
       if (method === 'mixto') {
         document.getElementById('paymentMethodsView').style.display = 'none';
         document.getElementById('mixedPayView').style.display = 'block';
@@ -1387,6 +1499,86 @@
   document.getElementById('backToMethods').addEventListener('click', () => {
     document.getElementById('mixedPayView').style.display = 'none';
     document.getElementById('paymentMethodsView').style.display = 'block';
+  });
+
+  function abrirFormularioCortesia() {
+    document.getElementById('calcView').style.display = 'none';
+    document.getElementById('infoView').style.display = 'none';
+    document.getElementById('paymentMethodsView').style.display = 'none';
+    document.getElementById('mixedPayView').style.display = 'none';
+    document.getElementById('cortesiaFormView').style.display = 'block';
+
+    const r = estado[currentMesa] || {};
+    const inputBeneficiario = document.getElementById('cortesiaBeneficiarioInput');
+    const inputPersonas = document.getElementById('cortesiaPersonasInput');
+    const inputNota = document.getElementById('cortesiaNotaInput');
+
+    if (inputBeneficiario) inputBeneficiario.value = r.nombre || r.beneficiario || '';
+    if (inputPersonas) inputPersonas.value = currentPeople || r.cantidadPersonas || 4;
+    if (inputNota) inputNota.value = r.masterNote || '';
+  }
+
+  document.getElementById('btnMarcarCortesia')?.addEventListener('click', abrirFormularioCortesia);
+  document.getElementById('btnMarcarCortesiaInfo')?.addEventListener('click', abrirFormularioCortesia);
+
+  document.getElementById('btnCancelarCortesiaForm')?.addEventListener('click', () => {
+    document.getElementById('cortesiaFormView').style.display = 'none';
+    openModal(currentMesa, estado[currentMesa]);
+  });
+
+  document.getElementById('btnConfirmarGuardarCortesia')?.addEventListener('click', async () => {
+    const btn = document.getElementById('btnConfirmarGuardarCortesia');
+    btn.disabled = true;
+    try {
+      const beneficiario = document.getElementById('cortesiaBeneficiarioInput')?.value.trim() || 'Invitado Especial';
+      const personas = parseInt(document.getElementById('cortesiaPersonasInput')?.value) || currentPeople || 4;
+      const nota = document.getElementById('cortesiaNotaInput')?.value.trim() || '';
+      const r = estado[currentMesa] || {};
+
+      const payload = {
+        ...r,
+        status: 'cortesia',
+        esCortesia: true,
+        formaPago: 'cortesia',
+        montoTotal: 0,
+        precioTotal: 0,
+        montoSenado: 0,
+        saldoPuerta: 0,
+        montoConsumicion: 0,
+        montoConsumoCredito: 0,
+        porcentajeConsumo: 0,
+        cobroEfectivo: 0,
+        cobroTransferencia: 0,
+        nombre: beneficiario,
+        beneficiario: beneficiario,
+        cantidadPersonas: personas,
+        masterNote: nota || r.masterNote || '',
+        autorizadoPor: auth.currentUser?.email || 'Boletería',
+        cortesiaAt: Date.now(),
+        ts: r.ts || Date.now()
+      };
+
+      const targetCol = window.getActiveBolCollection ? window.getActiveBolCollection() : 'reservas';
+      await db.collection(targetCol).doc(currentMesa).set(payload, { merge: true });
+      showToast("Mesa " + currentMesa + " asignada como CORTESÍA (Púrpura)");
+      document.getElementById('modalOverlay').classList.remove('open');
+    } catch(err) {
+      alert("Error al guardar cortesía: " + err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById('btnQuitarCortesia')?.addEventListener('click', async () => {
+    if (!confirm("¿Deseas quitar el estado de cortesía a la mesa " + currentMesa + " y dejarla disponible nuevamente?")) return;
+    try {
+      const targetCol = window.getActiveBolCollection ? window.getActiveBolCollection() : 'reservas';
+      await db.collection(targetCol).doc(currentMesa).delete();
+      showToast("Mesa " + currentMesa + " liberada con éxito.");
+      document.getElementById('modalOverlay').classList.remove('open');
+    } catch(err) {
+      alert("Error al liberar mesa: " + err.message);
+    }
   });
 
   async function finalizarCobro(metodo, cash, transf) {

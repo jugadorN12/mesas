@@ -683,6 +683,22 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 10px rgba(88, 166, 255, 0.4);
     }
 
+    .table-btn.cortesia {
+      background: linear-gradient(145deg, #c084fc, #9333ea 55%, #581c87) !important;
+      border-color: #e9d5ff !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 14px rgba(168, 85, 247, 0.7) !important;
+    }
+
+    .dot.cortesia {
+      background: #a855f7 !important;
+      box-shadow: 0 0 6px rgba(168, 85, 247, 0.6) !important;
+    }
+
+    .ultra-vip-overlay.cortesia {
+      color: #c084fc !important;
+      text-shadow: 0 1px 4px #000, 0 0 10px rgba(192, 132, 252, 0.8) !important;
+    }
+
     .table-btn .table-label {
       pointer-events: none;
       color: #fff;
@@ -1413,6 +1429,7 @@
       <span><span class="dot pending"></span>En disputa</span>
       <span><span class="dot approved"></span>Vendida</span>
       <span id="legendIngresada" style="display:none;"><span class="dot ingresada-master"></span>En Puerta</span>
+      <span><span class="dot cortesia"></span>Cortesía</span>
     </div>
   </div>
 
@@ -1568,6 +1585,7 @@
             <button class="btn-master" data-status="disputa">PENDIENTE (AMARILLO)</button>
             <button class="btn-master" data-status="aprobada">VENDIDA (ROJO)</button>
             <button class="btn-master" data-status="ingresada">INGRESADA (ROJO)</button>
+            <button class="btn-master btn-master-cortesia" data-status="cortesia" style="background:linear-gradient(145deg, #c084fc, #9333ea); border-color:#e9d5ff; color:#fff; font-weight:bold;">🎁 CORTESÍA (VIOLETA)</button>
           </div>
         </div>
 
@@ -2464,15 +2482,18 @@
       activeTables.forEach(t => {
         const reserva = estado[t.id];
         const activa = reservaActiva(reserva);
-        const isIngresada = activa && reserva.status === "ingresada";
+        const isCortesia = activa && (reserva.status === "cortesia" || reserva.esCortesia);
+        const isIngresada = activa && reserva.status === "ingresada" && !isCortesia;
         const isVentaEnPuerta = isIngresada && (reserva.nombre === "Venta en Puerta" || reserva.masterAction);
-        const approved = activa && ["aprobada", "ocupada", "vendida"].includes(reserva.status);
-        const pending = activa && ["pendiente", "disputa", "comprobante_subido", "pendiente_revision"].includes(reserva.status);
-        const blocked = approved || pending || isIngresada;
+        const approved = activa && ["aprobada", "ocupada", "vendida"].includes(reserva.status) && !isCortesia;
+        const pending = activa && ["pendiente", "disputa", "comprobante_subido", "pendiente_revision"].includes(reserva.status) && !isCortesia;
+        const blocked = approved || pending || isIngresada || isCortesia;
 
         const btn = document.createElement("button");
         let statusClass = "";
-        if (isIngresada) {
+        if (isCortesia) {
+          statusClass = " cortesia";
+        } else if (isIngresada) {
           statusClass = (isMaster && isVentaEnPuerta) ? " ingresada-master" : " ingresada";
         } else if (approved) {
           statusClass = " approved";
@@ -2489,10 +2510,10 @@
         btn.style.height = btnSize + "px";
 
         const labelText = t.num || t.id;
-        btn.innerHTML = (approved || isIngresada) ? '<span class="x-mark">X</span>' : '<span class="table-label">' + labelText + '</span>';
-        btn.setAttribute("aria-label", "Mesa " + labelText + (isIngresada ? " (ingresada)" : approved ? " (aprobada)" : pending ? " (pendiente de aprobacion)" : " (libre)"));
+        btn.innerHTML = (approved || isIngresada || isCortesia) ? '<span class="x-mark">X</span>' : '<span class="table-label">' + labelText + '</span>';
+        btn.setAttribute("aria-label", "Mesa " + labelText + (isCortesia ? " (cortesía)" : isIngresada ? " (ingresada)" : approved ? " (aprobada)" : pending ? " (pendiente de aprobacion)" : " (libre)"));
 
-        if (!blocked) {
+        if (!blocked || isMaster) {
           btn.addEventListener("click", () => abrirMesa(t.id));
         }
         planoMesas.appendChild(btn);
@@ -2512,20 +2533,24 @@
 
       const isIngresada = active && reserva.status === "ingresada";
       const isVentaEnPuerta = isIngresada && (reserva.nombre === "Venta en Puerta" || reserva.masterAction);
-      const confirmed = active && ["aprobada", "ocupada", "vendida"].includes(reserva.status);
-      const dispute = active && ["pendiente", "disputa", "comprobante_subido", "pendiente_revision"].includes(reserva.status);
+      const isCortesia = active && (reserva.status === "cortesia" || reserva.esCortesia);
+      const confirmed = active && ["aprobada", "ocupada", "vendida"].includes(reserva.status) && !isCortesia;
+      const dispute = active && ["pendiente", "disputa", "comprobante_subido", "pendiente_revision"].includes(reserva.status) && !isCortesia;
 
+      ultraVipReserveBtn.classList.toggle("cortesia", isCortesia);
       ultraVipReserveBtn.classList.toggle("dispute", dispute);
       ultraVipReserveBtn.classList.toggle("confirmed", (confirmed || isIngresada));
 
-      // Si está ingresada y es maestro, color azul. Si no, rojo (como vendida)
-      if (isIngresada) {
+      if (isCortesia) {
+        ultraVipReserveBtn.style.color = "#c084fc";
+        ultraVipReserveBtn.textContent = "CORTESÍA";
+      } else if (isIngresada) {
         ultraVipReserveBtn.style.color = (isMaster && isVentaEnPuerta) ? "var(--blue)" : "var(--red)";
+        ultraVipReserveBtn.textContent = (isMaster && isVentaEnPuerta) ? "EN PUERTA" : "INGRESADA";
       } else {
         ultraVipReserveBtn.style.color = "";
+        ultraVipReserveBtn.textContent = confirmed ? "RESERVADO" : dispute ? "DISPUTA" : "RESERVAR";
       }
-
-      ultraVipReserveBtn.textContent = isIngresada ? (isMaster && isVentaEnPuerta ? "EN PUERTA" : "INGRESADA") : confirmed ? "RESERVADO" : dispute ? "DISPUTA" : "RESERVAR";
     }
 
     ultraVipReserveBtn.addEventListener("click", () => {
@@ -2923,6 +2948,32 @@
           try {
             if (newStatus === "libre") {
               await firebaseDb.collection(targetCol).doc(mesaActual).delete();
+            } else if (newStatus === "cortesia") {
+              const currentEmail = auth?.currentUser?.email || (userRole === "assistant" ? "asistente" : "admin");
+              const isTerrazaMesa = mesaActual.startsWith("T-");
+              await firebaseDb.collection(targetCol).doc(mesaActual).set({
+                status: "cortesia",
+                esCortesia: true,
+                formaPago: "cortesia",
+                nombre: masterName || "Invitado Especial",
+                beneficiario: masterName || "Invitado Especial",
+                masterNote: masterNote || "",
+                contacto: estado[mesaActual]?.contacto || "0000000000",
+                ts: estado[mesaActual]?.ts || Date.now(),
+                masterAction: true,
+                sector: isTerrazaMesa ? "terraza" : "salon",
+                numeroMesa: isTerrazaMesa ? mesaActual.replace("T-", "") : mesaActual,
+                cantidadPersonas: estado[mesaActual]?.cantidadPersonas || 4,
+                precioTotal: 0,
+                montoTotal: 0,
+                montoSenado: 0,
+                saldoPuerta: 0,
+                montoConsumicion: 0,
+                montoConsumoCredito: 0,
+                porcentajeConsumo: 0,
+                autorizadoPor: currentEmail,
+                cortesiaAt: Date.now()
+              }, { merge: true });
             } else {
               const isEx = !!document.getElementById("masterIsExcepcion")?.checked;
               let exPayload = {};
