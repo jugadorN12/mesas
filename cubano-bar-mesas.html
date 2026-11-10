@@ -1718,7 +1718,7 @@
             placeholder="Ej.: Juan Pérez o @juanperez">
 
           <label class="field-label" for="contactInput">Número de WhatsApp (10 dígitos)</label>
-          <input class="name-input" id="contactInput" type="tel" maxlength="10" autocomplete="tel"
+          <input class="name-input" id="contactInput" type="tel" maxlength="20" autocomplete="tel"
             placeholder="Ej.: 1123456789">
 
           <div class="captcha-box">
@@ -2301,7 +2301,18 @@
       setTimeout(() => toast.classList.remove("show"), 2200);
     }
 
-    function normalizarWhatsapp(value) { return value.trim().replace(/[\s().-]/g, ""); }
+    function normalizarWhatsapp(value) {
+      let d = String(value || "").replace(/\D/g, "");
+      if (d.startsWith("549") && d.length >= 12) d = d.slice(3);
+      else if (d.startsWith("54") && d.length >= 11) d = d.slice(2);
+      if (d.startsWith("0")) d = d.slice(1);
+      if (d.length === 12 || d.length === 11) {
+        if (d.slice(2, 4) === "15") d = d.slice(0, 2) + d.slice(4);
+        else if (d.slice(3, 5) === "15") d = d.slice(0, 3) + d.slice(5);
+        else if (d.slice(4, 6) === "15") d = d.slice(0, 4) + d.slice(6);
+      }
+      return d;
+    }
 
     function getRecentAttempts() {
       try {
@@ -2834,10 +2845,19 @@
       setTimeout(() => { btn.textContent = "Copiar"; btn.classList.remove("copied"); }, 1600);
     });
 
+    contactInput?.addEventListener("blur", () => {
+      if (contactInput.value.trim()) {
+        const norm = normalizarWhatsapp(contactInput.value);
+        if (norm.length === 10) contactInput.value = norm;
+      }
+    });
+
     document.getElementById("finalizarBtn").addEventListener("click", async () => {
       if (!mesaActual) return;
       const nombre = nameInput.value.trim();
-      const contacto = contactInput.value.trim();
+      const contactoLimpio = normalizarWhatsapp(contactInput.value);
+      contactInput.value = contactoLimpio;
+      const contacto = contactoLimpio;
 
       // Limpiar errores anteriores
       nameInput.classList.remove("input-error");
@@ -2850,7 +2870,7 @@
         showToast("Ingresá el nombre o alias de la reserva.");
         return;
       }
-      if (!/^\d{10}$/.test(normalizarWhatsapp(contacto))) {
+      if (!/^\d{10}$/.test(contacto)) {
         contactInput.classList.add("input-error");
         contactInput.focus();
         showToast("Ingresá los 10 dígitos de tu WhatsApp (sin 0 ni 15).");
@@ -3141,6 +3161,7 @@
               await firebaseDb.collection(targetCol).doc(mesaActual).set({
                 status: "cortesia",
                 esCortesia: true,
+                cortesiaIngresada: false,
                 formaPago: "cortesia",
                 nombre: masterName || "Invitado Especial",
                 beneficiario: masterName || "Invitado Especial",
@@ -3202,6 +3223,8 @@
               const isTerrazaMesa = mesaActual.startsWith("T-");
               await firebaseDb.collection(targetCol).doc(mesaActual).set({
                 status: newStatus,
+                esCortesia: false,
+                cortesiaIngresada: false,
                 nombre: masterName || (userRole === "assistant" ? "Asignado por Asistente" : "Asignado por Admin"),
                 masterNote: masterNote || "",
                 contacto: estado[mesaActual]?.contacto || "0000000000",

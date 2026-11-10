@@ -3973,12 +3973,14 @@
 
           await db.collection(col).doc(id).update({
             status: 'aprobada',
+            esCortesia: false,
+            cortesiaIngresada: false,
             montoSenado: monto,
             approvedAt: Date.now(),
             approvedBy: auth.currentUser.email
           });
         }
-        if (button.dataset.action === 'pending') await db.collection(col).doc(id).update({ status: 'pendiente', approvedAt: null, approvedBy: null, montoSenado: null });
+        if (button.dataset.action === 'pending') await db.collection(col).doc(id).update({ status: 'pendiente', esCortesia: false, cortesiaIngresada: false, approvedAt: null, approvedBy: null, montoSenado: null });
         if (button.dataset.action === 'delete') {
           if (!confirm('¿Eliminar esta reserva?')) return;
           await db.collection(col).doc(id).delete();
@@ -4757,6 +4759,7 @@
           payload = {
             status: 'cortesia',
             esCortesia: true,
+            cortesiaIngresada: false,
             formaPago: 'cortesia',
             nombre: cliente || 'Invitado Especial',
             beneficiario: cliente || 'Invitado Especial',
@@ -4783,6 +4786,8 @@
           const totalFinal = calcSelectedPayment === 'efectivo' ? res.precioMesa : res.totalTransferencia;
           payload = {
             status: 'aprobada',
+            esCortesia: false,
+            cortesiaIngresada: false,
             nombre: cliente || `Cliente Mesa ${mesaId}`,
             contacto: '',
             cantidadPersonas: res.personas,

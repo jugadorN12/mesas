@@ -31,6 +31,19 @@ function normalizeWhatsapp(value) {
   return String(value || "").replace(/[\s().-]/g, "");
 }
 
+function normalizeWhatsappTo10Digits(value) {
+  let d = String(value || "").replace(/\D/g, "");
+  if (d.startsWith("549") && d.length >= 12) d = d.slice(3);
+  else if (d.startsWith("54") && d.length >= 11) d = d.slice(2);
+  if (d.startsWith("0")) d = d.slice(1);
+  if (d.length === 12 || d.length === 11) {
+    if (d.slice(2, 4) === "15") d = d.slice(0, 2) + d.slice(4);
+    else if (d.slice(3, 5) === "15") d = d.slice(0, 3) + d.slice(5);
+    else if (d.slice(4, 6) === "15") d = d.slice(0, 4) + d.slice(6);
+  }
+  return d;
+}
+
 function verificationRef(phone) {
   return db.collection("whatsappVerifications").doc(hash(phone));
 }
@@ -118,7 +131,7 @@ exports.createDispute = onCall({
   const data = request.data || {};
   const mesaId = String(data.mesaId || "").trim();
   const nombre = String(data.nombre || "").trim();
-  const contacto = normalize(data.contacto);
+  const contacto = normalizeWhatsappTo10Digits(data.contacto);
   const verificationToken = String(data.verificationToken || "");
   const now = Date.now();
 
