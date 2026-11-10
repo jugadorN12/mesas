@@ -3399,6 +3399,8 @@
           if (linkBolEl) linkBolEl.style.display = isMaster ? 'block' : 'none';
           const captureCardEl = document.querySelector('.capture-card');
           if (captureCardEl) captureCardEl.style.display = isMaster ? 'block' : 'none';
+          const cardCortesia = document.getElementById('calcCardCortesia');
+          if (cardCortesia) cardCortesia.style.display = isMaster ? 'flex' : 'none';
 
           document.querySelectorAll('.event-card').forEach(card => {
             card.style.display = isMaster ? 'block' : 'none';
@@ -3704,7 +3706,7 @@
             <button style="${r.mostrarNombreEnMapa ? 'background:rgba(163,230,53,0.18); border-color:#a3e635; color:#a3e635; font-weight:bold;' : 'background:transparent; border-color:var(--line); color:var(--muted);'}" data-action="toggle_name_map" data-id="${mesa}" title="Mostrar u ocultar nombre en el mapa público">🏷️ Mapa: ${r.mostrarNombreEnMapa ? escapeHtml(r.nombreEnMapa || 'SÍ') : 'NO'}</button>
             ${isApproved ? `<button data-action="pending" data-id="${mesa}">Volver a disputa</button>` : ''}
             ${r.status === 'pendiente' || isPending ? `<button class="approve" data-action="approve" data-id="${mesa}">Confirmar reserva</button>` : ''}
-            ${!isCortesia ? `<button style="background:#5a189a; border-color:#9d4edd; color:#fff;" data-action="cortesia" data-id="${mesa}">🎁 Cortesía</button>` : `<button style="background:#2a2a35; border-color:#5a189a; color:#e0aaff;" data-action="quitar_cortesia" data-id="${mesa}">Quitar cortesía</button>`}
+            ${(currentUserRole === 'admin') ? (!isCortesia ? `<button style="background:#5a189a; border-color:#9d4edd; color:#fff;" data-action="cortesia" data-id="${mesa}">🎁 Cortesía</button>` : `<button style="background:#2a2a35; border-color:#5a189a; color:#e0aaff;" data-action="quitar_cortesia" data-id="${mesa}">Quitar cortesía</button>`) : ''}
             <button class="delete" data-action="delete" data-id="${mesa}">Eliminar</button>
           </div>
         `;
@@ -3969,6 +3971,10 @@
           await db.collection(col).doc(id).delete();
         }
         if (button.dataset.action === 'cortesia') {
+          if (currentUserRole !== 'admin') {
+            alert('Solo los administradores tienen permiso para otorgar cortesías.');
+            return;
+          }
           const r = sharedData[id] || {};
           const nombreInvitado = prompt(`¿A nombre de quién es la cortesía para la MESA ${id}?`, r.nombre || 'Invitado Especial');
           if (nombreInvitado === null) return;
@@ -3995,6 +4001,10 @@
           }, { merge: true });
         }
         if (button.dataset.action === 'quitar_cortesia') {
+          if (currentUserRole !== 'admin') {
+            alert('Solo los administradores tienen permiso para modificar cortesías.');
+            return;
+          }
           if (!confirm(`¿Quitar el estado de cortesía a la MESA ${id} y volver a dejarla disponible?`)) return;
           await db.collection(col).doc(id).delete();
         }
@@ -4702,6 +4712,11 @@
         }
 
         if (!confirm(confirmMsg)) return;
+
+        if (calcSelectedPayment === 'cortesia' && currentUserRole !== 'admin') {
+          alert('Solo los administradores tienen permiso para otorgar cortesías.');
+          return;
+        }
 
         btnCalcConfirmar.disabled = true;
         btnCalcConfirmar.textContent = '⏳ Guardando...';

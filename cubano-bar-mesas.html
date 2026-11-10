@@ -2712,6 +2712,12 @@
           pBtn.classList.toggle("active", pBtn.dataset.pos === posValue);
         });
 
+        // Ocultar botón de cortesía para asistentes (solo Admin puede otorgar cortesías)
+        const btnMasterCortesia = document.querySelector(".btn-master-cortesia");
+        if (btnMasterCortesia) {
+          btnMasterCortesia.style.display = (userRole === "admin") ? "block" : "none";
+        }
+
         // Highlight current status in buttons
         document.querySelectorAll(".btn-master").forEach(btn => {
           const isActive = (current && current.status === btn.dataset.status) || (!current && btn.dataset.status === 'libre');
@@ -3080,6 +3086,12 @@
         btn.addEventListener("click", async () => {
           if (!mesaActual || !firebaseDb) return;
           const newStatus = btn.dataset.status;
+
+          if (newStatus === "cortesia" && userRole !== "admin") {
+            showToast("Solo los administradores pueden otorgar cortesías.");
+            return;
+          }
+
           const masterName = document.getElementById("masterNameInput").value.trim();
           const masterNote = document.getElementById("masterNoteInput").value.trim();
           const targetCol = getActiveReservasCollection();
