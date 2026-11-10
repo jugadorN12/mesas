@@ -173,6 +173,13 @@
       border: 1px solid #9d4edd
     }
 
+    .cortesia-ingresada {
+      background: linear-gradient(135deg, rgba(88, 166, 255, 0.25), rgba(168, 85, 247, 0.4));
+      color: #e0aaff;
+      border: 1px solid #58a6ff;
+      box-shadow: 0 0 10px rgba(88, 166, 255, 0.3);
+    }
+
     .actions {
       display: flex;
       gap: 7px;
@@ -3523,7 +3530,7 @@
 
       const pending = items.filter(([, r]) => ['pendiente', 'disputa', 'comprobante_subido', 'pendiente_revision'].includes(r.status) && !r.esCortesia && r.status !== 'cortesia').length;
       const approved = items.filter(([, r]) => ['aprobada', 'ocupada', 'vendida'].includes(r.status) && !r.esCortesia && r.status !== 'cortesia').length;
-      const ingresadas = items.filter(([, r]) => r.status === 'ingresada' && !r.esCortesia).length;
+      const ingresadas = items.filter(([, r]) => r.status === 'ingresada').length;
       const cortesias = items.filter(([, r]) => r.status === 'cortesia' || r.esCortesia).length;
       const totalPeople = items.reduce((sum, [, r]) => sum + (parseInt(r.cantidadPersonas) || 0), 0);
 
@@ -3544,11 +3551,13 @@
         const isPending = ['disputa', 'pendiente', 'comprobante_subido', 'pendiente_revision'].includes(r.status);
 
         const isCortesia = r.status === 'cortesia' || r.esCortesia;
+        const isCortesiaIngresada = isIngresada && isCortesia;
         let statusLabel = 'En disputa';
         let badgeClass = 'pendiente';
         if (isApproved) { statusLabel = 'Reservada confirmada'; badgeClass = 'aprobada'; }
-        if (isIngresada) { statusLabel = 'INGRESADA'; badgeClass = 'ingresada'; }
-        if (isCortesia) { statusLabel = '🎁 CORTESÍA ($0)'; badgeClass = 'cortesia'; }
+        if (isIngresada && !isCortesia) { statusLabel = 'INGRESADA (DENTRO)'; badgeClass = 'ingresada'; }
+        if (isCortesia && !isIngresada) { statusLabel = '🎁 CORTESÍA ($0)'; badgeClass = 'cortesia'; }
+        if (isCortesiaIngresada) { statusLabel = '🟣🔵 DENTRO (CORTESÍA $0)'; badgeClass = 'cortesia-ingresada'; }
 
         const node = document.createElement('article');
         node.className = 'row';
@@ -3559,6 +3568,9 @@
         }
         if (r.masterNote) {
           detailHtml += `<div style="font-size:11px; color:var(--amber); margin-top:2px;">📝 ${escapeHtml(r.masterNote)}</div>`;
+        }
+        if (r.ingresadaAt) {
+          detailHtml += `<div style="font-size:11.5px; color:#58a6ff; margin-top:3px; font-weight:bold;">🚪 Ingresó por puerta: ${new Date(r.ingresadaAt).toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})} hs</div>`;
         }
 
         // Datos de seña y vendedor
@@ -4566,6 +4578,8 @@
       TABLE_ORDER.forEach(mesaId => {
         const r = sharedData[mesaId];
         const isCortesia = r && (r.status === 'cortesia' || r.esCortesia);
+        const isIngresada = r && r.status === 'ingresada';
+        const isCortesiaIngresada = isIngresada && isCortesia;
         const isSold = r && ['aprobada', 'ocupada', 'vendida', 'ingresada'].includes(r.status) && !isCortesia;
         const isPending = r && ['pendiente', 'disputa', 'comprobante_subido', 'pendiente_revision'].includes(r.status) && !isCortesia;
 
@@ -4575,16 +4589,22 @@
         const isTerraza = mesaId.startsWith('T-');
         const mesaName = isTerraza ? `Mesa ${mesaId.replace('T-', '')} (TERRACE SOUL)` : (mesaId === 'ULTRA VIP' ? 'ULTRA VIP' : `Mesa ${mesaId} (MAIN STAGE)`);
 
-        if (isCortesia) {
+        if (isCortesiaIngresada) {
+          const nombreInvitado = r.nombre ? ` (${r.nombre})` : '';
+          opt.textContent = `🟣🔵 ${mesaName} - CORTESÍA DENTRO${nombreInvitado}`;
+          opt.disabled = true;
+          opt.style.color = '#c084fc';
+        } else if (isCortesia) {
           const nombreInvitado = r.nombre ? ` (${r.nombre})` : '';
           opt.textContent = `🟣 ${mesaName} - CORTESÍA${nombreInvitado}`;
           opt.disabled = true;
           opt.style.color = '#c084fc';
         } else if (isSold) {
           const nombreCliente = r.nombre ? ` (${r.nombre})` : '';
-          opt.textContent = `🔴 ${mesaName} - VENDIDA${nombreCliente}`;
+          const soldText = isIngresada ? 'INGRESADA' : 'VENDIDA';
+          opt.textContent = `🔴 ${mesaName} - ${soldText}${nombreCliente}`;
           opt.disabled = true;
-          opt.style.color = '#ff6b72';
+          opt.style.color = isIngresada ? '#58a6ff' : '#ff6b72';
         } else if (isPending) {
           opt.textContent = `🟡 ${mesaName} - En disputa`;
           opt.disabled = true;
@@ -4683,8 +4703,8 @@
 
         // Doble verificación: comprobar que la mesa no haya sido tomada recién
         const reservaExistente = sharedData[mesaId];
-        if (reservaExistente && ['aprobada', 'ocupada', 'vendida', 'ingresada'].includes(reservaExistente.status)) {
-          alert(`⚠️ La Mesa ${mesaId} ya figura como reservada o vendida. Por favor elegí otra.`);
+        if (reservaExistente && (['aprobada', 'ocupada', 'vendida', 'ingresada', 'cortesia'].includes(reservaExistente.status) || reservaExistente.esCortesia)) {
+          alert(`⚠️ La Mesa ${mesaId} ya figura como reservada, vendida o cortesía. Por favor elegí otra.`);
           actualizarSelectorMesasCalc();
           return;
         }

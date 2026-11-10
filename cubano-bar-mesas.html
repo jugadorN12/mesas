@@ -689,14 +689,30 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 14px rgba(168, 85, 247, 0.7) !important;
     }
 
+    .table-btn.cortesia-ingresada {
+      background: linear-gradient(145deg, #58a6ff, #9333ea 60%, #581c87) !important;
+      border-color: #c084fc !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 16px rgba(88, 166, 255, 0.7), inset 0 0 8px rgba(192, 132, 252, 0.5) !important;
+    }
+
     .dot.cortesia {
       background: #a855f7 !important;
       box-shadow: 0 0 6px rgba(168, 85, 247, 0.6) !important;
     }
 
+    .dot.cortesia-ingresada {
+      background: linear-gradient(135deg, #58a6ff, #a855f7) !important;
+      box-shadow: 0 0 6px rgba(168, 85, 247, 0.8) !important;
+    }
+
     .ultra-vip-overlay.cortesia {
       color: #c084fc !important;
       text-shadow: 0 1px 4px #000, 0 0 10px rgba(192, 132, 252, 0.8) !important;
+    }
+
+    .ultra-vip-overlay.cortesia-ingresada {
+      color: #58a6ff !important;
+      text-shadow: 0 1px 4px #000, 0 0 12px rgba(192, 132, 252, 0.9) !important;
     }
 
     .table-name-tag {
@@ -2549,15 +2565,18 @@
         const reserva = estado[t.id];
         const activa = reservaActiva(reserva);
         const isCortesia = activa && (reserva.status === "cortesia" || reserva.esCortesia);
-        const isIngresada = activa && reserva.status === "ingresada" && !isCortesia;
-        const isVentaEnPuerta = isIngresada && (reserva.nombre === "Venta en Puerta" || reserva.masterAction);
+        const isIngresada = activa && reserva.status === "ingresada";
+        const isCortesiaIngresada = isIngresada && isCortesia;
+        const isVentaEnPuerta = isIngresada && !isCortesia && (reserva.nombre === "Venta en Puerta" || reserva.masterAction);
         const approved = activa && ["aprobada", "ocupada", "vendida"].includes(reserva.status) && !isCortesia;
         const pending = activa && ["pendiente", "disputa", "comprobante_subido", "pendiente_revision"].includes(reserva.status) && !isCortesia;
         const blocked = approved || pending || isIngresada || isCortesia;
 
         const btn = document.createElement("button");
         let statusClass = "";
-        if (isCortesia) {
+        if (isCortesiaIngresada) {
+          statusClass = " cortesia-ingresada";
+        } else if (isCortesia) {
           statusClass = " cortesia";
         } else if (isIngresada) {
           statusClass = (isMaster && isVentaEnPuerta) ? " ingresada-master" : " ingresada";
@@ -2577,7 +2596,7 @@
 
         const labelText = t.num || t.id;
         btn.innerHTML = (approved || isIngresada || isCortesia) ? '<span class="x-mark">X</span>' : '<span class="table-label">' + labelText + '</span>';
-        btn.setAttribute("aria-label", "Mesa " + labelText + (isCortesia ? " (cortesía)" : isIngresada ? " (ingresada)" : approved ? " (aprobada)" : pending ? " (pendiente de aprobacion)" : " (libre)"));
+        btn.setAttribute("aria-label", "Mesa " + labelText + (isCortesiaIngresada ? " (cortesía dentro)" : isCortesia ? " (cortesía)" : isIngresada ? " (ingresada)" : approved ? " (aprobada)" : pending ? " (pendiente de aprobacion)" : " (libre)"));
 
         if (!blocked || isMaster) {
           btn.addEventListener("click", () => abrirMesa(t.id));
@@ -2629,16 +2648,21 @@
       const active = reservaActiva(reserva);
 
       const isIngresada = active && reserva.status === "ingresada";
-      const isVentaEnPuerta = isIngresada && (reserva.nombre === "Venta en Puerta" || reserva.masterAction);
       const isCortesia = active && (reserva.status === "cortesia" || reserva.esCortesia);
+      const isCortesiaIngresada = isIngresada && isCortesia;
+      const isVentaEnPuerta = isIngresada && !isCortesia && (reserva.nombre === "Venta en Puerta" || reserva.masterAction);
       const confirmed = active && ["aprobada", "ocupada", "vendida"].includes(reserva.status) && !isCortesia;
       const dispute = active && ["pendiente", "disputa", "comprobante_subido", "pendiente_revision"].includes(reserva.status) && !isCortesia;
 
-      ultraVipReserveBtn.classList.toggle("cortesia", isCortesia);
+      ultraVipReserveBtn.classList.toggle("cortesia-ingresada", isCortesiaIngresada);
+      ultraVipReserveBtn.classList.toggle("cortesia", isCortesia && !isCortesiaIngresada);
       ultraVipReserveBtn.classList.toggle("dispute", dispute);
-      ultraVipReserveBtn.classList.toggle("confirmed", (confirmed || isIngresada));
+      ultraVipReserveBtn.classList.toggle("confirmed", (confirmed || (isIngresada && !isCortesia)));
 
-      if (isCortesia) {
+      if (isCortesiaIngresada) {
+        ultraVipReserveBtn.style.color = "#58a6ff";
+        ultraVipReserveBtn.textContent = "CORTESÍA DENTRO";
+      } else if (isCortesia) {
         ultraVipReserveBtn.style.color = "#c084fc";
         ultraVipReserveBtn.textContent = "CORTESÍA";
       } else if (isIngresada) {

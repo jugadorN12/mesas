@@ -116,8 +116,15 @@
     border-color:#e9d5ff !important;
     box-shadow:0 4px 12px rgba(0,0,0,0.5), 0 0 14px rgba(168,85,247,0.7) !important;
   }
+  .table-btn.cortesia-ingresada{
+    background:linear-gradient(145deg, #58a6ff, #9333ea 60%, #581c87) !important;
+    border-color:#c084fc !important;
+    box-shadow:0 4px 12px rgba(0,0,0,0.5), 0 0 16px rgba(88,166,255,0.8), inset 0 0 8px rgba(192,132,252,0.6) !important;
+  }
   .dot.cortesia{ background:#a855f7; box-shadow:0 0 6px rgba(168,85,247,0.6); }
+  .dot.cortesia-ingresada{ background:linear-gradient(135deg, #58a6ff, #a855f7); box-shadow:0 0 6px rgba(168,85,247,0.8); }
   .ultra-vip-overlay.cortesia{ color:#c084fc !important; text-shadow:0 1px 4px #000, 0 0 10px rgba(192,132,252,0.8) !important; }
+  .ultra-vip-overlay.cortesia-ingresada{ color:#58a6ff !important; text-shadow:0 1px 4px #000, 0 0 12px rgba(192,132,252,0.9) !important; }
   .btn-cortesia-action{
     width:100%; padding:11px 14px; background:rgba(168,85,247,0.14); border:1.5px solid #a855f7;
     color:#e9d5ff; border-radius:12px; cursor:pointer; font-weight:700; font-size:13px;
@@ -277,6 +284,7 @@
       <span><span class="dot approved"></span>Vendida</span>
       <span><span class="dot ingresada"></span>Dentro</span>
       <span><span class="dot cortesia"></span>Cortesía</span>
+      <span><span class="dot cortesia-ingresada"></span>Cortesía Dentro</span>
     </div>
   </div>
 
@@ -886,12 +894,26 @@
       const r = estado[t.id];
       const isActive = r && (r.status !== "disputa" || (Number.isFinite(r.expiresAt) && r.expiresAt > Date.now()));
       const isCortesia = isActive && (r.status === "cortesia" || r.esCortesia);
-      const isIngresada = isActive && r.status === "ingresada" && !isCortesia;
+      const isIngresada = isActive && r.status === "ingresada";
+      const isCortesiaIngresada = isIngresada && isCortesia;
       const isApproved = isActive && ["aprobada", "ocupada", "vendida"].includes(r.status) && !isCortesia;
       const isPending = isActive && ["disputa", "pendiente", "comprobante_subido", "pendiente_revision"].includes(r.status) && !isCortesia;
 
+      let statusClass = "";
+      if (isCortesiaIngresada) {
+        statusClass = " cortesia-ingresada";
+      } else if (isCortesia) {
+        statusClass = " cortesia";
+      } else if (isIngresada) {
+        statusClass = " ingresada";
+      } else if (isApproved) {
+        statusClass = " approved";
+      } else if (isPending) {
+        statusClass = " pending";
+      }
+
       const btn = document.createElement("button");
-      btn.className = "table-btn" + (isTerraza ? " terraza-btn" : "") + (isCortesia ? " cortesia" : isIngresada ? " ingresada" : isApproved ? " approved" : isPending ? " pending" : "");
+      btn.className = "table-btn" + (isTerraza ? " terraza-btn" : "") + statusClass;
       btn.style.left = t.x + "%";
       btn.style.top = t.y + "%";
       btn.style.width = btnSize + "px";
@@ -913,12 +935,13 @@
     const r = estado["ULTRA VIP"];
     const isActive = r && (r.status !== "disputa" || (Number.isFinite(r.expiresAt) && r.expiresAt > Date.now()));
     const isCortesia = isActive && (r.status === "cortesia" || r.esCortesia);
-    const isIngresada = isActive && r.status === "ingresada" && !isCortesia;
+    const isIngresada = isActive && r.status === "ingresada";
+    const isCortesiaIngresada = isIngresada && isCortesia;
     const isApproved = isActive && ["aprobada", "ocupada", "vendida"].includes(r.status) && !isCortesia;
     const isPending = isActive && ["disputa", "pendiente", "comprobante_subido", "pendiente_revision"].includes(r.status) && !isCortesia;
 
-    btn.className = "ultra-vip-overlay" + (isCortesia ? " cortesia" : isIngresada ? " ingresada" : isApproved ? " confirmed" : isPending ? " dispute" : "");
-    btn.textContent = isCortesia ? "CORTESÍA" : isIngresada ? "DENTRO" : isApproved ? "VENDIDA" : isPending ? "PENDIENTE" : "RESERVAR";
+    btn.className = "ultra-vip-overlay" + (isCortesiaIngresada ? " cortesia-ingresada" : isCortesia ? " cortesia" : isIngresada ? " ingresada" : isApproved ? " confirmed" : isPending ? " dispute" : "");
+    btn.textContent = isCortesiaIngresada ? "CORTESÍA DENTRO" : isCortesia ? "CORTESÍA" : isIngresada ? "DENTRO" : isApproved ? "VENDIDA" : isPending ? "PENDIENTE" : "RESERVAR";
     btn.onclick = () => handleTableClick("ULTRA VIP");
   }
 
@@ -1012,6 +1035,73 @@
     const hasPactadaEx = !!(r && (r.esExcepcion || r.excepcion));
     const isCalcRes = !!(r && (r.origen === 'calculadora_admin' || r.formaPago || (r.montoTotal && r.saldoPuerta !== undefined && ['aprobada', 'ocupada', 'vendida'].includes(r.status))));
     const isCortesiaRes = !!(r && (r.status === 'cortesia' || r.esCortesia));
+    const isIngresada = !!(r && r.status === 'ingresada');
+
+    if (isIngresada) {
+      infoView.style.display = 'block';
+      if (isCortesiaRes) {
+        sub.textContent = "CORTESÍA INGRESADA (DENTRO)";
+        if (cortesiaBadge) {
+          cortesiaBadge.style.display = 'block';
+          document.getElementById('modalCortesiaDetails').innerHTML = `
+            👤 Beneficiario: <b>${escapeHtml(r.nombre || r.beneficiario || 'Invitado Especial')}</b><br>
+            👥 Personas autorizadas: <b>${r.cantidadPersonas || 4}</b><br>
+            🔑 Autorizado por: <b>${escapeHtml(r.autorizadoPor || 'Admin / Boletería')}</b>
+            ${r.masterNote ? `<br>📝 Nota: <i>${escapeHtml(r.masterNote)}</i>` : ''}
+            ${r.ingresadaAt ? `<br>🚪 <b>Ingresó:</b> ${new Date(r.ingresadaAt).toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})} hs (${new Date(r.ingresadaAt).toLocaleDateString('es-AR')})` : ''}
+          `;
+        }
+        document.getElementById('infoDetails').innerHTML = `
+          <div style="font-size:15px; font-weight:800; color:#c084fc; margin-bottom:8px;">🟣🔵 MESA DE CORTESÍA DENTRO DEL LOCAL</div>
+          <div style="font-size:13px; color:var(--text); line-height:1.6;">
+            Esta mesa ya ingresó con <b>${r.cantidadPersonas || 4} personas</b>.<br>
+            Total abonado en boletería: <b style="color:var(--green);">$0 (Cortesía)</b>
+          </div>
+        `;
+      } else {
+        sub.textContent = "Reserva de " + (r.nombre || "Sin nombre");
+        const promoInfo = formatReservationPromoInfo(r);
+        const isEx = !!(r.esExcepcion || r.excepcion);
+        const isCalc = !!(r.origen === 'calculadora_admin' || r.formaPago);
+        const exResponsable = r.responsableExcepcion || 'Admin / Asistente';
+        const total = r.montoTotal || r.precioTotal || 0;
+        const senado = r.montoSenado || 0;
+        const cobradoPuerta = (r.cobroEfectivo || 0) + (r.cobroTransferencia || 0);
+        const pctAbonado = r.porcentajeAbonado !== undefined ? r.porcentajeAbonado : (total > 0 ? Math.round((senado / total) * 100) : 0);
+        const pctSaldo = r.porcentajeSaldo !== undefined ? r.porcentajeSaldo : (total > 0 ? Math.round((cobradoPuerta / total) * 100) : 0);
+
+        document.getElementById('infoDetails').innerHTML = `
+          Personas: ${r.cantidadPersonas || 4}<br>
+          Total Cobrado: $${(total).toLocaleString('es-AR')}<br>
+          Entregado en Bebidas: $${(r.montoConsumicion || r.montoConsumoCredito || 0).toLocaleString('es-AR')}<br>
+          ${isEx ? `
+            <div style="margin-top:10px; padding:10px; background:rgba(255,189,62,0.12); border:1.5px solid var(--amber); border-radius:10px; text-align:left; font-size:12px; line-height:1.6;">
+              <b style="color:var(--amber);">⚡ FUE UNA EXCEPCIÓN DE VENTA</b><br>
+              👤 Autorizado por: <b>${escapeHtml(exResponsable)}</b><br>
+              🍹 En Bebidas acordado: <b>${r.porcentajeConsumo || 0}%</b><br>
+              💵 Abonó previamente: <b>${pctAbonado}% ($${senado.toLocaleString('es-AR')})</b><br>
+              🚪 Pagó en puerta: <b>${pctSaldo}% ($${cobradoPuerta.toLocaleString('es-AR')})</b>
+              ${r.masterNote ? `<br>📝 Nota: <i>${escapeHtml(r.masterNote)}</i>` : ''}
+            </div>
+          ` : isCalc ? `
+            <div style="margin-top:10px; padding:10px; background:rgba(88,166,255,0.1); border:1.5px solid var(--blue); border-radius:10px; text-align:left; font-size:12px; line-height:1.6;">
+              <b style="color:var(--blue);">📋 RESERVA DESDE CALCULADORA ADMIN</b><br>
+              👤 Cliente: <b>${escapeHtml(r.nombre || 'Cliente')}</b><br>
+              👥 Ingresaron: <b>${r.cantidadPersonas || 5} personas</b><br>
+              💳 Medio acordado: <b>${r.formaPago === 'transferencia' ? 'Transferencia / QR' : 'Efectivo'}</b><br>
+              💵 Seña abonada: <b>$${senado.toLocaleString('es-AR')}</b><br>
+              🚪 Cobrado en puerta: <b>$${cobradoPuerta.toLocaleString('es-AR')}</b> (${r.metodoCobro || r.formaPago || 'Efectivo'})<br>
+              🍹 Entregado en Bebidas: <b>$${(r.montoConsumicion || r.montoConsumoCredito || 0).toLocaleString('es-AR')}</b>
+            </div>
+          ` : `
+            <span style="color:var(--green); font-size:13px; font-weight:600;">Promo aplicada: ${promoInfo.originText}</span><br>
+          `}
+          ${r.ts ? `<span style="color:var(--grey); font-size:11.5px; display:block; margin-top:6px;">Fecha reserva: ${new Date(r.ts).toLocaleString('es-AR', {dateStyle:'short', timeStyle:'short'})}</span>` : ''}
+        `;
+      }
+      overlay.classList.add('open');
+      return;
+    }
 
     if (isCortesiaRes) {
       calcView.style.display = 'block';
@@ -1043,55 +1133,15 @@
       }
       const btnCort = document.getElementById('btnMarcarCortesia');
       if (btnCort) btnCort.style.display = 'none';
+
+      overlay.classList.add('open');
       return;
-    } else {
-      const btnCort = document.getElementById('btnMarcarCortesia');
-      if (btnCort) btnCort.style.display = 'flex';
     }
 
-    if (r && r.status === "ingresada") {
-      infoView.style.display = 'block';
-      sub.textContent = "Reserva de " + (r.nombre || "Sin nombre");
-      const promoInfo = formatReservationPromoInfo(r);
-      const isEx = !!(r.esExcepcion || r.excepcion);
-      const isCalc = !!(r.origen === 'calculadora_admin' || r.formaPago);
-      const exResponsable = r.responsableExcepcion || 'Admin / Asistente';
-      const total = r.montoTotal || r.precioTotal || 0;
-      const senado = r.montoSenado || 0;
-      const cobradoPuerta = (r.cobroEfectivo || 0) + (r.cobroTransferencia || 0);
-      const pctAbonado = r.porcentajeAbonado !== undefined ? r.porcentajeAbonado : (total > 0 ? Math.round((senado / total) * 100) : 0);
-      const pctSaldo = r.porcentajeSaldo !== undefined ? r.porcentajeSaldo : (total > 0 ? Math.round((cobradoPuerta / total) * 100) : 0);
+    const btnCort = document.getElementById('btnMarcarCortesia');
+    if (btnCort) btnCort.style.display = 'flex';
 
-      document.getElementById('infoDetails').innerHTML = `
-        Personas: ${r.cantidadPersonas || 4}<br>
-        Total Cobrado: $${(total).toLocaleString('es-AR')}<br>
-        Entregado en Bebidas: $${(r.montoConsumicion || r.montoConsumoCredito || 0).toLocaleString('es-AR')}<br>
-        ${isEx ? `
-          <div style="margin-top:10px; padding:10px; background:rgba(255,189,62,0.12); border:1.5px solid var(--amber); border-radius:10px; text-align:left; font-size:12px; line-height:1.6;">
-            <b style="color:var(--amber);">⚡ FUE UNA EXCEPCIÓN DE VENTA</b><br>
-            👤 Autorizado por: <b>${escapeHtml(exResponsable)}</b><br>
-            🍹 En Bebidas acordado: <b>${r.porcentajeConsumo || 0}%</b><br>
-            💵 Abonó previamente: <b>${pctAbonado}% ($${senado.toLocaleString('es-AR')})</b><br>
-            🚪 Pagó en puerta: <b>${pctSaldo}% ($${cobradoPuerta.toLocaleString('es-AR')})</b>
-            ${r.masterNote ? `<br>📝 Nota: <i>${escapeHtml(r.masterNote)}</i>` : ''}
-          </div>
-        ` : isCalc ? `
-          <div style="margin-top:10px; padding:10px; background:rgba(88,166,255,0.1); border:1.5px solid var(--blue); border-radius:10px; text-align:left; font-size:12px; line-height:1.6;">
-            <b style="color:var(--blue);">📋 RESERVA DESDE CALCULADORA ADMIN</b><br>
-            👤 Cliente: <b>${escapeHtml(r.nombre || 'Cliente')}</b><br>
-            👥 Ingresaron: <b>${r.cantidadPersonas || 5} personas</b><br>
-            💳 Medio acordado: <b>${r.formaPago === 'transferencia' ? 'Transferencia / QR' : 'Efectivo'}</b><br>
-            💵 Seña abonada: <b>$${senado.toLocaleString('es-AR')}</b><br>
-            🚪 Cobrado en puerta: <b>$${cobradoPuerta.toLocaleString('es-AR')}</b> (${r.metodoCobro || r.formaPago || 'Efectivo'})<br>
-            🍹 Entregado en Bebidas: <b>$${(r.montoConsumicion || r.montoConsumoCredito || 0).toLocaleString('es-AR')}</b>
-          </div>
-        ` : `
-          <span style="color:var(--green); font-size:13px; font-weight:600;">Promo aplicada: ${promoInfo.originText}</span><br>
-        `}
-        ${r.ts ? `<span style="color:var(--grey); font-size:11.5px; display:block; margin-top:6px;">Fecha reserva: ${new Date(r.ts).toLocaleString('es-AR', {dateStyle:'short', timeStyle:'short'})}</span>` : ''}
-      `;
-    } else {
-      calcView.style.display = 'block';
+    calcView.style.display = 'block';
       currentPeople = (r && r.cantidadPersonas) ? parseInt(r.cantidadPersonas) : 4;
       const countEl = document.getElementById('peopleCount');
       if (countEl) countEl.value = currentPeople;
@@ -1153,7 +1203,6 @@
       }
 
       updateCalc();
-    }
     overlay.classList.add('open');
   }
 
@@ -1590,8 +1639,9 @@
     const finalTotal = parseInt(document.getElementById('valTotal').textContent.replace(/\D/g,'')) || 0;
     const finalDrinks = parseInt(document.getElementById('valDrinks').textContent.replace(/\D/g,'')) || 0;
     try {
+      const isCortesia = !!(r.status === 'cortesia' || r.esCortesia || metodo === 'cortesia');
       const isEx = isException || !!(r && (r.esExcepcion || r.excepcion));
-      const senaMonto = isEx ? exPactadaSena : ((r && r.montoSenado !== undefined && r.montoSenado !== null) ? r.montoSenado : 20000);
+      const senaMonto = isEx ? exPactadaSena : ((r && r.montoSenado !== undefined && r.montoSenado !== null) ? r.montoSenado : (isCortesia ? 0 : 20000));
       const pctAbonado = (finalTotal > 0 ? Math.round((senaMonto / finalTotal) * 100) : 0);
       const pctSaldo = (finalTotal > 0 ? Math.max(0, 100 - pctAbonado) : 0);
       const unitPrice = exPactadaPrecioPersona > 0 ? exPactadaPrecioPersona : (r.precioPorPersona || (currentPeople > 0 ? Math.round(finalTotal / currentPeople) : 0));
@@ -1599,32 +1649,34 @@
       const dataToSave = {
         ...r,
         status: 'ingresada',
+        esCortesia: isCortesia,
+        cortesiaIngresada: isCortesia,
         cantidadPersonas: currentPeople,
-        precioPorPersona: unitPrice,
-        montoTotal: finalTotal,
-        precioTotal: finalTotal,
-        montoConsumicion: finalDrinks,
-        montoConsumoCredito: finalDrinks,
-        porcentajeConsumo: isEx ? exPactadaDrinksPct : (isCalcReservation ? (finalTotal > 0 ? Math.round((finalDrinks / finalTotal) * 100) : 80) : ((r && r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) ? r.porcentajeConsumo : getTodayPromo().pct)),
-        formaPago: isCalcReservation ? calcResSelectedPayment : (r.formaPago || metodo),
-        origen: isCalcReservation ? 'calculadora_admin' : (r.origen || 'puerta'),
-        excepcion: isEx,
-        esExcepcion: isEx,
-        responsableExcepcion: r.responsableExcepcion || (isEx ? ('Cobrado en boletería por ' + (auth?.currentUser?.email || 'boleteria')) : null),
-        montoSenado: senaMonto,
-        saldoPuerta: currentBalance,
-        porcentajeAbonado: pctAbonado,
-        porcentajeSaldo: pctSaldo,
-        metodoCobro: metodo,
-        cobroEfectivo: cash,
-        cobroTransferencia: transf,
+        precioPorPersona: isCortesia ? 0 : unitPrice,
+        montoTotal: isCortesia ? 0 : finalTotal,
+        precioTotal: isCortesia ? 0 : finalTotal,
+        montoConsumicion: isCortesia ? 0 : finalDrinks,
+        montoConsumoCredito: isCortesia ? 0 : finalDrinks,
+        porcentajeConsumo: isCortesia ? 0 : (isEx ? exPactadaDrinksPct : (isCalcReservation ? (finalTotal > 0 ? Math.round((finalDrinks / finalTotal) * 100) : 80) : ((r && r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) ? r.porcentajeConsumo : getTodayPromo().pct))),
+        formaPago: isCortesia ? 'cortesia' : (isCalcReservation ? calcResSelectedPayment : (r.formaPago || metodo)),
+        origen: isCortesia ? (r.origen || 'cortesia') : (isCalcReservation ? 'calculadora_admin' : (r.origen || 'puerta')),
+        excepcion: isCortesia ? false : isEx,
+        esExcepcion: isCortesia ? false : isEx,
+        responsableExcepcion: isCortesia ? null : (r.responsableExcepcion || (isEx ? ('Cobrado en boletería por ' + (auth?.currentUser?.email || 'boleteria')) : null)),
+        montoSenado: isCortesia ? 0 : senaMonto,
+        saldoPuerta: 0,
+        porcentajeAbonado: isCortesia ? 0 : pctAbonado,
+        porcentajeSaldo: isCortesia ? 0 : pctSaldo,
+        metodoCobro: isCortesia ? 'cortesia' : metodo,
+        cobroEfectivo: isCortesia ? 0 : cash,
+        cobroTransferencia: isCortesia ? 0 : transf,
         ingresadaAt: Date.now(),
         ingresadaBy: auth.currentUser?.email || 'boleteria'
       };
       if (!dataToSave.ts) dataToSave.ts = Date.now();
       const targetCol = window.getActiveBolCollection ? window.getActiveBolCollection() : 'reservas';
       await db.collection(targetCol).doc(currentMesa).set(dataToSave, { merge: true });
-      showToast("Cobro registrado e ingreso confirmado.");
+      showToast(isCortesia ? "Ingreso de CORTESÍA confirmado." : "Cobro registrado e ingreso confirmado.");
       document.getElementById('modalOverlay').classList.remove('open');
     } catch (e) {
       alert("Error al guardar: " + e.message);
