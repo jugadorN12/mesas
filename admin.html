@@ -2703,6 +2703,7 @@
     });
     function printStatusLabel(reserva) {
       if (!reserva) return { label: 'Libre', className: 'free' };
+      if (reserva.status === 'cortesia' || reserva.esCortesia) return { label: 'Cortesía ($0)', className: 'cortesia' };
       if (reserva.status === 'aprobada' || reserva.status === 'ocupada' || reserva.status === 'ingresada') return { label: 'Pagado - reserva confirmada', className: 'confirmed' };
       return { label: 'Señado - en disputa', className: 'dispute' };
     }
@@ -4564,8 +4565,9 @@
 
       TABLE_ORDER.forEach(mesaId => {
         const r = sharedData[mesaId];
-        const isSold = r && ['aprobada', 'ocupada', 'vendida', 'ingresada'].includes(r.status);
-        const isPending = r && ['pendiente', 'disputa', 'comprobante_subido', 'pendiente_revision'].includes(r.status);
+        const isCortesia = r && (r.status === 'cortesia' || r.esCortesia);
+        const isSold = r && ['aprobada', 'ocupada', 'vendida', 'ingresada'].includes(r.status) && !isCortesia;
+        const isPending = r && ['pendiente', 'disputa', 'comprobante_subido', 'pendiente_revision'].includes(r.status) && !isCortesia;
 
         const opt = document.createElement('option');
         opt.value = mesaId;
@@ -4573,7 +4575,12 @@
         const isTerraza = mesaId.startsWith('T-');
         const mesaName = isTerraza ? `Mesa ${mesaId.replace('T-', '')} (TERRACE SOUL)` : (mesaId === 'ULTRA VIP' ? 'ULTRA VIP' : `Mesa ${mesaId} (MAIN STAGE)`);
 
-        if (isSold) {
+        if (isCortesia) {
+          const nombreInvitado = r.nombre ? ` (${r.nombre})` : '';
+          opt.textContent = `🟣 ${mesaName} - CORTESÍA${nombreInvitado}`;
+          opt.disabled = true;
+          opt.style.color = '#c084fc';
+        } else if (isSold) {
           const nombreCliente = r.nombre ? ` (${r.nombre})` : '';
           opt.textContent = `🔴 ${mesaName} - VENDIDA${nombreCliente}`;
           opt.disabled = true;
