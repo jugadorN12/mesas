@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Panel de Clientes Externos — Gestión de Mesas</title>
+  <meta name="theme-color" content="#0d0d12">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07070a;
+      --card: #111118;
+      --card-hover: #161622;
+      --line: rgba(255, 255, 255, 0.08);
+      --line-light: rgba(255, 255, 255, 0.14);
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      --green: #2ee6a6;
+      --green-glow: rgba(46, 230, 166, 0.35);
+      --red: #ff4757;
+      --amber: #ffa502;
+      --purple: #a855f7;
+      --blue: #38bdf8;
+      --text: #f1f2f6;
+      --muted: #8b8ea4;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Topbar */
+    header.topbar {
+      background: #0d0d14;
+      border-bottom: 1px solid var(--line);
+      padding: 14px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 1.5px;
+      color: #fff;
+    }
+
+    .brand-title span {
+      color: var(--primary);
+    }
+
+    .brand-tag {
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(99, 102, 241, 0.15);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .client-selector-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #171722;
+      border: 1px solid var(--line-light);
+      border-radius: 8px;
+      padding: 5px 10px;
+    }
+
+    .client-selector-box label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .client-selector-box select {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .client-selector-box select option {
+      background: #171722;
+      color: #fff;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 12px var(--primary-glow);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border-color: var(--line-light);
+      color: var(--text);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--muted);
+    }
+
+    .btn-danger {
+      background: rgba(255, 71, 87, 0.15);
+      border-color: var(--red);
+      color: #ff6b81;
+    }
+
+    .btn-danger:hover {
+      background: var(--red);
+      color: #fff;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1240px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 22px 18px 60px;
+      flex: 1;
+    }
+
+    /* Subheader & Tabs */
+    .subnav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 14px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      padding: 9px 16px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn.active {
+      background: #1a1a26;
+      border-color: var(--line-light);
+      color: #fff;
+    }
+
+    /* Quick Stats Bar */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 16px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .stat-val {
+      font-size: 22px;
+      font-weight: 800;
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 1px;
+    }
+
+    .stat-val.green { color: var(--green); }
+    .stat-val.yellow { color: var(--amber); }
+    .stat-val.red { color: var(--red); }
+    .stat-val.purple { color: var(--purple); }
+    .stat-val.blue { color: var(--blue); }
+
+    /* Content Cards */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 20px 22px;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      color: #fff;
+    }
+
+    .card-subtitle {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-bottom: 18px;
+      line-height: 1.45;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .form-group input,
+    .form-group select {
+      background: #181824;
+      border: 1px solid var(--line-light);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 13.5px;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 8px var(--primary-glow);
+    }
+
+    /* Mesas Grid Builder */
+    .tables-table-wrap {
+      overflow-x: auto;
+      margin-top: 14px;
+    }
+
+    table.tables-list {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    table.tables-list th {
+      text-align: left;
+      padding: 10px 12px;
+      background: #171724;
+      color: var(--muted);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      border-bottom: 1px solid var(--line-light);
+    }
+
+    table.tables-list td {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    table.tables-list tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-status.libre { background: rgba(46, 230, 166, 0.15); color: var(--green); border: 1px solid var(--green); }
+    .badge-status.disputa { background: rgba(255, 165, 2, 0.15); color: var(--amber); border: 1px solid var(--amber); }
+    .badge-status.aprobada { background: rgba(255, 71, 87, 0.15); color: var(--red); border: 1px solid var(--red); }
+    .badge-status.cortesia { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid var(--purple); }
+    .badge-status.ingresada { background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(168, 85, 247, 0.3)); color: #bae6fd; border: 1px solid var(--blue); }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: #12121a;
+      border: 1px solid var(--line-light);
+      border-radius: 14px;
+      max-width: 500px;
+      width: 100%;
+      padding: 22px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    /* Links Card Box */
+    .link-share-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: #171724;
+      border: 1px solid var(--line-light);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+    }
+
+    .link-share-box code {
+      font-size: 12.5px;
+      color: #a5b4fc;
+      word-break: break-all;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e1e2d;
+      border: 1px solid var(--line-light);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 30px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      z-index: 2000;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-6px);
+    }
+
+    /* Auth gate */
+    #authView {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+      padding: 20px;
+    }
+
+    .auth-card {
+      background: var(--card);
+      border: 1px solid var(--line-light);
+      border-radius: 14px;
+      max-width: 380px;
+      width: 100%;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    .auth-card h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
+    }
+  </style>
+
+  <!-- Firebase v8 SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+
+<body>
+
+  <!-- Vista Login si no está autenticado -->
+  <div id="authView" style="display:none;">
+    <div class="auth-card">
+      <h2>PANEL <span>CLIENTES</span></h2>
+      <p style="font-size:12.5px; color:var(--muted); margin-bottom:18px;">Ingresá con tu cuenta de Administrador</p>
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group" style="text-align:left; margin-bottom:12px;">
+          <label>Email</label>
+          <input type="email" id="loginEmail" required placeholder="admin@cubanobar.com">
+        </div>
+        <div class="form-group" style="text-align:left; margin-bottom:18px;">
+          <label>Contraseña</label>
+          <input type="password" id="loginPassword" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:11px;">Entrar al Panel</button>
+      </form>
+      <div id="loginError" style="color:var(--red); font-size:12px; margin-top:12px; font-weight:600;"></div>
+    </div>
+  </div>
+
+  <!-- Vista Principal del Panel -->
+  <div id="appView" style="display:none; flex-direction:column; flex:1;">
+    <header class="topbar">
+      <div class="brand-wrap">
+        <div class="brand-title">PANEL <span>CLIENTES EXTERNOS</span></div>
+        <span class="brand-tag">Multi-Local / Demo</span>
+      </div>
+
+      <div class="top-actions">
+        <!-- Selector de Cliente / Local -->
+        <div class="client-selector-box">
+          <label for="selectCliente">Local:</label>
+          <select id="selectCliente" onchange="cambiarCliente(this.value)">
+            <option value="demo">✨ Demo General</option>
+          </select>
+        </div>
+        <button type="button" class="btn btn-outline" onclick="abrirModalNuevoCliente()">+ Nuevo Local</button>
+        <button type="button" class="btn btn-outline" id="btnLogout" onclick="handleLogout()">Salir</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="subnav">
+        <div class="tabs">
+          <button type="button" class="tab-btn active" data-tab="tab-mesas" onclick="switchTab('tab-mesas')">🪑 Mesas del Local</button>
+          <button type="button" class="tab-btn" data-tab="tab-reservas" onclick="switchTab('tab-reservas')">📋 Reservas en Vivo</button>
+          <button type="button" class="tab-btn" data-tab="tab-links" onclick="switchTab('tab-links')">🔗 Enlaces y Roles</button>
+          <button type="button" class="tab-btn" data-tab="tab-config" onclick="switchTab('tab-config')">⚙️ Precios y Pago</button>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-danger" onclick="reiniciarMesasDemo()">🔄 Resetear Mesas a Cero</button>
+        </div>
+      </div>
+
+      <!-- Tarjetas de Estadísticas Rápidas -->
+      <section class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-label">Total Mesas</div>
+          <div class="stat-val" id="statTotal">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Libres</div>
+          <div class="stat-val green" id="statLibres">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">En Disputa</div>
+          <div class="stat-val yellow" id="statDisputa">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Vendidas</div>
+          <div class="stat-val red" id="statVendidas">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Cortesías</div>
+          <div class="stat-val purple" id="statCortesias">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Dentro (Ingresadas)</div>
+          <div class="stat-val blue" id="statIngresadas">0</div>
+        </div>
+      </section>
+
+      <!-- TAB 1: MESAS DEL LOCAL (Configuración y Creador Rápido) -->
+      <div id="tab-mesas" class="tab-content">
+        <div class="card">
+          <div class="card-title">⚡ Generador Rápido de Mesas</div>
+          <div class="card-subtitle">
+            Cargá las mesas de este boliche en segundos. Podés generar un lote del 1 al N con un toque o agregar mesas y boxes especiales.
+          </div>
+
+          <div class="form-grid" style="align-items:flex-end;">
+            <div class="form-group">
+              <label>Generar lote de mesas</label>
+              <div style="display:flex; gap:6px;">
+                <input type="number" id="genCantidad" min="1" max="100" placeholder="Ej: 20" value="20">
+                <button type="button" class="btn btn-primary" onclick="generarLoteMesas()">⚡ Crear Mesas</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>O agregar una mesa especial</label>
+              <div style="display:flex; gap:6px;">
+                <input type="text" id="nuevaMesaNombre" placeholder="Ej: Box VIP 1">
+                <input type="text" id="nuevaMesaSector" placeholder="Sector (ej: VIP)" style="max-width:130px;">
+                <button type="button" class="btn btn-outline" onclick="agregarMesaManual()">+ Agregar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🪑 Listado Actual de Mesas (<span id="countMesasActivas">0</span>)</div>
+          <div class="card-subtitle">Estas son las mesas que se muestran en la botonera interactiva para este cliente.</div>
+          <div class="tables-table-wrap">
+            <table class="tables-list">
+              <thead>
+                <tr>
+                  <th>N° / ID</th>
+                  <th>Nombre Visible</th>
+                  <th>Sector</th>
+                  <th>Capacidad</th>
+                  <th>Estado Actual</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="mesasTableBody">
+                <tr><td colspan="6" style="text-align:center; color:var(--muted);">Cargando mesas...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: RESERVAS EN VIVO -->
+      <div id="tab-reservas" class="tab-content" style="display:none;">
+        <div class="card">
+          <div class="card-title">📋 Estado de Reservas en Tiempo Real</div>
+          <div class="card-subtitle">Controlá quién señó, quién tiene cortesía o confirmá las reservas de este local.</div>
+          <div class="tables-table-wrap">
+            <table class="tables-list">
+              <thead>
+                <tr>
+                  <th>Mesa</th>
+                  <th>Cliente / Beneficiario</th>
+                  <th>WhatsApp</th>
+                  <th>Estado</th>
+                  <th>Total / Seña</th>
+                  <th>Nombre en Mapa</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="reservasTableBody">
+                <tr><td colspan="7" style="text-align:center; color:var(--muted);">No hay reservas activas.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: ENLACES Y ROLES -->
+      <div id="tab-links" class="tab-content" style="display:none;">
+        <div class="card">
+          <div class="card-title">🔗 Enlaces Rápidos para Compartir con el Cliente</div>
+          <div class="card-subtitle">Estos son los enlaces directos para este cliente específico. Abrilos o compartilos con el dueño o cajero.</div>
+
+          <div style="margin-top:14px;">
+            <div style="font-weight:700; font-size:12.5px; margin-bottom:6px;">1. Botonera Pública para Reservar (Clientes del boliche):</div>
+            <div class="link-share-box">
+              <code id="linkPublico">Cargando enlace...</code>
+              <button type="button" class="btn btn-outline" onclick="copiarLink('linkPublico')">📋 Copiar</button>
+            </div>
+
+            <div style="font-weight:700; font-size:12.5px; margin-bottom:6px; margin-top:16px;">2. Boletería de Puerta (Para cobrar y dar ingreso):</div>
+            <div class="link-share-box">
+              <code id="linkBoleteria">Cargando enlace...</code>
+              <button type="button" class="btn btn-outline" onclick="copiarLink('linkBoleteria')">📋 Copiar</button>
+            </div>
+
+            <div style="font-weight:700; font-size:12.5px; margin-bottom:6px; margin-top:16px;">3. Panel de Administración de este Local:</div>
+            <div class="link-share-box">
+              <code id="linkAdmin">Cargando enlace...</code>
+              <button type="button" class="btn btn-outline" onclick="copiarLink('linkAdmin')">📋 Copiar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">👥 Crear Usuarios para este Local (Solo 2 Roles)</div>
+          <div class="card-subtitle">Creá los accesos para el dueño del local (Admin) y el personal de puerta (Boletería).</div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="newUserEmail" placeholder="ejemplo@boliche.com">
+            </div>
+            <div class="form-group">
+              <label>Contraseña</label>
+              <input type="password" id="newUserPass" placeholder="Mínimo 6 caracteres">
+            </div>
+            <div class="form-group">
+              <label>Rol asignado</label>
+              <select id="newUserRole">
+                <option value="admin">👑 Administrador (Control Total)</option>
+                <option value="boleteria">🎟️ Boletería (Cobro e Ingreso en Puerta)</option>
+              </select>
+            </div>
+            <div class="form-group" style="justify-content:flex-end;">
+              <button type="button" class="btn btn-primary" onclick="crearUsuarioLocal()">Crear Usuario</button>
+            </div>
+          </div>
+          <div id="userCreateStatus" style="margin-top:10px; font-size:12.5px; font-weight:600;"></div>
+        </div>
+      </div>
+
+      <!-- TAB 4: CONFIGURACIÓN DE PRECIOS Y PAGOS -->
+      <div id="tab-config" class="tab-content" style="display:none;">
+        <div class="card">
+          <div class="card-title">⚙️ Datos Comerciales y Transferencia</div>
+          <div class="card-subtitle">Configurá los precios de las mesas, el porcentaje de bebidas y los datos bancarios para las señas.</div>
+
+          <div class="form-grid" style="margin-bottom:14px;">
+            <div class="form-group">
+              <label>Nombre del Local</label>
+              <input type="text" id="cfgNombreLocal" placeholder="Ej: Demo Boliche">
+            </div>
+            <div class="form-group">
+              <label>Precio Estándar de Mesa ($)</label>
+              <input type="number" id="cfgPrecioMesa" placeholder="100000" step="5000">
+            </div>
+            <div class="form-group">
+              <label>Monto de Seña para Reservar ($)</label>
+              <input type="number" id="cfgMontoSena" placeholder="20000" step="5000">
+            </div>
+            <div class="form-group">
+              <label>Beneficio en Bebidas (%)</label>
+              <input type="number" id="cfgPctBebidas" placeholder="80" min="0" max="100">
+            </div>
+          </div>
+
+          <div class="form-grid" style="margin-bottom:20px;">
+            <div class="form-group">
+              <label>Alias de Transferencia</label>
+              <input type="text" id="cfgAlias" placeholder="BOLICHE.DEMO.MP">
+            </div>
+            <div class="form-group">
+              <label>Titular de la Cuenta</label>
+              <input type="text" id="cfgTitular" placeholder="Juan Pérez">
+            </div>
+            <div class="form-group">
+              <label>CBU / CVU</label>
+              <input type="text" id="cfgCbu" placeholder="0000003100012345678901">
+            </div>
+            <div class="form-group">
+              <label>WhatsApp de Contacto (10 dígitos)</label>
+              <input type="text" id="cfgWhatsapp" placeholder="1123456789">
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary" onclick="guardarConfigLocal()">💾 Guardar Configuración</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Nuevo Cliente / Local -->
+  <div class="modal-overlay" id="modalNuevoCliente">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>+ Crear Nuevo Cliente / Local</h3>
+        <button class="modal-close" onclick="cerrarModalNuevoCliente()">×</button>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Identificador corto (slug sin espacios)</label>
+        <input type="text" id="newClientSlug" placeholder="ej: boliche-central" maxlength="30">
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Nombre del Boliche o Bar</label>
+        <input type="text" id="newClientNombre" placeholder="ej: Boliche Central">
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Cantidad de mesas iniciales</label>
+        <input type="number" id="newClientMesas" value="20" min="1" max="100">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" onclick="cerrarModalNuevoCliente()">Cancelar</button>
+        <button type="button" class="btn btn-primary" onclick="confirmarCrearCliente()">Crear y Configurar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Nombre en Mapa -->
+  <div class="modal-overlay" id="modalNameMap">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalNameMapTitle">🏷️ Nombre en Botonera</h3>
+        <button class="modal-close" onclick="cerrarModalNameMap()">×</button>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Nombre a mostrar sobre la mesa</label>
+        <input type="text" id="modalNameMapInput" placeholder="Ej: Juan">
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Posición de la etiqueta</label>
+        <select id="modalNameMapPos">
+          <option value="arriba">⬆️ Arriba del botón</option>
+          <option value="abajo">⬇️ Abajo del botón</option>
+          <option value="izquierda">⬅️ A la izquierda</option>
+          <option value="derecha">➡️ A la derecha</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" onclick="guardarNombreMapa(false)">Ocultar Nombre</button>
+        <button type="button" class="btn btn-primary" onclick="guardarNombreMapa(true)">Guardar y Mostrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Inicialización de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBw-dummyKeyForHostingInit-SafeEnv01",
+      authDomain: "mesas-cubano-bar.firebaseapp.com",
+      projectId: "mesas-cubano-bar",
+      storageBucket: "mesas-cubano-bar.appspot.com",
+      messagingSenderId: "367352843801",
+      appId: "1:367352843801:web:2f0ea682d3ab331d2797bf"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let clienteActual = 'demo';
+    let configActual = {};
+    let mesasLista = [];
+    let reservasActuales = {};
+    let unsubConfig = null;
+    let unsubReservas = null;
+    let mesaEditandoNombre = null;
+
+    // Verificar sesión
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById('authView').style.display = 'none';
+        document.getElementById('appView').style.display = 'flex';
+        inicializarPanel();
+      } else {
+        document.getElementById('authView').style.display = 'flex';
+        document.getElementById('appView').style.display = 'none';
+      }
+    });
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const pass = document.getElementById('loginPassword').value;
+      const errEl = document.getElementById('loginError');
+      errEl.textContent = '';
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+      } catch (err) {
+        errEl.textContent = 'Error: ' + err.message;
+      }
+    }
+
+    async function handleLogout() {
+      if (confirm('¿Cerrar sesión del panel de clientes?')) {
+        await auth.signOut();
+      }
+    }
+
+    function inicializarPanel() {
+      // Revisar si viene ?cliente= en la URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlCliente = urlParams.get('cliente');
+      if (urlCliente) {
+        clienteActual = urlCliente;
+      }
+
+      cargarListaClientes();
+      escucharCliente(clienteActual);
+      actualizarEnlacesCompartir();
+    }
+
+    async function cargarListaClientes() {
+      const select = document.getElementById('selectCliente');
+      try {
+        const snap = await db.collection('clientes_externos').get();
+        select.innerHTML = '';
+        if (snap.empty) {
+          // Crear el cliente demo por defecto si no existe
+          await db.collection('clientes_externos').doc('demo').set({
+            nombreLocal: 'Demo General',
+            precioMesa: 100000,
+            montoSena: 20000,
+            porcentajeBebidas: 80,
+            alias: 'DEMO.PAGO.BAR',
+            titular: 'Local Demo',
+            cbu: '0000003100012345678901',
+            whatsapp: '1123456789',
+            mesas: Array.from({ length: 20 }, (_, i) => ({
+              id: String(i + 1),
+              nombre: `Mesa ${i + 1}`,
+              sector: i < 15 ? 'Sector Principal' : 'VIP',
+              capacidad: 4
+            }))
+          }, { merge: true });
+          select.innerHTML = '<option value="demo">✨ Demo General</option>';
+        } else {
+          snap.forEach(doc => {
+            const data = doc.data();
+            const opt = document.createElement('option');
+            opt.value = doc.id;
+            opt.textContent = (doc.id === 'demo' ? '✨ ' : '🏢 ') + (data.nombreLocal || doc.id);
+            if (doc.id === clienteActual) opt.selected = true;
+            select.appendChild(opt);
+          });
+        }
+      } catch (e) {
+        console.error('Error al cargar clientes:', e);
+      }
+    }
+
+    function cambiarCliente(slug) {
+      clienteActual = slug;
+      // Actualizar query param sin recargar
+      const newUrl = window.location.pathname + '?cliente=' + encodeURIComponent(slug);
+      window.history.pushState({ path: newUrl }, '', newUrl);
+      escucharCliente(slug);
+      actualizarEnlacesCompartir();
+    }
+
+    function escucharCliente(slug) {
+      if (unsubConfig) unsubConfig();
+      if (unsubReservas) unsubReservas();
+
+      // 1. Escuchar datos y configuración del cliente
+      unsubConfig = db.collection('clientes_externos').doc(slug).onSnapshot(doc => {
+        if (doc.exists) {
+          configActual = doc.data();
+          mesasLista = configActual.mesas || [];
+          poblarFormularioConfig();
+          renderTablaMesas();
+          renderStats();
+        } else {
+          // Si no existe, inicializarlo
+          db.collection('clientes_externos').doc(slug).set({
+            nombreLocal: slug.toUpperCase(),
+            precioMesa: 100000,
+            montoSena: 20000,
+            porcentajeBebidas: 80,
+            mesas: Array.from({ length: 15 }, (_, i) => ({
+              id: String(i + 1),
+              nombre: `Mesa ${i + 1}`,
+              sector: 'Salón',
+              capacidad: 4
+            }))
+          });
+        }
+      });
+
+      // 2. Escuchar reservas en vivo de este cliente
+      unsubReservas = db.collection('clientes_externos').doc(slug).collection('reservas').onSnapshot(snap => {
+        reservasActuales = {};
+        snap.forEach(doc => {
+          reservasActuales[doc.id] = doc.data();
+        });
+        renderTablaMesas();
+        renderTablaReservas();
+        renderStats();
+      });
+    }
+
+    function poblarFormularioConfig() {
+      document.getElementById('cfgNombreLocal').value = configActual.nombreLocal || '';
+      document.getElementById('cfgPrecioMesa').value = configActual.precioMesa || 100000;
+      document.getElementById('cfgMontoSena').value = configActual.montoSena || 20000;
+      document.getElementById('cfgPctBebidas').value = configActual.porcentajeBebidas || 80;
+      document.getElementById('cfgAlias').value = configActual.alias || '';
+      document.getElementById('cfgTitular').value = configActual.titular || '';
+      document.getElementById('cfgCbu').value = configActual.cbu || '';
+      document.getElementById('cfgWhatsapp').value = configActual.whatsapp || '';
+    }
+
+    async function guardarConfigLocal() {
+      try {
+        await db.collection('clientes_externos').doc(clienteActual).set({
+          nombreLocal: document.getElementById('cfgNombreLocal').value.trim() || clienteActual,
+          precioMesa: Number(document.getElementById('cfgPrecioMesa').value) || 100000,
+          montoSena: Number(document.getElementById('cfgMontoSena').value) || 20000,
+          porcentajeBebidas: Number(document.getElementById('cfgPctBebidas').value) || 80,
+          alias: document.getElementById('cfgAlias').value.trim(),
+          titular: document.getElementById('cfgTitular').value.trim(),
+          cbu: document.getElementById('cfgCbu').value.trim(),
+          whatsapp: document.getElementById('cfgWhatsapp').value.trim()
+        }, { merge: true });
+        showToast('Configuración guardada.');
+        cargarListaClientes();
+      } catch (e) {
+        alert('Error al guardar: ' + e.message);
+      }
+    }
+
+    async function generarLoteMesas() {
+      const cant = parseInt(document.getElementById('genCantidad').value) || 20;
+      if (!confirm(`¿Generar ${cant} mesas (1 al ${cant}) para este local? Reemplazará la lista actual.`)) return;
+
+      const nuevasMesas = Array.from({ length: cant }, (_, i) => ({
+        id: String(i + 1),
+        nombre: `Mesa ${i + 1}`,
+        sector: i < Math.floor(cant * 0.75) ? 'Sector Principal' : 'Sector VIP',
+        capacidad: 4
+      }));
+
+      try {
+        await db.collection('clientes_externos').doc(clienteActual).set({ mesas: nuevasMesas }, { merge: true });
+        showToast(`${cant} mesas generadas.`);
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    async function agregarMesaManual() {
+      const nombre = document.getElementById('nuevaMesaNombre').value.trim();
+      const sector = document.getElementById('nuevaMesaSector').value.trim() || 'General';
+      if (!nombre) return alert('Ingresá el nombre o número de la mesa.');
+
+      const id = nombre.toLowerCase().replace(/[^a-z0-9]/g, '-');
+      const existe = mesasLista.some(m => m.id === id);
+      if (existe) return alert('Ya existe una mesa con ese identificador.');
+
+      const nuevaLista = [...mesasLista, {
+        id: id,
+        nombre: nombre,
+        sector: sector,
+        capacidad: 4
+      }];
+
+      try {
+        await db.collection('clientes_externos').doc(clienteActual).set({ mesas: nuevaLista }, { merge: true });
+        document.getElementById('nuevaMesaNombre').value = '';
+        showToast('Mesa agregada.');
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    async function eliminarMesa(id) {
+      if (!confirm(`¿Eliminar la mesa "${id}" de la lista?`)) return;
+      const nuevaLista = mesasLista.filter(m => m.id !== id);
+      try {
+        await db.collection('clientes_externos').doc(clienteActual).set({ mesas: nuevaLista }, { merge: true });
+        // También borrar su reserva si tenía
+        await db.collection('clientes_externos').doc(clienteActual).collection('reservas').doc(id).delete();
+        showToast('Mesa eliminada.');
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    function renderTablaMesas() {
+      const tbody = document.getElementById('mesasTableBody');
+      const countEl = document.getElementById('countMesasActivas');
+      if (countEl) countEl.textContent = mesasLista.length;
+
+      if (!mesasLista.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--muted); padding:20px;">No hay mesas creadas aún. Creá un lote arriba.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      mesasLista.forEach(m => {
+        const r = reservasActuales[m.id];
+        let status = 'libre';
+        let statusText = '🟢 Libre';
+        if (r) {
+          const isCortesia = r.status === 'cortesia' || r.esCortesia;
+          const isIngresada = r.status === 'ingresada';
+          if (isIngresada && isCortesia) {
+            status = 'ingresada';
+            statusText = '🟣🔵 Dentro ($0)';
+          } else if (isIngresada) {
+            status = 'ingresada';
+            statusText = '🔵 Dentro';
+          } else if (isCortesia) {
+            status = 'cortesia';
+            statusText = '🟣 Cortesía';
+          } else if (['aprobada', 'ocupada', 'vendida'].includes(r.status)) {
+            status = 'aprobada';
+            statusText = '🔴 Vendida';
+          } else if (['disputa', 'pendiente'].includes(r.status)) {
+            status = 'disputa';
+            statusText = '🟡 En Disputa';
+          }
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><b>#${m.id}</b></td>
+          <td><b>${escapeHtml(m.nombre)}</b></td>
+          <td><span style="color:var(--muted);">${escapeHtml(m.sector || 'General')}</span></td>
+          <td>${m.capacidad || 4} pers</td>
+          <td><span class="badge-status ${status}">${statusText}</span></td>
+          <td>
+            <button class="btn btn-outline" style="padding:4px 8px; font-size:11px;" onclick="eliminarMesa('${m.id}')">🗑️ Borrar</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderTablaReservas() {
+      const tbody = document.getElementById('reservasTableBody');
+      const items = Object.entries(reservasActuales);
+      if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:24px;">No hay reservas activas en este local.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      items.forEach(([id, r]) => {
+        const isCortesia = r.status === 'cortesia' || r.esCortesia;
+        const isIngresada = r.status === 'ingresada';
+        const isApproved = ['aprobada', 'ocupada', 'vendida'].includes(r.status);
+        const isDispute = ['disputa', 'pendiente'].includes(r.status);
+
+        let badgeClass = 'disputa';
+        let badgeLabel = 'En Disputa';
+        if (isIngresada && isCortesia) { badgeClass = 'ingresada'; badgeLabel = '🟣🔵 Dentro ($0)'; }
+        else if (isIngresada) { badgeClass = 'ingresada'; badgeLabel = '🔵 Ingresada'; }
+        else if (isCortesia) { badgeClass = 'cortesia'; badgeLabel = '🟣 Cortesía'; }
+        else if (isApproved) { badgeClass = 'aprobada'; badgeLabel = '🔴 Vendida'; }
+
+        const total = r.montoTotal || r.precioTotal || 0;
+        const sena = r.montoSenado || 0;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><b>${id}</b></td>
+          <td><b>${escapeHtml(r.nombre || 'Sin nombre')}</b> <small style="color:var(--muted);">(${r.cantidadPersonas || 4}p)</small></td>
+          <td>${escapeHtml(r.contacto || '-')}</td>
+          <td><span class="badge-status ${badgeClass}">${badgeLabel}</span></td>
+          <td>
+            ${isCortesia ? '<b style="color:var(--purple);">$0 (Cortesía)</b>' : `<b>$${total.toLocaleString('es-AR')}</b> <small style="color:var(--green);">($${sena.toLocaleString('es-AR')} señado)</small>`}
+          </td>
+          <td>
+            <button class="btn btn-outline" style="padding:4px 8px; font-size:11px;" onclick="abrirModalNameMap('${id}')">
+              🏷️ ${r.mostrarNombreEnMapa ? escapeHtml(r.nombreEnMapa || 'SÍ') : 'Oculto'}
+            </button>
+          </td>
+          <td style="display:flex; gap:6px; flex-wrap:wrap;">
+            ${!isApproved && !isCortesia ? `<button class="btn btn-outline" style="padding:4px 8px; font-size:11px; border-color:var(--green); color:var(--green);" onclick="aprobarReserva('${id}')">✅ Confirmar</button>` : ''}
+            ${!isCortesia ? `<button class="btn btn-outline" style="padding:4px 8px; font-size:11px; border-color:var(--purple); color:#d8b4fe;" onclick="darCortesia('${id}')">🎁 Cortesía</button>` : `<button class="btn btn-outline" style="padding:4px 8px; font-size:11px;" onclick="quitarCortesia('${id}')">Quitar cortesía</button>`}
+            <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="eliminarReserva('${id}')">Liberar</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderStats() {
+      const total = mesasLista.length;
+      let libres = 0, disputa = 0, vendidas = 0, cortesias = 0, ingresadas = 0;
+
+      mesasLista.forEach(m => {
+        const r = reservasActuales[m.id];
+        if (!r) {
+          libres++;
+        } else {
+          const isCortesia = r.status === 'cortesia' || r.esCortesia;
+          const isIngresada = r.status === 'ingresada';
+          if (isIngresada) {
+            ingresadas++;
+            if (isCortesia) cortesias++;
+          } else if (isCortesia) {
+            cortesias++;
+          } else if (['aprobada', 'ocupada', 'vendida'].includes(r.status)) {
+            vendidas++;
+          } else if (['disputa', 'pendiente'].includes(r.status)) {
+            disputa++;
+          } else {
+            libres++;
+          }
+        }
+      });
+
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statLibres').textContent = libres;
+      document.getElementById('statDisputa').textContent = disputa;
+      document.getElementById('statVendidas').textContent = vendidas;
+      document.getElementById('statCortesias').textContent = cortesias;
+      document.getElementById('statIngresadas').textContent = ingresadas;
+    }
+
+    async function aprobarReserva(mesaId) {
+      const r = reservasActuales[mesaId] || {};
+      const montoStr = prompt('Ingresá el monto de la seña abonada:', r.montoSenado || configActual.montoSena || 20000);
+      if (montoStr === null) return;
+      const monto = parseInt(montoStr.replace(/\D/g, '')) || 0;
+
+      try {
+        await db.collection('clientes_externos').doc(clienteActual).collection('reservas').doc(mesaId).update({
+          status: 'aprobada',
+          esCortesia: false,
+          cortesiaIngresada: false,
+          montoSenado: monto,
+          approvedAt: Date.now(),
+          approvedBy: auth.currentUser?.email || 'admin'
+        });
+        showToast(`Mesa ${mesaId} aprobada.`);
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    async function darCortesia(mesaId) {
+      const r = reservasActuales[mesaId] || {};
+      const nombre = prompt(`¿A nombre de quién es la cortesía para la Mesa ${mesaId}?`, r.nombre || 'Invitado Especial');
+      if (nombre === null) return;
+
+      try {
+        await db.collection('clientes_externos').doc(clienteActual).collection('reservas').doc(mesaId).set({
+          status: 'cortesia',
+          esCortesia: true,
+          cortesiaIngresada: false,
+          nombre: nombre.trim() || 'Invitado Especial',
+          beneficiario: nombre.trim() || 'Invitado Especial',
+          cantidadPersonas: r.cantidadPersonas || 4,
+          montoTotal: 0,
+          precioTotal: 0,
+          montoSenado: 0,
+          saldoPuerta: 0,
+          montoConsumicion: 0,
+          porcentajeConsumo: 0,
+          autorizadoPor: auth.currentUser?.email || 'admin',
+          cortesiaAt: Date.now(),
+          ts: Date.now()
+        }, { merge: true });
+        showToast(`Mesa ${mesaId} marcada como Cortesía.`);
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    async function quitarCortesia(mesaId) {
+      if (!confirm(`¿Quitar la cortesía de la Mesa ${mesaId} y dejarla libre?`)) return;
+      try {
+        await db.collection('clientes_externos').doc(clienteActual).collection('reservas').doc(mesaId).delete();
+        showToast(`Mesa ${mesaId} liberada.`);
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    async function eliminarReserva(mesaId) {
+      if (!confirm(`¿Liberar la reserva de la Mesa ${mesaId}?`)) return;
+      try {
+        await db.collection('clientes_externos').doc(clienteActual).collection('reservas').doc(mesaId).delete();
+        showToast(`Mesa ${mesaId} liberada.`);
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    async function reiniciarMesasDemo() {
+      if (!confirm(`⚠️ ATENCIÓN: Esto liberará TODAS las reservas del local "${clienteActual}". Las mesas volverán a quedar libres en verde.\n\n¿Continuar?`)) return;
+      try {
+        const snap = await db.collection('clientes_externos').doc(clienteActual).collection('reservas').get();
+        const batch = db.batch();
+        snap.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+        showToast('Todas las mesas quedaron libres a cero.');
+      } catch (e) {
+        alert('Error al resetear: ' + e.message);
+      }
+    }
+
+    // Modal Nombre en Mapa
+    function abrirModalNameMap(mesaId) {
+      mesaEditandoNombre = mesaId;
+      const r = reservasActuales[mesaId] || {};
+      document.getElementById('modalNameMapTitle').textContent = `🏷️ Nombre en Botonera: Mesa ${mesaId}`;
+      document.getElementById('modalNameMapInput').value = r.nombreEnMapa || (r.nombre ? r.nombre.split(' ')[0] : '');
+      document.getElementById('modalNameMapPos').value = r.posicionNombreMapa || 'arriba';
+      document.getElementById('modalNameMap').classList.add('open');
+    }
+
+    function cerrarModalNameMap() {
+      document.getElementById('modalNameMap').classList.remove('open');
+      mesaEditandoNombre = null;
+    }
+
+    async function guardarNombreMapa(mostrar) {
+      if (!mesaEditandoNombre) return;
+      const nombre = document.getElementById('modalNameMapInput').value.trim();
+      const pos = document.getElementById('modalNameMapPos').value;
+      try {
+        await db.collection('clientes_externos').doc(clienteActual).collection('reservas').doc(mesaEditandoNombre).set({
+          mostrarNombreEnMapa: mostrar,
+          nombreEnMapa: nombre,
+          posicionNombreMapa: pos
+        }, { merge: true });
+        cerrarModalNameMap();
+        showToast(mostrar ? 'Nombre activado en la botonera.' : 'Nombre ocultado.');
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    // Enlaces para compartir
+    function actualizarEnlacesCompartir() {
+      const base = window.location.origin;
+      const slug = clienteActual;
+      document.getElementById('linkPublico').textContent = `${base}/demo.html?cliente=${slug}`;
+      document.getElementById('linkBoleteria').textContent = `${base}/demo-boleteria.html?cliente=${slug}`;
+      document.getElementById('linkAdmin').textContent = `${base}/panel-clientes.html?cliente=${slug}`;
+    }
+
+    function copiarLink(elementId) {
+      const text = document.getElementById(elementId).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Enlace copiado al portapapeles.');
+      }).catch(() => {
+        prompt('Copiá el enlace:', text);
+      });
+    }
+
+    // Modal Nuevo Cliente
+    function abrirModalNuevoCliente() {
+      document.getElementById('newClientSlug').value = '';
+      document.getElementById('newClientNombre').value = '';
+      document.getElementById('newClientMesas').value = 20;
+      document.getElementById('modalNuevoCliente').classList.add('open');
+    }
+
+    function cerrarModalNuevoCliente() {
+      document.getElementById('modalNuevoCliente').classList.remove('open');
+    }
+
+    async function confirmarCrearCliente() {
+      const rawSlug = document.getElementById('newClientSlug').value.trim();
+      const nombre = document.getElementById('newClientNombre').value.trim();
+      const cantMesas = parseInt(document.getElementById('newClientMesas').value) || 20;
+
+      const slug = rawSlug.toLowerCase().replace(/[^a-z0-9-]/g, '');
+      if (!slug) return alert('Ingresá un identificador corto (sin espacios ni símbolos raros).');
+      if (!nombre) return alert('Ingresá el nombre del boliche o bar.');
+
+      try {
+        const mesasIniciales = Array.from({ length: cantMesas }, (_, i) => ({
+          id: String(i + 1),
+          nombre: `Mesa ${i + 1}`,
+          sector: i < Math.floor(cantMesas * 0.75) ? 'Sector Principal' : 'Sector VIP',
+          capacidad: 4
+        }));
+
+        await db.collection('clientes_externos').doc(slug).set({
+          nombreLocal: nombre,
+          precioMesa: 100000,
+          montoSena: 20000,
+          porcentajeBebidas: 80,
+          alias: `${slug.toUpperCase()}.PAGO`,
+          titular: nombre,
+          cbu: '',
+          whatsapp: '',
+          mesas: mesasIniciales,
+          creadoAt: Date.now()
+        });
+
+        cerrarModalNuevoCliente();
+        showToast(`Cliente "${nombre}" creado exitosamente.`);
+        await cargarListaClientes();
+        cambiarCliente(slug);
+      } catch (e) {
+        alert('Error al crear cliente: ' + e.message);
+      }
+    }
+
+    // Creación de Usuario Staff
+    async function crearUsuarioLocal() {
+      const email = document.getElementById('newUserEmail').value.trim();
+      const pass = document.getElementById('newUserPass').value.trim();
+      const role = document.getElementById('newUserRole').value;
+      const statusEl = document.getElementById('userCreateStatus');
+
+      if (!email || !pass) return alert('Completá email y contraseña.');
+      if (pass.length < 6) return alert('La contraseña debe tener al menos 6 caracteres.');
+
+      statusEl.textContent = 'Creando usuario...';
+      statusEl.style.color = '#fff';
+
+      try {
+        // Guardamos el rol en users
+        await db.collection('users').doc(email.toLowerCase()).set({
+          email: email.toLowerCase(),
+          role: role,
+          cliente: clienteActual,
+          creadoPor: auth.currentUser?.email || 'admin',
+          creadoAt: Date.now()
+        }, { merge: true });
+
+        statusEl.textContent = `✅ Usuario ${email} registrado con rol ${role.toUpperCase()} para el local ${clienteActual}.`;
+        statusEl.style.color = 'var(--green)';
+        document.getElementById('newUserEmail').value = '';
+        document.getElementById('newUserPass').value = '';
+      } catch (e) {
+        statusEl.textContent = 'Error: ' + e.message;
+        statusEl.style.color = 'var(--red)';
+      }
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabId);
+      });
+      document.querySelectorAll('.tab-content').forEach(c => {
+        c.style.display = (c.id === tabId) ? 'block' : 'none';
+      });
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+
+</html>
+

@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Botonera Interactiva de Mesas — Demo</title>
+  <meta name="theme-color" content="#060608">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #060609;
+      --card-bg: rgba(18, 18, 26, 0.85);
+      --line: rgba(255, 255, 255, 0.08);
+      --line-light: rgba(255, 255, 255, 0.14);
+      --green: #2ee6a6;
+      --green-glow: rgba(46, 230, 166, 0.4);
+      --yellow: #ffa502;
+      --yellow-glow: rgba(255, 165, 2, 0.4);
+      --red: #ff4757;
+      --red-glow: rgba(255, 71, 87, 0.4);
+      --purple: #a855f7;
+      --purple-glow: rgba(168, 85, 247, 0.45);
+      --blue: #38bdf8;
+      --blue-glow: rgba(56, 189, 248, 0.45);
+      --text: #f5f5f7;
+      --muted: #8e8e9a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Topbar */
+    header.topbar {
+      background: rgba(13, 13, 18, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 2px;
+      color: #fff;
+    }
+
+    .brand span {
+      color: var(--green);
+    }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 11.5px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot.free { background: var(--green); box-shadow: 0 0 6px var(--green-glow); }
+    .dot.dispute { background: var(--yellow); box-shadow: 0 0 6px var(--yellow-glow); }
+    .dot.approved { background: var(--red); box-shadow: 0 0 6px var(--red-glow); }
+    .dot.cortesia { background: var(--purple); box-shadow: 0 0 6px var(--purple-glow); }
+    .dot.ingresada { background: linear-gradient(135deg, var(--blue), var(--purple)); box-shadow: 0 0 6px var(--blue-glow); }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 24px 16px 14px;
+    }
+
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      letter-spacing: 1.5px;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .hero p {
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.45;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 10px 16px 60px;
+      flex: 1;
+    }
+
+    /* Sectors & Grid */
+    .sector-block {
+      margin-bottom: 28px;
+    }
+
+    .sector-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 1.5px;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding-left: 4px;
+      border-left: 3px solid var(--green);
+    }
+
+    .tables-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+      gap: 12px;
+    }
+
+    @media (min-width: 600px) {
+      .tables-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 16px;
+      }
+    }
+
+    /* Table Button Card */
+    .table-card {
+      position: relative;
+      background: var(--card-bg);
+      border: 1.5px solid var(--line-light);
+      border-radius: 12px;
+      padding: 14px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 95px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .table-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+    }
+
+    .table-card:active {
+      transform: scale(0.97);
+    }
+
+    /* Status classes for table card */
+    .table-card.free {
+      border-color: rgba(46, 230, 166, 0.4);
+      background: linear-gradient(145deg, rgba(46, 230, 166, 0.12), rgba(18, 18, 26, 0.9));
+    }
+    .table-card.free:hover {
+      border-color: var(--green);
+      box-shadow: 0 0 16px var(--green-glow);
+    }
+
+    .table-card.dispute {
+      border-color: rgba(255, 165, 2, 0.6);
+      background: linear-gradient(145deg, rgba(255, 165, 2, 0.15), rgba(18, 18, 26, 0.9));
+      box-shadow: 0 0 12px var(--yellow-glow);
+      cursor: not-allowed;
+    }
+
+    .table-card.approved {
+      border-color: rgba(255, 71, 87, 0.5);
+      background: linear-gradient(145deg, rgba(255, 71, 87, 0.15), rgba(18, 18, 26, 0.9));
+      box-shadow: 0 0 12px var(--red-glow);
+      cursor: not-allowed;
+    }
+
+    .table-card.cortesia {
+      border-color: rgba(168, 85, 247, 0.6);
+      background: linear-gradient(145deg, rgba(168, 85, 247, 0.2), rgba(18, 18, 26, 0.9));
+      box-shadow: 0 0 14px var(--purple-glow);
+      cursor: not-allowed;
+    }
+
+    .table-card.ingresada {
+      border-color: rgba(56, 189, 248, 0.6);
+      background: linear-gradient(145deg, rgba(56, 189, 248, 0.2), rgba(168, 85, 247, 0.25));
+      box-shadow: 0 0 16px var(--blue-glow);
+      cursor: not-allowed;
+    }
+
+    .table-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 1px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .table-card.free .table-num { color: #fff; }
+    .table-card.dispute .table-num { color: var(--yellow); }
+    .table-card.approved .table-num { color: var(--red); }
+    .table-card.cortesia .table-num { color: #d8b4fe; }
+    .table-card.ingresada .table-num { color: #bae6fd; }
+
+    .table-status-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .table-card.free .table-status-label {
+      background: rgba(46, 230, 166, 0.18);
+      color: var(--green);
+    }
+    .table-card.dispute .table-status-label {
+      background: rgba(255, 165, 2, 0.2);
+      color: var(--yellow);
+    }
+    .table-card.approved .table-status-label {
+      background: rgba(255, 71, 87, 0.2);
+      color: var(--red);
+    }
+    .table-card.cortesia .table-status-label {
+      background: rgba(168, 85, 247, 0.25);
+      color: #e9d5ff;
+    }
+    .table-card.ingresada .table-status-label {
+      background: rgba(56, 189, 248, 0.25);
+      color: #7dd3fc;
+    }
+
+    .table-cap {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Tag de nombre sobre/debajo de la mesa */
+    .name-tag {
+      position: absolute;
+      background: #000;
+      color: #a3e635;
+      border: 1px solid rgba(163, 230, 53, 0.6);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 10;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    }
+
+    .name-tag.pos-arriba { top: -10px; left: 50%; transform: translateX(-50%); }
+    .name-tag.pos-abajo { bottom: -10px; left: 50%; transform: translateX(-50%); }
+    .name-tag.pos-izquierda { left: -10px; top: 50%; transform: translate(-100%, -50%); }
+    .name-tag.pos-derecha { right: -10px; top: 50%; transform: translate(100%, -50%); }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: #101018;
+      border: 1.5px solid var(--line-light);
+      border-radius: 16px;
+      max-width: 440px;
+      width: 100%;
+      padding: 22px 20px;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.9);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 12px;
+    }
+
+    .modal-header h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      letter-spacing: 1px;
+      color: #fff;
+    }
+
+    .modal-header .sub {
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    /* Price Preview Box */
+    .price-box {
+      background: rgba(46, 230, 166, 0.08);
+      border: 1px solid rgba(46, 230, 166, 0.3);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .price-row b {
+      color: #fff;
+    }
+
+    .price-row.highlight b {
+      color: var(--green);
+      font-size: 14.5px;
+    }
+
+    /* Form Inputs */
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-bottom: 5px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 11px 12px;
+      background: #181824;
+      border: 1px solid var(--line-light);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .form-group input:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 10px var(--green-glow);
+    }
+
+    .form-group input.input-error {
+      border-color: var(--red) !important;
+      background: rgba(255, 71, 87, 0.1) !important;
+    }
+
+    /* Bank info box */
+    .bank-box {
+      background: #161622;
+      border: 1px solid var(--line-light);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .bank-box b {
+      color: #fff;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px var(--green-glow);
+      transition: all 0.15s ease;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px var(--green-glow);
+    }
+
+    .btn-submit:active {
+      transform: scale(0.98);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e1e2d;
+      border: 1px solid var(--line-light);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 30px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      z-index: 2000;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-6px);
+    }
+  </style>
+
+  <!-- Firebase v8 SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div class="brand" id="brandTitle">BOLICHE <span>DEMO</span></div>
+    <div class="legend">
+      <div class="legend-item"><span class="dot free"></span>Libre</div>
+      <div class="legend-item"><span class="dot dispute"></span>En Disputa</div>
+      <div class="legend-item"><span class="dot approved"></span>Vendida</div>
+      <div class="legend-item"><span class="dot cortesia"></span>Cortesía</div>
+      <div class="legend-item"><span class="dot ingresada"></span>Dentro</div>
+    </div>
+  </header>
+
+  <div class="hero">
+    <h1 id="heroTitle">Elegí tu mesa</h1>
+    <p>Tocá cualquier mesa verde disponible para señarla por transferencia y asegurar tu lugar.</p>
+  </div>
+
+  <main class="container" id="sectorsContainer">
+    <div style="text-align:center; color:var(--muted); padding:40px 0;">
+      Cargando mesas en tiempo real...
+    </div>
+  </main>
+
+  <!-- Modal de Reserva -->
+  <div class="modal-overlay" id="modalReserva">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <h3 id="modalMesaNombre">Mesa 1</h3>
+          <div class="sub" id="modalMesaSector">Sector Principal</div>
+        </div>
+        <button class="modal-close" onclick="cerrarModal()">×</button>
+      </div>
+
+      <div class="price-box">
+        <div class="price-row">
+          <span>Valor total de la mesa:</span>
+          <b id="lblPrecioTotal">$100.000</b>
+        </div>
+        <div class="price-row highlight">
+          <span>Seña para reservar hoy:</span>
+          <b id="lblMontoSena">$20.000</b>
+        </div>
+        <div class="price-row" style="color:var(--green); margin-top:4px;">
+          <span>Voucher en bebidas (<span id="lblPctBebidas">80</span>%):</span>
+          <b id="lblConsumoBebidas">+$80.000</b>
+        </div>
+      </div>
+
+      <form onsubmit="handleConfirmarReserva(event)">
+        <div class="form-group">
+          <label for="inputNombre">Nombre y Apellido</label>
+          <input type="text" id="inputNombre" required placeholder="Ej: Juan Pérez" maxlength="60">
+        </div>
+
+        <div class="form-group">
+          <label for="inputWhatsapp">WhatsApp (10 dígitos)</label>
+          <input type="tel" id="inputWhatsapp" required placeholder="Ej: 1123456789" maxlength="20">
+        </div>
+
+        <div class="bank-box" id="bankBox">
+          <div style="font-weight:700; color:var(--green); margin-bottom:4px;">💳 Datos para transferir la seña:</div>
+          <div>Alias: <b id="lblBankAlias">DEMO.PAGO</b></div>
+          <div>Titular: <b id="lblBankTitular">Demo Boliche</b></div>
+          <div id="rowBankCbu">CBU/CVU: <b id="lblBankCbu">-</b></div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btnConfirmarReserva">
+          🔒 Confirmar Seña de Reserva
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Inicialización de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBw-dummyKeyForHostingInit-SafeEnv01",
+      authDomain: "mesas-cubano-bar.firebaseapp.com",
+      projectId: "mesas-cubano-bar",
+      storageBucket: "mesas-cubano-bar.appspot.com",
+      messagingSenderId: "367352843801",
+      appId: "1:367352843801:web:2f0ea682d3ab331d2797bf"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    const db = firebase.firestore();
+
+    // Obtener cliente de la URL (?cliente=...)
+    const urlParams = new URLSearchParams(window.location.search);
+    const clienteId = urlParams.get('cliente') || 'demo';
+
+    let configLocal = {};
+    let mesasLista = [];
+    let reservasActuales = {};
+    let mesaSeleccionada = null;
+
+    // Normalizador de WhatsApp inteligente
+    function normalizarWhatsapp(value) {
+      let d = String(value || "").replace(/\D/g, "");
+      if (d.startsWith("549") && d.length >= 12) d = d.slice(3);
+      else if (d.startsWith("54") && d.length >= 11) d = d.slice(2);
+      if (d.startsWith("0")) d = d.slice(1);
+      if (d.length === 12 || d.length === 11) {
+        if (d.slice(2, 4) === "15") d = d.slice(0, 2) + d.slice(4);
+        else if (d.slice(3, 5) === "15") d = d.slice(0, 3) + d.slice(5);
+        else if (d.slice(4, 6) === "15") d = d.slice(0, 4) + d.slice(6);
+      }
+      return d;
+    }
+
+    // Auto-formateo en blur del input de whatsapp
+    document.getElementById('inputWhatsapp')?.addEventListener('blur', () => {
+      const el = document.getElementById('inputWhatsapp');
+      if (el.value.trim()) {
+        const norm = normalizarWhatsapp(el.value);
+        if (norm.length === 10) el.value = norm;
+      }
+    });
+
+    // Iniciar escuchas en vivo
+    iniciarEscuchas();
+
+    function iniciarEscuchas() {
+      // 1. Escuchar datos del local y mesas
+      db.collection('clientes_externos').doc(clienteId).onSnapshot(doc => {
+        if (doc.exists) {
+          configLocal = doc.data();
+          mesasLista = configLocal.mesas || [];
+          actualizarInfoLocal();
+          renderBotonera();
+        } else {
+          // Si no existe, crear la demo inicial con 20 mesas
+          const mesasDemo = Array.from({ length: 20 }, (_, i) => ({
+            id: String(i + 1),
+            nombre: `Mesa ${i + 1}`,
+            sector: i < 15 ? 'Sector Principal' : 'Sector VIP',
+            capacidad: 4
+          }));
+          db.collection('clientes_externos').doc(clienteId).set({
+            nombreLocal: 'Demo General',
+            precioMesa: 100000,
+            montoSena: 20000,
+            porcentajeBebidas: 80,
+            alias: 'DEMO.PAGO.BAR',
+            titular: 'Local Demo',
+            cbu: '',
+            whatsapp: '1123456789',
+            mesas: mesasDemo
+          });
+        }
+      });
+
+      // 2. Escuchar reservas en vivo
+      db.collection('clientes_externos').doc(clienteId).collection('reservas').onSnapshot(snap => {
+        reservasActuales = {};
+        snap.forEach(doc => {
+          reservasActuales[doc.id] = doc.data();
+        });
+        renderBotonera();
+      });
+    }
+
+    function actualizarInfoLocal() {
+      const nombre = configLocal.nombreLocal || 'Boliche Demo';
+      document.title = `${nombre} — Reservá tu Mesa`;
+      document.getElementById('brandTitle').innerHTML = `${escapeHtml(nombre).toUpperCase()} <span>MESAS</span>`;
+      document.getElementById('heroTitle').textContent = `Elegí tu mesa en ${nombre}`;
+    }
+
+    function renderBotonera() {
+      const container = document.getElementById('sectorsContainer');
+      if (!mesasLista.length) {
+        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:40px;">No hay mesas configuradas aún para este local.</div>';
+        return;
+      }
+
+      // Agrupar mesas por sector
+      const sectores = {};
+      mesasLista.forEach(m => {
+        const sec = m.sector || 'General';
+        if (!sectores[sec]) sectores[sec] = [];
+        sectores[sec].push(m);
+      });
+
+      container.innerHTML = '';
+      Object.entries(sectores).forEach(([sectorNombre, mesasDelSector]) => {
+        const sectorEl = document.createElement('section');
+        sectorEl.className = 'sector-block';
+
+        let gridHtml = '';
+        mesasDelSector.forEach(m => {
+          const r = reservasActuales[m.id];
+          const isActiva = r && (r.status !== 'disputa' || (Number.isFinite(r.expiresAt) && r.expiresAt > Date.now()));
+          const isCortesia = isActiva && (r.status === 'cortesia' || r.esCortesia);
+          const isIngresada = isActiva && r.status === 'ingresada';
+          const isCortesiaIngresada = isIngresada && isCortesia;
+          const isApproved = isActiva && ['aprobada', 'ocupada', 'vendida'].includes(r.status) && !isCortesia;
+          const isDispute = isActiva && ['disputa', 'pendiente'].includes(r.status) && !isCortesia;
+
+          let cardClass = 'free';
+          let statusLabel = 'Libre';
+
+          if (isCortesiaIngresada) {
+            cardClass = 'ingresada';
+            statusLabel = 'Dentro ($0)';
+          } else if (isIngresada) {
+            cardClass = 'ingresada';
+            statusLabel = 'Dentro';
+          } else if (isCortesia) {
+            cardClass = 'cortesia';
+            statusLabel = 'Cortesía';
+          } else if (isApproved) {
+            cardClass = 'approved';
+            statusLabel = 'Vendida';
+          } else if (isDispute) {
+            cardClass = 'dispute';
+            statusLabel = 'En Disputa';
+          }
+
+          // Etiqueta de nombre en mapa si corresponde
+          let nameTagHtml = '';
+          if (isActiva && r.mostrarNombreEnMapa && (r.nombreEnMapa || r.nombre)) {
+            const posClass = `pos-${r.posicionNombreMapa || 'arriba'}`;
+            const nom = escapeHtml(r.nombreEnMapa || r.nombre.split(' ')[0]);
+            nameTagHtml = `<span class="name-tag ${posClass}">${nom}</span>`;
+          }
+
+          gridHtml += `
+            <div class="table-card ${cardClass}" onclick="handleTableClick('${m.id}')">
+              ${nameTagHtml}
+              <div class="table-num">${escapeHtml(m.nombre || m.id)}</div>
+              <span class="table-status-label">${statusLabel}</span>
+              <div class="table-cap">${m.capacidad || 4} pers</div>
+            </div>
+          `;
+        });
+
+        sectorEl.innerHTML = `
+          <div class="sector-title">📍 ${escapeHtml(sectorNombre)} (${mesasDelSector.length} mesas)</div>
+          <div class="tables-grid">${gridHtml}</div>
+        `;
+        container.appendChild(sectorEl);
+      });
+    }
+
+    function handleTableClick(mesaId) {
+      const mesa = mesasLista.find(m => m.id === mesaId);
+      const r = reservasActuales[mesaId];
+      const isActiva = r && (r.status !== 'disputa' || (Number.isFinite(r.expiresAt) && r.expiresAt > Date.now()));
+
+      if (isActiva) {
+        if (r.status === 'cortesia' || r.esCortesia) {
+          showToast('Esta mesa es una invitación de cortesía.');
+        } else if (r.status === 'ingresada') {
+          showToast('Esta mesa ya ingresó al local.');
+        } else if (['aprobada', 'ocupada', 'vendida'].includes(r.status)) {
+          showToast('Esta mesa ya fue vendida.');
+        } else {
+          showToast('Esta mesa está en disputa temporalmente.');
+        }
+        return;
+      }
+
+      // Si está libre, abrir modal
+      mesaSeleccionada = mesa || { id: mesaId, nombre: `Mesa ${mesaId}`, sector: 'General' };
+      abrirModal(mesaSeleccionada);
+    }
+
+    function abrirModal(mesa) {
+      document.getElementById('modalMesaNombre').textContent = mesa.nombre || `Mesa ${mesa.id}`;
+      document.getElementById('modalMesaSector').textContent = mesa.sector || 'General';
+
+      const precio = configLocal.precioMesa || 100000;
+      const sena = configLocal.montoSena || 20000;
+      const pctBebidas = configLocal.porcentajeBebidas || 80;
+      const consumo = Math.round((precio * pctBebidas) / 100);
+
+      document.getElementById('lblPrecioTotal').textContent = `$${precio.toLocaleString('es-AR')}`;
+      document.getElementById('lblMontoSena').textContent = `$${sena.toLocaleString('es-AR')}`;
+      document.getElementById('lblPctBebidas').textContent = pctBebidas;
+      document.getElementById('lblConsumoBebidas').textContent = `+$${consumo.toLocaleString('es-AR')}`;
+
+      document.getElementById('lblBankAlias').textContent = configLocal.alias || 'A consultar';
+      document.getElementById('lblBankTitular').textContent = configLocal.titular || 'A consultar';
+      const cbuEl = document.getElementById('lblBankCbu');
+      if (cbuEl) cbuEl.textContent = configLocal.cbu || '-';
+
+      document.getElementById('inputNombre').value = '';
+      document.getElementById('inputWhatsapp').value = '';
+
+      document.getElementById('modalReserva').classList.add('open');
+    }
+
+    function cerrarModal() {
+      document.getElementById('modalReserva').classList.remove('open');
+      mesaSeleccionada = null;
+    }
+
+    async function handleConfirmarReserva(e) {
+      e.preventDefault();
+      if (!mesaSeleccionada) return;
+
+      const nombre = document.getElementById('inputNombre').value.trim();
+      const rawWa = document.getElementById('inputWhatsapp').value.trim();
+      const whatsapp = normalizarWhatsapp(rawWa);
+
+      if (!nombre) return alert('Ingresá tu nombre.');
+      if (!/^\d{10}$/.test(whatsapp)) {
+        document.getElementById('inputWhatsapp').classList.add('input-error');
+        document.getElementById('inputWhatsapp').focus();
+        showToast('Ingresá los 10 dígitos de tu WhatsApp (sin 0 ni 15).');
+        return;
+      }
+      document.getElementById('inputWhatsapp').classList.remove('input-error');
+
+      const btn = document.getElementById('btnConfirmarReserva');
+      btn.disabled = true;
+      btn.textContent = 'Procesando...';
+
+      const precio = configLocal.precioMesa || 100000;
+      const sena = configLocal.montoSena || 20000;
+      const pctBebidas = configLocal.porcentajeBebidas || 80;
+      const consumo = Math.round((precio * pctBebidas) / 100);
+
+      try {
+        const DISPUTE_MS = 15 * 60 * 1000;
+        await db.collection('clientes_externos').doc(clienteId).collection('reservas').doc(mesaSeleccionada.id).set({
+          status: 'disputa',
+          nombre: nombre,
+          contacto: whatsapp,
+          cantidadPersonas: mesaSeleccionada.capacidad || 4,
+          precioTotal: precio,
+          montoTotal: precio,
+          montoSenado: sena,
+          saldoPuerta: Math.max(0, precio - sena),
+          montoConsumicion: consumo,
+          porcentajeConsumo: pctBebidas,
+          esCortesia: false,
+          cortesiaIngresada: false,
+          ts: Date.now(),
+          expiresAt: Date.now() + DISPUTE_MS
+        });
+
+        cerrarModal();
+        showToast('¡Mesa señada con éxito! Tu reserva quedó registrada.');
+      } catch (err) {
+        alert('Error al reservar: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🔒 Confirmar Seña de Reserva';
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+
+</html>
+

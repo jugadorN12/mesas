@@ -100,5 +100,32 @@ service cloud.firestore {
     match /caja_joseo/{movimientoId} {
       allow read, write: if anyRole(['admin', 'admin_joseo', 'assistant_joseo', 'boleteria_joseo']);
     }
+
+    // --- Soporte multi-cliente / sedes externas ---
+
+    match /clientes_externos/{clienteId} {
+      allow read: if true;
+      allow write: if hasRole('admin') || request.auth != null;
+
+      match /reservas/{mesaId} {
+        allow read: if true;
+
+        allow create: if (request.resource.data.status in ['pendiente', 'disputa']
+          && request.resource.data.nombre is string
+          && request.resource.data.nombre.size() > 0
+          && request.resource.data.contacto is string
+          && request.resource.data.ts is int)
+          || request.auth != null;
+
+        allow update: if request.auth != null;
+
+        allow delete: if request.auth != null
+          || (resource.data.status == 'disputa' && resource.data.expiresAt <= request.time.toMillis());
+      }
+
+      match /caja/{movimientoId} {
+        allow read, write: if request.auth != null;
+      }
+    }
   }
 }

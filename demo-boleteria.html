@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Boletería — Control de Puerta y Cobro</title>
+  <meta name="theme-color" content="#0a0a0f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07070a;
+      --card-bg: #12121c;
+      --line: rgba(255, 255, 255, 0.08);
+      --line-light: rgba(255, 255, 255, 0.14);
+      --green: #2ee6a6;
+      --green-glow: rgba(46, 230, 166, 0.4);
+      --yellow: #ffa502;
+      --red: #ff4757;
+      --purple: #a855f7;
+      --purple-glow: rgba(168, 85, 247, 0.45);
+      --blue: #38bdf8;
+      --blue-glow: rgba(56, 189, 248, 0.45);
+      --text: #f5f5f7;
+      --muted: #8e8e9a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header.topbar {
+      background: #0d0d14;
+      border-bottom: 1px solid var(--line);
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      letter-spacing: 1.5px;
+      color: #fff;
+    }
+
+    .brand span {
+      color: var(--blue);
+    }
+
+    .cash-tools {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-tool {
+      padding: 6px 12px;
+      background: #171724;
+      border: 1px solid var(--line-light);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-tool:hover {
+      background: #202030;
+      border-color: var(--muted);
+    }
+
+    .container {
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px;
+      flex: 1;
+    }
+
+    .sector-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 19px;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin: 18px 0 10px;
+    }
+
+    .tables-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 12px;
+    }
+
+    .table-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--line-light);
+      border-radius: 12px;
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 95px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    .table-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .table-card.free {
+      border-color: rgba(46, 230, 166, 0.3);
+      opacity: 0.65;
+    }
+
+    .table-card.dispute {
+      border-color: rgba(255, 165, 2, 0.5);
+      background: rgba(255, 165, 2, 0.08);
+    }
+
+    .table-card.approved {
+      border-color: var(--red);
+      background: linear-gradient(145deg, rgba(255, 71, 87, 0.2), #12121c);
+      box-shadow: 0 0 14px rgba(255, 71, 87, 0.35);
+    }
+
+    .table-card.cortesia {
+      border-color: var(--purple);
+      background: linear-gradient(145deg, rgba(168, 85, 247, 0.25), #12121c);
+      box-shadow: 0 0 14px var(--purple-glow);
+    }
+
+    .table-card.ingresada {
+      border-color: var(--blue);
+      background: linear-gradient(145deg, rgba(56, 189, 248, 0.25), rgba(168, 85, 247, 0.3));
+      box-shadow: 0 0 16px var(--blue-glow);
+    }
+
+    .table-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .table-status-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .table-card.free .table-status-label { color: var(--green); }
+    .table-card.dispute .table-status-label { color: var(--yellow); }
+    .table-card.approved .table-status-label { color: var(--red); font-weight: 800; }
+    .table-card.cortesia .table-status-label { color: #d8b4fe; font-weight: 800; }
+    .table-card.ingresada .table-status-label { color: #bae6fd; font-weight: 800; }
+
+    .table-client {
+      font-size: 10.5px;
+      color: #fff;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 90px;
+      margin-top: 3px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: #11111a;
+      border: 1.5px solid var(--line-light);
+      border-radius: 16px;
+      max-width: 440px;
+      width: 100%;
+      padding: 22px;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.9);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 10px;
+    }
+
+    .modal-header h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      color: #fff;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .info-card {
+      background: #171724;
+      border: 1px solid var(--line-light);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .info-card b {
+      color: #fff;
+    }
+
+    .btn-action {
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.15s ease;
+      margin-bottom: 8px;
+    }
+
+    .btn-confirm-pay {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      box-shadow: 0 4px 15px var(--green-glow);
+    }
+
+    .btn-confirm-cortesia {
+      background: linear-gradient(135deg, #a855f7, #7e22ce);
+      color: #fff;
+      box-shadow: 0 4px 15px var(--purple-glow);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e1e2d;
+      border: 1px solid var(--line-light);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 30px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      z-index: 2000;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-6px);
+    }
+  </style>
+
+  <!-- Firebase v8 SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div class="brand" id="brandTitle">BOLETERÍA <span>PUERTA</span></div>
+    <div class="cash-tools">
+      <button class="btn-tool" onclick="verArqueoCaja()">💵 Ver Caja</button>
+      <button class="btn-tool" onclick="registrarMovimientoCaja('inicial')">+ Caja Inicial</button>
+      <button class="btn-tool" onclick="registrarMovimientoCaja('retiro')">- Retiro</button>
+    </div>
+  </header>
+
+  <main class="container" id="tablesContainer">
+    <div style="text-align:center; color:var(--muted); padding:40px 0;">
+      Cargando mesas de boletería...
+    </div>
+  </main>
+
+  <!-- Modal de Cobro / Ingreso -->
+  <div class="modal-overlay" id="modalIngreso">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <h3 id="modalMesaTitle">Mesa 1</h3>
+          <div style="font-size:11.5px; color:var(--muted);" id="modalMesaSector">Sector Principal</div>
+        </div>
+        <button class="modal-close" onclick="cerrarModal()">×</button>
+      </div>
+
+      <div class="info-card" id="modalInfoCard">
+        <!-- Render dinámico según estado -->
+      </div>
+
+      <div id="modalActionButtons">
+        <!-- Render dinámico de botones de cobro/ingreso -->
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Inicialización de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBw-dummyKeyForHostingInit-SafeEnv01",
+      authDomain: "mesas-cubano-bar.firebaseapp.com",
+      projectId: "mesas-cubano-bar",
+      storageBucket: "mesas-cubano-bar.appspot.com",
+      messagingSenderId: "367352843801",
+      appId: "1:367352843801:web:2f0ea682d3ab331d2797bf"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    const db = firebase.firestore();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const clienteId = urlParams.get('cliente') || 'demo';
+
+    let configLocal = {};
+    let mesasLista = [];
+    let reservasActuales = {};
+    let mesaActivaId = null;
+
+    iniciarEscuchas();
+
+    function iniciarEscuchas() {
+      // 1. Configuración de mesas del local
+      db.collection('clientes_externos').doc(clienteId).onSnapshot(doc => {
+        if (doc.exists) {
+          configLocal = doc.data();
+          mesasLista = configLocal.mesas || [];
+          document.getElementById('brandTitle').innerHTML = `${escapeHtml(configLocal.nombreLocal || 'BOLETERÍA').toUpperCase()} <span>PUERTA</span>`;
+          renderBotonera();
+        }
+      });
+
+      // 2. Reservas en tiempo real
+      db.collection('clientes_externos').doc(clienteId).collection('reservas').onSnapshot(snap => {
+        reservasActuales = {};
+        snap.forEach(doc => {
+          reservasActuales[doc.id] = doc.data();
+        });
+        renderBotonera();
+      });
+    }
+
+    function renderBotonera() {
+      const container = document.getElementById('tablesContainer');
+      if (!mesasLista.length) {
+        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:40px;">No hay mesas registradas.</div>';
+        return;
+      }
+
+      const sectores = {};
+      mesasLista.forEach(m => {
+        const sec = m.sector || 'General';
+        if (!sectores[sec]) sectores[sec] = [];
+        sectores[sec].push(m);
+      });
+
+      container.innerHTML = '';
+      Object.entries(sectores).forEach(([sectorNombre, mesas]) => {
+        const secEl = document.createElement('section');
+        let gridHtml = '';
+
+        mesas.forEach(m => {
+          const r = reservasActuales[m.id];
+          const isActiva = r && (r.status !== 'disputa' || (Number.isFinite(r.expiresAt) && r.expiresAt > Date.now()));
+          const isCortesia = isActiva && (r.status === 'cortesia' || r.esCortesia);
+          const isIngresada = isActiva && r.status === 'ingresada';
+          const isCortesiaIngresada = isIngresada && isCortesia;
+          const isApproved = isActiva && ['aprobada', 'ocupada', 'vendida'].includes(r.status) && !isCortesia;
+          const isDispute = isActiva && ['disputa', 'pendiente'].includes(r.status) && !isCortesia;
+
+          let cardClass = 'free';
+          let statusText = 'Libre';
+          let clientName = '';
+
+          if (isCortesiaIngresada) {
+            cardClass = 'ingresada';
+            statusText = 'Dentro ($0)';
+            clientName = r.nombre || 'Invitado';
+          } else if (isIngresada) {
+            cardClass = 'ingresada';
+            statusText = 'Dentro';
+            clientName = r.nombre || '';
+          } else if (isCortesia) {
+            cardClass = 'cortesia';
+            statusText = 'Cortesía';
+            clientName = r.nombre || 'Invitado';
+          } else if (isApproved) {
+            cardClass = 'approved';
+            statusText = 'Cobrar Puerta';
+            clientName = r.nombre || 'Cliente';
+          } else if (isDispute) {
+            cardClass = 'dispute';
+            statusText = 'En Disputa';
+            clientName = r.nombre || '';
+          }
+
+          gridHtml += `
+            <div class="table-card ${cardClass}" onclick="handleTableClick('${m.id}')">
+              <div class="table-num">${escapeHtml(m.nombre || m.id)}</div>
+              <span class="table-status-label">${statusText}</span>
+              ${clientName ? `<div class="table-client">${escapeHtml(clientName)}</div>` : ''}
+            </div>
+          `;
+        });
+
+        secEl.innerHTML = `
+          <div class="sector-title">${escapeHtml(sectorNombre)}</div>
+          <div class="tables-grid">${gridHtml}</div>
+        `;
+        container.appendChild(secEl);
+      });
+    }
+
+    function handleTableClick(mesaId) {
+      mesaActivaId = mesaId;
+      const mesa = mesasLista.find(m => m.id === mesaId) || { id: mesaId, nombre: `Mesa ${mesaId}`, sector: 'General' };
+      const r = reservasActuales[mesaId];
+
+      document.getElementById('modalMesaTitle').textContent = mesa.nombre || `Mesa ${mesa.id}`;
+      document.getElementById('modalMesaSector').textContent = mesa.sector || 'General';
+
+      const infoCard = document.getElementById('modalInfoCard');
+      const actionBox = document.getElementById('modalActionButtons');
+
+      if (!r) {
+        // Mesa libre: permitir venta directa en puerta
+        infoCard.innerHTML = `
+          <div style="color:var(--green); font-weight:800; font-size:14px; margin-bottom:6px;">🟢 MESA LIBRE EN PUERTA</div>
+          <div>Capacidad: <b>${mesa.capacidad || 4} personas</b></div>
+          <div>Total de la mesa: <b>$${(configLocal.precioMesa || 100000).toLocaleString('es-AR')}</b></div>
+          <div>Voucher en bebidas: <b>+$${Math.round(((configLocal.precioMesa || 100000) * (configLocal.porcentajeBebidas || 80)) / 100).toLocaleString('es-AR')}</b></div>
+        `;
+        actionBox.innerHTML = `
+          <button class="btn-action btn-confirm-pay" onclick="cobrarVentaEnPuerta('efectivo')">💵 Cobrar en Efectivo y Dar Ingreso</button>
+          <button class="btn-action btn-confirm-pay" style="background:#0284c7;" onclick="cobrarVentaEnPuerta('transferencia')">💳 Cobrar por Transferencia y Dar Ingreso</button>
+        `;
+      } else {
+        const isCortesia = r.status === 'cortesia' || r.esCortesia;
+        const isIngresada = r.status === 'ingresada';
+
+        if (isIngresada) {
+          // Ya adentro
+          infoCard.innerHTML = `
+            <div style="color:var(--blue); font-weight:800; font-size:14px; margin-bottom:6px;">🔵 MESA YA DENTRO DEL LOCAL</div>
+            <div>Cliente: <b>${escapeHtml(r.nombre || 'Sin nombre')}</b></div>
+            <div>Personas: <b>${r.cantidadPersonas || 4} pers</b></div>
+            <div>Estado de cobro: <b>${isCortesia ? '$0 (Cortesía)' : 'Totalmente abonada'}</b></div>
+            ${r.ingresadaAt ? `<div style="font-size:12px; color:var(--muted); margin-top:6px;">Ingresó: ${new Date(r.ingresadaAt).toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})} hs</div>` : ''}
+          `;
+          actionBox.innerHTML = `
+            <button class="btn-action" style="background:#262638; color:var(--muted);" onclick="cerrarModal()">Cerrar</button>
+          `;
+        } else if (isCortesia) {
+          // Cortesía lista para ingresar ($0)
+          infoCard.innerHTML = `
+            <div style="color:var(--purple); font-weight:800; font-size:14px; margin-bottom:6px;">🟣 INVITACIÓN DE CORTESÍA ($0)</div>
+            <div>Beneficiario: <b>${escapeHtml(r.nombre || r.beneficiario || 'Invitado')}</b></div>
+            <div>Personas autorizadas: <b>${r.cantidadPersonas || 4} pers</b></div>
+            <div>Autorizado por: <b>${escapeHtml(r.autorizadoPor || 'Admin')}</b></div>
+            <div style="margin-top:6px; color:var(--green); font-weight:bold;">Total a cobrar en puerta: $0</div>
+          `;
+          actionBox.innerHTML = `
+            <button class="btn-action btn-confirm-cortesia" onclick="confirmarIngresoCortesia()">🟣 Confirmar Ingreso (Cortesía $0)</button>
+          `;
+        } else {
+          // Mesa vendida: cobrar saldo
+          const total = r.montoTotal || r.precioTotal || configLocal.precioMesa || 100000;
+          const sena = r.montoSenado || 0;
+          const saldo = Math.max(0, total - sena);
+          const bebidas = r.montoConsumicion || Math.round((total * (r.porcentajeConsumo || 80)) / 100);
+
+          infoCard.innerHTML = `
+            <div style="color:var(--yellow); font-weight:800; font-size:14px; margin-bottom:6px;">🎟️ COBRO DE SALDO EN PUERTA</div>
+            <div>Cliente: <b>${escapeHtml(r.nombre || 'Cliente')}</b> (${escapeHtml(r.contacto || '-')})</div>
+            <div>Total acordado: <b>$${total.toLocaleString('es-AR')}</b></div>
+            <div>Ya señó: <b style="color:var(--green);">$${sena.toLocaleString('es-AR')}</b></div>
+            <div style="font-size:15px; margin-top:4px;">Saldo a cobrar: <b style="color:var(--yellow); font-size:16px;">$${saldo.toLocaleString('es-AR')}</b></div>
+            <div>Entregar en bebidas: <b>+$${bebidas.toLocaleString('es-AR')}</b></div>
+          `;
+          actionBox.innerHTML = `
+            <button class="btn-action btn-confirm-pay" onclick="confirmarCobroSaldo('efectivo', ${saldo})">💵 Cobrar $${saldo.toLocaleString('es-AR')} en Efectivo y Dar Ingreso</button>
+            <button class="btn-action btn-confirm-pay" style="background:#0284c7;" onclick="confirmarCobroSaldo('transferencia', ${saldo})">💳 Cobrar $${saldo.toLocaleString('es-AR')} por Transferencia y Dar Ingreso</button>
+          `;
+        }
+      }
+
+      document.getElementById('modalIngreso').classList.add('open');
+    }
+
+    function cerrarModal() {
+      document.getElementById('modalIngreso').classList.remove('open');
+      mesaActivaId = null;
+    }
+
+    async function confirmarIngresoCortesia() {
+      if (!mesaActivaId) return;
+      try {
+        await db.collection('clientes_externos').doc(clienteId).collection('reservas').doc(mesaActivaId).set({
+          status: 'ingresada',
+          esCortesia: true,
+          cortesiaIngresada: true,
+          saldoPuerta: 0,
+          ingresadaAt: Date.now(),
+          ingresadaBy: 'boleteria'
+        }, { merge: true });
+
+        cerrarModal();
+        showToast('Ingreso de cortesía confirmado con éxito.');
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    async function confirmarCobroSaldo(metodo, saldo) {
+      if (!mesaActivaId) return;
+      try {
+        const r = reservasActuales[mesaActivaId] || {};
+        await db.collection('clientes_externos').doc(clienteId).collection('reservas').doc(mesaActivaId).set({
+          status: 'ingresada',
+          esCortesia: false,
+          cortesiaIngresada: false,
+          metodoCobroPuerta: metodo,
+          saldoCobradoEnPuerta: saldo,
+          saldoPuerta: 0,
+          ingresadaAt: Date.now(),
+          ingresadaBy: 'boleteria'
+        }, { merge: true });
+
+        // Registrar en caja
+        await db.collection('clientes_externos').doc(clienteId).collection('caja').add({
+          tipo: 'ingreso_mesa',
+          monto: saldo,
+          metodo: metodo,
+          mesaId: mesaActivaId,
+          cliente: r.nombre || 'Cliente',
+          ts: Date.now()
+        });
+
+        cerrarModal();
+        showToast(`Cobro de $${saldo.toLocaleString('es-AR')} registrado e ingreso confirmado.`);
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    async function cobrarVentaEnPuerta(metodo) {
+      if (!mesaActivaId) return;
+      const nombre = prompt('Nombre del cliente para la venta en puerta:', 'Venta en Puerta');
+      if (nombre === null) return;
+
+      const precio = configLocal.precioMesa || 100000;
+      const bebidas = Math.round((precio * (configLocal.porcentajeBebidas || 80)) / 100);
+
+      try {
+        await db.collection('clientes_externos').doc(clienteId).collection('reservas').doc(mesaActivaId).set({
+          status: 'ingresada',
+          nombre: nombre.trim() || 'Venta en Puerta',
+          contacto: '',
+          precioTotal: precio,
+          montoTotal: precio,
+          montoSenado: 0,
+          saldoPuerta: 0,
+          saldoCobradoEnPuerta: precio,
+          metodoCobroPuerta: metodo,
+          montoConsumicion: bebidas,
+          porcentajeConsumo: configLocal.porcentajeBebidas || 80,
+          esCortesia: false,
+          cortesiaIngresada: false,
+          ingresadaAt: Date.now(),
+          ingresadaBy: 'boleteria',
+          ts: Date.now()
+        });
+
+        await db.collection('clientes_externos').doc(clienteId).collection('caja').add({
+          tipo: 'ingreso_mesa_puerta',
+          monto: precio,
+          metodo: metodo,
+          mesaId: mesaActivaId,
+          cliente: nombre,
+          ts: Date.now()
+        });
+
+        cerrarModal();
+        showToast(`Venta en puerta de $${precio.toLocaleString('es-AR')} registrada.`);
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    // Caja
+    async function verArqueoCaja() {
+      try {
+        const snap = await db.collection('clientes_externos').doc(clienteId).collection('caja').get();
+        let totalEf = 0, totalTransf = 0, apertura = 0, retiros = 0;
+
+        snap.forEach(doc => {
+          const m = doc.data();
+          if (m.tipo === 'apertura') apertura += (m.monto || 0);
+          else if (m.tipo === 'retiro') retiros += (m.monto || 0);
+          else if (m.metodo === 'efectivo') totalEf += (m.monto || 0);
+          else if (m.metodo === 'transferencia') totalTransf += (m.monto || 0);
+        });
+
+        const efectivoEnMano = apertura + totalEf - retiros;
+
+        alert(
+          `📊 ESTADO DE CAJA DEL TURNO (${configLocal.nombreLocal || 'Demo'}):\n\n` +
+          `• Caja Inicial (Apertura): $${apertura.toLocaleString('es-AR')}\n` +
+          `• Cobros en Efectivo: +$${totalEf.toLocaleString('es-AR')}\n` +
+          `• Retiros de Efectivo: -$${retiros.toLocaleString('es-AR')}\n` +
+          `──────────────────────────────\n` +
+          `💵 Efectivo en Mano actual: $${efectivoEnMano.toLocaleString('es-AR')}\n\n` +
+          `💳 Cobrado por Transferencia: $${totalTransf.toLocaleString('es-AR')}`
+        );
+      } catch (e) {
+        alert('Error al obtener caja: ' + e.message);
+      }
+    }
+
+    async function registrarMovimientoCaja(tipo) {
+      const montoStr = prompt(tipo === 'inicial' ? 'Ingresá el monto de Apertura de Caja Inicial:' : 'Ingresá el monto a Retirar de la caja:');
+      if (montoStr === null) return;
+      const monto = parseInt(montoStr.replace(/\D/g, '')) || 0;
+      if (!monto) return alert('Ingresá un monto válido.');
+
+      const nota = prompt('Nota u observación (opcional):', '') || '';
+
+      try {
+        await db.collection('clientes_externos').doc(clienteId).collection('caja').add({
+          tipo: tipo === 'inicial' ? 'apertura' : 'retiro',
+          monto: monto,
+          nota: nota,
+          ts: Date.now()
+        });
+        showToast(tipo === 'inicial' ? 'Caja inicial registrada.' : 'Retiro registrado.');
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+
+</html>
+
