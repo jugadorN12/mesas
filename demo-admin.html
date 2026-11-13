@@ -548,7 +548,10 @@
           </div>
         </div>
 
-        <button type="button" class="btn" onclick="guardarConfigLocal()">💾 Guardar Configuración</button>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <button type="button" class="btn" onclick="guardarConfigLocal()">💾 Guardar Configuración</button>
+          <a id="btnProbarBotonera" href="#" target="_blank" class="btn btn-outline">↗️ Ver mi Botonera Pública</a>
+        </div>
       </div>
     </div>
 
@@ -912,6 +915,8 @@
 
       document.getElementById('linkPublico').textContent = urlPub;
       document.getElementById('btnAbrirPublico').href = urlPub;
+      const btnProbar = document.getElementById('btnProbarBotonera');
+      if (btnProbar) btnProbar.href = urlPub;
 
       document.getElementById('linkBoleteria').textContent = urlBol;
       document.getElementById('btnAbrirBoleteria').href = urlBol;

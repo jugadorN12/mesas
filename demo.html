@@ -800,11 +800,11 @@
       document.getElementById('modalMesaNombre').textContent = mesa.nombre || `Mesa ${mesa.id}`;
       document.getElementById('modalMesaSector').textContent = mesa.sector || 'General';
 
-      const precio = configLocal.precioMesa || 100000;
-      const sena = configLocal.montoSena || 20000;
+      const precio = Number(mesa.precio) || Number(configLocal.precioMesa) || 100000;
+      const sena = Number(mesa.sena) || Number(configLocal.montoSena) || 20000;
       const horaLimite = configLocal.horarioLimite || '03:00';
-      const pctAntes = configLocal.porcentajeAntes !== undefined ? configLocal.porcentajeAntes : (configLocal.porcentajeBebidas || 80);
-      const pctDespues = configLocal.porcentajeDespues !== undefined ? configLocal.porcentajeDespues : 50;
+      const pctAntes = configLocal.porcentajeAntes !== undefined ? Number(configLocal.porcentajeAntes) : (Number(configLocal.porcentajeBebidas) || 80);
+      const pctDespues = configLocal.porcentajeDespues !== undefined ? Number(configLocal.porcentajeDespues) : 50;
       const consumoAntes = Math.round((precio * pctAntes) / 100);
       const consumoDespues = Math.round((precio * pctDespues) / 100);
 
@@ -853,10 +853,12 @@
       btn.disabled = true;
       btn.textContent = 'Procesando...';
 
-      const precio = configLocal.precioMesa || 100000;
-      const sena = configLocal.montoSena || 20000;
-      const pctBebidas = configLocal.porcentajeBebidas || 80;
-      const consumo = Math.round((precio * pctBebidas) / 100);
+      const precio = Number(mesaSeleccionada.precio) || Number(configLocal.precioMesa) || 100000;
+      const sena = Number(mesaSeleccionada.sena) || Number(configLocal.montoSena) || 20000;
+      const horaLimite = configLocal.horarioLimite || '03:00';
+      const pctAntes = configLocal.porcentajeAntes !== undefined ? Number(configLocal.porcentajeAntes) : (Number(configLocal.porcentajeBebidas) || 80);
+      const pctDespues = configLocal.porcentajeDespues !== undefined ? Number(configLocal.porcentajeDespues) : 50;
+      const consumoAntes = Math.round((precio * pctAntes) / 100);
 
       try {
         const DISPUTE_MS = 15 * 60 * 1000;
@@ -869,8 +871,11 @@
           montoTotal: precio,
           montoSenado: sena,
           saldoPuerta: Math.max(0, precio - sena),
-          montoConsumicion: consumo,
-          porcentajeConsumo: pctBebidas,
+          montoConsumicion: consumoAntes,
+          porcentajeConsumo: pctAntes,
+          horarioLimite: horaLimite,
+          porcentajeAntes: pctAntes,
+          porcentajeDespues: pctDespues,
           esCortesia: false,
           cortesiaIngresada: false,
           ts: Date.now(),
