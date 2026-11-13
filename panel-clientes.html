@@ -799,8 +799,16 @@
               <input type="number" id="cfgMontoSena" placeholder="20000" step="5000">
             </div>
             <div class="form-group">
-              <label>Beneficio en Bebidas (%)</label>
-              <input type="number" id="cfgPctBebidas" placeholder="80" min="0" max="100">
+              <label>Horario Límite de Ingreso (ej. 03:00)</label>
+              <input type="text" id="cfgHorarioLimite" placeholder="03:00" maxlength="5">
+            </div>
+            <div class="form-group">
+              <label>% Bebidas ANTES del horario</label>
+              <input type="number" id="cfgPorcentajeAntes" placeholder="80" min="0" max="100">
+            </div>
+            <div class="form-group">
+              <label>% Bebidas DESPUÉS del horario</label>
+              <input type="number" id="cfgPorcentajeDespues" placeholder="50" min="0" max="100">
             </div>
           </div>
 
@@ -1048,7 +1056,9 @@
       document.getElementById('cfgNombreLocal').value = configActual.nombreLocal || '';
       document.getElementById('cfgPrecioMesa').value = configActual.precioMesa || 100000;
       document.getElementById('cfgMontoSena').value = configActual.montoSena || 20000;
-      document.getElementById('cfgPctBebidas').value = configActual.porcentajeBebidas || 80;
+      document.getElementById('cfgHorarioLimite').value = configActual.horarioLimite || '03:00';
+      document.getElementById('cfgPorcentajeAntes').value = configActual.porcentajeAntes !== undefined ? configActual.porcentajeAntes : (configActual.porcentajeBebidas || 80);
+      document.getElementById('cfgPorcentajeDespues').value = configActual.porcentajeDespues !== undefined ? configActual.porcentajeDespues : 50;
       document.getElementById('cfgAlias').value = configActual.alias || '';
       document.getElementById('cfgTitular').value = configActual.titular || '';
       document.getElementById('cfgCbu').value = configActual.cbu || '';
@@ -1096,7 +1106,10 @@
           nombreLocal: document.getElementById('cfgNombreLocal').value.trim() || clienteActual,
           precioMesa: Number(document.getElementById('cfgPrecioMesa').value) || 100000,
           montoSena: Number(document.getElementById('cfgMontoSena').value) || 20000,
-          porcentajeBebidas: Number(document.getElementById('cfgPctBebidas').value) || 80,
+          horarioLimite: document.getElementById('cfgHorarioLimite').value.trim() || '03:00',
+          porcentajeAntes: Number(document.getElementById('cfgPorcentajeAntes').value) || 80,
+          porcentajeDespues: Number(document.getElementById('cfgPorcentajeDespues').value) || 50,
+          porcentajeBebidas: Number(document.getElementById('cfgPorcentajeAntes').value) || 80,
           alias: document.getElementById('cfgAlias').value.trim(),
           titular: document.getElementById('cfgTitular').value.trim(),
           cbu: document.getElementById('cfgCbu').value.trim(),

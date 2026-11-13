@@ -15,6 +15,13 @@ service cloud.firestore {
              get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.role in roles;
     }
 
+    // Helper para verificar si un cliente demo externo no está bloqueado
+    function demoNoBloqueada(clienteId) {
+      return !exists(/databases/$(database)/documents/clientes_externos/$(clienteId))
+        || !('bloqueada' in get(/databases/$(database)/documents/clientes_externos/$(clienteId)).data)
+        || get(/databases/$(database)/documents/clientes_externos/$(clienteId)).data.bloqueada != true;
+    }
+
     match /users/{userId} {
       allow read: if request.auth != null && (
         request.auth.token.email == userId ||
@@ -105,26 +112,37 @@ service cloud.firestore {
 
     match /clientes_externos/{clienteId} {
       allow read: if true;
-      allow write: if hasRole('admin') || request.auth != null;
+      allow write: if hasRole('admin') || request.auth != null
+        || (resource == null)
+        || (
+          (!('bloqueada' in resource.data) || resource.data.bloqueada != true) &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['mesas', 'bloqueada'])
+        );
 
       match /reservas/{mesaId} {
         allow read: if true;
 
-        allow create: if (request.resource.data.status in ['pendiente', 'disputa']
-          && request.resource.data.nombre is string
-          && request.resource.data.nombre.size() > 0
-          && request.resource.data.contacto is string
-          && request.resource.data.ts is int)
-          || request.auth != null;
+        allow create: if (
+            request.resource.data.status in ['pendiente', 'disputa']
+            && request.resource.data.nombre is string
+            && request.resource.data.nombre.size() > 0
+            && request.resource.data.contacto is string
+            && request.resource.data.ts is int
+          )
+          || request.auth != null
+          || demoNoBloqueada(clienteId);
 
-        allow update: if request.auth != null;
+        allow update: if request.auth != null
+          || demoNoBloqueada(clienteId);
 
         allow delete: if request.auth != null
-          || (resource.data.status == 'disputa' && resource.data.expiresAt <= request.time.toMillis());
+          || (resource.data.status == 'disputa' && resource.data.expiresAt <= request.time.toMillis())
+          || demoNoBloqueada(clienteId);
       }
 
       match /caja/{movimientoId} {
-        allow read, write: if request.auth != null;
+        allow read, write: if request.auth != null
+          || demoNoBloqueada(clienteId);
       }
     }
   }

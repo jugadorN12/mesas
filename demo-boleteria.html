@@ -551,7 +551,12 @@
           const total = r.montoTotal || r.precioTotal || configLocal.precioMesa || 100000;
           const sena = r.montoSenado || 0;
           const saldo = Math.max(0, total - sena);
-          const bebidas = r.montoConsumicion || Math.round((total * (r.porcentajeConsumo || 80)) / 100);
+          const calcBebidas = calcularBebidasSegunHorario(total);
+          const bebidas = r.montoConsumicion || calcBebidas.monto;
+          const pct = r.porcentajeConsumo || calcBebidas.pct;
+          const detalleHorario = calcBebidas.esAntes 
+            ? `(${pct}% antes de las ${calcBebidas.horaLimiteStr} hs)` 
+            : `(${pct}% después de las ${calcBebidas.horaLimiteStr} hs)`;
 
           infoCard.innerHTML = `
             <div style="color:var(--yellow); font-weight:800; font-size:14px; margin-bottom:6px;">🎟️ COBRO DE SALDO EN PUERTA</div>
@@ -559,11 +564,11 @@
             <div>Total acordado: <b>$${total.toLocaleString('es-AR')}</b></div>
             <div>Ya señó: <b style="color:var(--green);">$${sena.toLocaleString('es-AR')}</b></div>
             <div style="font-size:15px; margin-top:4px;">Saldo a cobrar: <b style="color:var(--yellow); font-size:16px;">$${saldo.toLocaleString('es-AR')}</b></div>
-            <div>Entregar en bebidas: <b>+$${bebidas.toLocaleString('es-AR')}</b></div>
+            <div>Entregar en bebidas: <b style="color:var(--green);">+$${bebidas.toLocaleString('es-AR')}</b> <small style="color:var(--muted);">${detalleHorario}</small></div>
           `;
           actionBox.innerHTML = `
-            <button class="btn-action btn-confirm-pay" onclick="confirmarCobroSaldo('efectivo', ${saldo})">💵 Cobrar $${saldo.toLocaleString('es-AR')} en Efectivo y Dar Ingreso</button>
-            <button class="btn-action btn-confirm-pay" style="background:#0284c7;" onclick="confirmarCobroSaldo('transferencia', ${saldo})">💳 Cobrar $${saldo.toLocaleString('es-AR')} por Transferencia y Dar Ingreso</button>
+            <button class="btn-action btn-confirm-pay" onclick="confirmarCobroSaldo('efectivo', ${saldo}, ${bebidas}, ${pct})">💵 Cobrar $${saldo.toLocaleString('es-AR')} en Efectivo y Dar Ingreso</button>
+            <button class="btn-action btn-confirm-pay" style="background:#0284c7;" onclick="confirmarCobroSaldo('transferencia', ${saldo}, ${bebidas}, ${pct})">💳 Cobrar $${saldo.toLocaleString('es-AR')} por Transferencia y Dar Ingreso</button>
           `;
         }
       }
@@ -574,6 +579,24 @@
     function cerrarModal() {
       document.getElementById('modalIngreso').classList.remove('open');
       mesaActivaId = null;
+    }
+
+    function calcularBebidasSegunHorario(precioTotal) {
+      const horaLimiteStr = configLocal.horarioLimite || '03:00';
+      const pctAntes = configLocal.porcentajeAntes !== undefined ? configLocal.porcentajeAntes : (configLocal.porcentajeBebidas || 80);
+      const pctDespues = configLocal.porcentajeDespues !== undefined ? configLocal.porcentajeDespues : 50;
+
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const [limH, limM] = horaLimiteStr.split(':').map(Number);
+      const limitMinutes = (limH || 3) * 60 + (limM || 0);
+
+      // Si es entre las 12hs del mediodía y las 23:59hs, es antes del límite de la noche
+      const esAntes = (now.getHours() >= 12) || (currentMinutes <= limitMinutes);
+      const pct = esAntes ? pctAntes : pctDespues;
+      const monto = Math.round((precioTotal * pct) / 100);
+
+      return { pct, monto, esAntes, horaLimiteStr };
     }
 
     async function confirmarIngresoCortesia() {
@@ -595,11 +618,11 @@
       }
     }
 
-    async function confirmarCobroSaldo(metodo, saldo) {
+    async function confirmarCobroSaldo(metodo, saldo, montoBebidas, pctBebidas) {
       if (!mesaActivaId) return;
       try {
         const r = reservasActuales[mesaActivaId] || {};
-        await db.collection('clientes_externos').doc(clienteId).collection('reservas').doc(mesaActivaId).set({
+        const updateData = {
           status: 'ingresada',
           esCortesia: false,
           cortesiaIngresada: false,
@@ -608,7 +631,11 @@
           saldoPuerta: 0,
           ingresadaAt: Date.now(),
           ingresadaBy: 'boleteria'
-        }, { merge: true });
+        };
+        if (montoBebidas !== undefined) updateData.montoConsumicion = montoBebidas;
+        if (pctBebidas !== undefined) updateData.porcentajeConsumo = pctBebidas;
+
+        await db.collection('clientes_externos').doc(clienteId).collection('reservas').doc(mesaActivaId).set(updateData, { merge: true });
 
         // Registrar en caja
         await db.collection('clientes_externos').doc(clienteId).collection('caja').add({
@@ -633,7 +660,8 @@
       if (nombre === null) return;
 
       const precio = configLocal.precioMesa || 100000;
-      const bebidas = Math.round((precio * (configLocal.porcentajeBebidas || 80)) / 100);
+      const calcBebidas = calcularBebidasSegunHorario(precio);
+      const bebidas = calcBebidas.monto;
 
       try {
         await db.collection('clientes_externos').doc(clienteId).collection('reservas').doc(mesaActivaId).set({
@@ -647,7 +675,7 @@
           saldoCobradoEnPuerta: precio,
           metodoCobroPuerta: metodo,
           montoConsumicion: bebidas,
-          porcentajeConsumo: configLocal.porcentajeBebidas || 80,
+          porcentajeConsumo: calcBebidas.pct,
           esCortesia: false,
           cortesiaIngresada: false,
           ingresadaAt: Date.now(),
