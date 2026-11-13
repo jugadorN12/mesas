@@ -3,7 +3,10 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Panel de Administración — Demo</title>
 
   <!-- Google Fonts -->
@@ -419,6 +422,84 @@
     .toast.show {
       opacity: 1;
       transform: translateX(-50%) translateY(-6px);
+    }
+
+    /* Mobile Responsive Styles (iPhone & Android) */
+    @media (max-width: 600px) {
+      .topbar {
+        padding: max(12px, env(safe-area-inset-top)) 16px 12px;
+      }
+      .brand-title {
+        font-size: 15px;
+      }
+      .subnav {
+        padding: 8px 12px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        flex-wrap: nowrap;
+        padding-bottom: 2px;
+      }
+      .tabs::-webkit-scrollbar {
+        display: none;
+      }
+      .tab-btn {
+        flex-shrink: 0;
+        font-size: 12px;
+        padding: 8px 12px;
+        white-space: nowrap;
+        touch-action: manipulation;
+      }
+      .container {
+        padding: 14px 12px;
+      }
+      .notice-box {
+        padding: 12px 14px;
+        font-size: 12.5px;
+        gap: 10px;
+        border-radius: 10px;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 6px !important;
+        margin-bottom: 14px !important;
+      }
+      .stat-card {
+        padding: 8px 4px !important;
+      }
+      .stat-num {
+        font-size: 18px !important;
+      }
+      .stat-label {
+        font-size: 9px !important;
+      }
+      .card {
+        padding: 16px 14px;
+        border-radius: 10px;
+      }
+      .form-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+      .form-group input {
+        font-size: 16px !important; /* 16px prevents iOS Safari auto-zoom */
+        padding: 12px 12px !important;
+      }
+      .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 14px;
+        font-size: 14px;
+        touch-action: manipulation;
+      }
+      .table-wrap table {
+        min-width: 580px;
+      }
     }
   </style>
 

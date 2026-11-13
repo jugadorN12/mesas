@@ -3,9 +3,11 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>Panel de Clientes Externos — Gestión de Mesas</title>
   <meta name="theme-color" content="#0d0d12">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap"
@@ -533,6 +535,82 @@
       font-size: 28px;
       letter-spacing: 1.5px;
       margin-bottom: 6px;
+    }
+
+    /* Mobile Responsive (iPhone & Android) */
+    @media (max-width: 680px) {
+      header.topbar {
+        padding: max(10px, env(safe-area-inset-top)) 12px 10px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .brand-wrap {
+        justify-content: space-between;
+      }
+      .top-actions {
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 6px;
+      }
+      .client-selector-box {
+        flex: 1;
+        min-width: 130px;
+      }
+      .client-selector-box select {
+        width: 100%;
+        font-size: 14px;
+      }
+      .subnav {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        flex-wrap: nowrap;
+        padding-bottom: 4px;
+      }
+      .tabs::-webkit-scrollbar {
+        display: none;
+      }
+      .tab-btn {
+        flex-shrink: 0;
+        font-size: 12px;
+        padding: 8px 12px;
+        white-space: nowrap;
+        touch-action: manipulation;
+      }
+      .stats-bar {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 6px !important;
+      }
+      .stat-card {
+        padding: 8px 4px !important;
+      }
+      .stat-val {
+        font-size: 18px !important;
+      }
+      .stat-label {
+        font-size: 9px !important;
+      }
+      .container {
+        padding: 12px 10px 40px;
+      }
+      .card {
+        padding: 16px 12px;
+      }
+      .form-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .form-group input, .form-group select {
+        font-size: 16px !important; /* Prevents auto-zoom on iOS */
+      }
+      .tables-table-wrap table {
+        min-width: 560px;
+      }
     }
   </style>
 
