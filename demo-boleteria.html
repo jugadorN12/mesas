@@ -321,6 +321,16 @@
 
 <body>
 
+  <!-- Pantalla de Bloqueo si la demo está finalizada/pausada -->
+  <div id="screenBloqueada" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(10, 10, 16, 0.98); backdrop-filter:blur(10px); flex-direction:column; align-items:center; justify-content:center; padding:24px; text-align:center;">
+    <div style="font-size:64px; margin-bottom:16px;">🔒</div>
+    <h2 style="font-size:24px; font-weight:800; color:#fff; margin-bottom:12px;">Boletería Pausada</h2>
+    <p style="font-size:15px; color:#94a3b8; max-width:440px; line-height:1.6; margin-bottom:24px;">
+      El acceso a la boletería de puerta de este local se encuentra deshabilitado temporalmente.<br>
+      Comunicate con el administrador para reactivar la demostración o habilitar el servicio.
+    </p>
+  </div>
+
   <header class="topbar">
     <div class="brand" id="brandTitle">BOLETERÍA <span>PUERTA</span></div>
     <div class="cash-tools">
@@ -391,6 +401,13 @@
       db.collection('clientes_externos').doc(clienteId).onSnapshot(doc => {
         if (doc.exists) {
           configLocal = doc.data();
+          const lockEl = document.getElementById('screenBloqueada');
+          if (configLocal.bloqueada) {
+            if (lockEl) lockEl.style.display = 'flex';
+            return;
+          } else {
+            if (lockEl) lockEl.style.display = 'none';
+          }
           mesasLista = configLocal.mesas || [];
           document.getElementById('brandTitle').innerHTML = `${escapeHtml(configLocal.nombreLocal || 'BOLETERÍA').toUpperCase()} <span>PUERTA</span>`;
           renderBotonera();

@@ -248,11 +248,25 @@
       letter-spacing: 1px;
     }
 
-    .stat-val.green { color: var(--green); }
-    .stat-val.yellow { color: var(--amber); }
-    .stat-val.red { color: var(--red); }
-    .stat-val.purple { color: var(--purple); }
-    .stat-val.blue { color: var(--blue); }
+    .stat-val.green {
+      color: var(--green);
+    }
+
+    .stat-val.yellow {
+      color: var(--amber);
+    }
+
+    .stat-val.red {
+      color: var(--red);
+    }
+
+    .stat-val.purple {
+      color: var(--purple);
+    }
+
+    .stat-val.blue {
+      color: var(--blue);
+    }
 
     /* Content Cards */
     .card {
@@ -360,11 +374,35 @@
       text-transform: uppercase;
     }
 
-    .badge-status.libre { background: rgba(46, 230, 166, 0.15); color: var(--green); border: 1px solid var(--green); }
-    .badge-status.disputa { background: rgba(255, 165, 2, 0.15); color: var(--amber); border: 1px solid var(--amber); }
-    .badge-status.aprobada { background: rgba(255, 71, 87, 0.15); color: var(--red); border: 1px solid var(--red); }
-    .badge-status.cortesia { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid var(--purple); }
-    .badge-status.ingresada { background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(168, 85, 247, 0.3)); color: #bae6fd; border: 1px solid var(--blue); }
+    .badge-status.libre {
+      background: rgba(46, 230, 166, 0.15);
+      color: var(--green);
+      border: 1px solid var(--green);
+    }
+
+    .badge-status.disputa {
+      background: rgba(255, 165, 2, 0.15);
+      color: var(--amber);
+      border: 1px solid var(--amber);
+    }
+
+    .badge-status.aprobada {
+      background: rgba(255, 71, 87, 0.15);
+      color: var(--red);
+      border: 1px solid var(--red);
+    }
+
+    .badge-status.cortesia {
+      background: rgba(168, 85, 247, 0.2);
+      color: #d8b4fe;
+      border: 1px solid var(--purple);
+    }
+
+    .badge-status.ingresada {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(168, 85, 247, 0.3));
+      color: #bae6fd;
+      border: 1px solid var(--blue);
+    }
 
     /* Modal */
     .modal-overlay {
@@ -487,7 +525,7 @@
       width: 100%;
       padding: 28px 24px;
       text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
     }
 
     .auth-card h2 {
@@ -520,7 +558,8 @@
           <label>Contraseña</label>
           <input type="password" id="loginPassword" required placeholder="••••••••">
         </div>
-        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:11px;">Entrar al Panel</button>
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:11px;">Entrar
+          al Panel</button>
       </form>
       <div id="loginError" style="color:var(--red); font-size:12px; margin-top:12px; font-weight:600;"></div>
     </div>
@@ -542,6 +581,7 @@
             <option value="demo">✨ Demo General</option>
           </select>
         </div>
+        <button type="button" class="btn btn-outline" id="btnToggleBloqueo" onclick="toggleBloqueoCliente()">🟢 Demo Activa</button>
         <button type="button" class="btn btn-outline" onclick="abrirModalNuevoCliente()">+ Nuevo Local</button>
         <button type="button" class="btn btn-outline" id="btnLogout" onclick="handleLogout()">Salir</button>
       </div>
@@ -550,10 +590,14 @@
     <main class="container">
       <div class="subnav">
         <div class="tabs">
-          <button type="button" class="tab-btn active" data-tab="tab-mesas" onclick="switchTab('tab-mesas')">🪑 Mesas del Local</button>
-          <button type="button" class="tab-btn" data-tab="tab-reservas" onclick="switchTab('tab-reservas')">📋 Reservas en Vivo</button>
-          <button type="button" class="tab-btn" data-tab="tab-links" onclick="switchTab('tab-links')">🔗 Enlaces y Roles</button>
-          <button type="button" class="tab-btn" data-tab="tab-config" onclick="switchTab('tab-config')">⚙️ Precios y Pago</button>
+          <button type="button" class="tab-btn active" data-tab="tab-mesas" onclick="switchTab('tab-mesas')">🪑 Mesas
+            del Local</button>
+          <button type="button" class="tab-btn" data-tab="tab-reservas" onclick="switchTab('tab-reservas')">📋 Reservas
+            en Vivo</button>
+          <button type="button" class="tab-btn" data-tab="tab-links" onclick="switchTab('tab-links')">🔗 Enlaces y
+            Roles</button>
+          <button type="button" class="tab-btn" data-tab="tab-config" onclick="switchTab('tab-config')">⚙️ Precios y
+            Pago</button>
         </div>
         <div style="display:flex; gap:8px;">
           <button type="button" class="btn btn-danger" onclick="reiniciarMesasDemo()">🔄 Resetear Mesas a Cero</button>
@@ -593,7 +637,8 @@
         <div class="card">
           <div class="card-title">⚡ Generador Rápido de Mesas</div>
           <div class="card-subtitle">
-            Cargá las mesas de este boliche en segundos. Podés generar un lote del 1 al N con un toque o agregar mesas y boxes especiales.
+            Cargá las mesas de este boliche en segundos. Podés generar un lote del 1 al N con un toque o agregar mesas y
+            boxes especiales.
           </div>
 
           <div class="form-grid" style="align-items:flex-end;">
@@ -617,7 +662,8 @@
 
         <div class="card">
           <div class="card-title">🪑 Listado Actual de Mesas (<span id="countMesasActivas">0</span>)</div>
-          <div class="card-subtitle">Estas son las mesas que se muestran en la botonera interactiva para este cliente.</div>
+          <div class="card-subtitle">Estas son las mesas que se muestran en la botonera interactiva para este cliente.
+          </div>
           <div class="tables-table-wrap">
             <table class="tables-list">
               <thead>
@@ -631,7 +677,9 @@
                 </tr>
               </thead>
               <tbody id="mesasTableBody">
-                <tr><td colspan="6" style="text-align:center; color:var(--muted);">Cargando mesas...</td></tr>
+                <tr>
+                  <td colspan="6" style="text-align:center; color:var(--muted);">Cargando mesas...</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -642,7 +690,8 @@
       <div id="tab-reservas" class="tab-content" style="display:none;">
         <div class="card">
           <div class="card-title">📋 Estado de Reservas en Tiempo Real</div>
-          <div class="card-subtitle">Controlá quién señó, quién tiene cortesía o confirmá las reservas de este local.</div>
+          <div class="card-subtitle">Controlá quién señó, quién tiene cortesía o confirmá las reservas de este local.
+          </div>
           <div class="tables-table-wrap">
             <table class="tables-list">
               <thead>
@@ -657,7 +706,9 @@
                 </tr>
               </thead>
               <tbody id="reservasTableBody">
-                <tr><td colspan="7" style="text-align:center; color:var(--muted);">No hay reservas activas.</td></tr>
+                <tr>
+                  <td colspan="7" style="text-align:center; color:var(--muted);">No hay reservas activas.</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -668,32 +719,40 @@
       <div id="tab-links" class="tab-content" style="display:none;">
         <div class="card">
           <div class="card-title">🔗 Enlaces Rápidos para Compartir con el Cliente</div>
-          <div class="card-subtitle">Estos son los enlaces directos para este cliente específico. Abrilos o compartilos con el dueño o cajero.</div>
+          <div class="card-subtitle">Estos son los enlaces directos para este cliente específico. Abrilos o compartilos
+            con el dueño o cajero.</div>
 
           <div style="margin-top:14px;">
-            <div style="font-weight:700; font-size:12.5px; margin-bottom:6px;">1. Botonera Pública para Reservar (Clientes del boliche):</div>
+            <div style="font-weight:700; font-size:12.5px; margin-bottom:6px;">1. Botonera Pública para Reservar
+              (Clientes del boliche):</div>
             <div class="link-share-box">
               <code id="linkPublico">Cargando enlace...</code>
               <button type="button" class="btn btn-outline" onclick="copiarLink('linkPublico')">📋 Copiar</button>
             </div>
 
-            <div style="font-weight:700; font-size:12.5px; margin-bottom:6px; margin-top:16px;">2. Boletería de Puerta (Para cobrar y dar ingreso):</div>
+            <div style="font-weight:700; font-size:12.5px; margin-bottom:6px; margin-top:16px;">2. Boletería de Puerta
+              (Para cobrar y dar ingreso):</div>
             <div class="link-share-box">
               <code id="linkBoleteria">Cargando enlace...</code>
               <button type="button" class="btn btn-outline" onclick="copiarLink('linkBoleteria')">📋 Copiar</button>
             </div>
 
-            <div style="font-weight:700; font-size:12.5px; margin-bottom:6px; margin-top:16px;">3. Panel de Administración de este Local:</div>
+            <div style="font-weight:700; font-size:12.5px; margin-bottom:6px; margin-top:16px;">3. Panel de
+              Administración para el Cliente (Para el dueño del boliche):</div>
             <div class="link-share-box">
               <code id="linkAdmin">Cargando enlace...</code>
               <button type="button" class="btn btn-outline" onclick="copiarLink('linkAdmin')">📋 Copiar</button>
+            </div>
+            <div style="font-size:12px; color:var(--muted); margin-top:8px;">
+              💡 <b>Tu control como SuperAdmin:</b> Este panel actual (<code>panel-clientes.html</code>) es exclusivo tuyo para crear locales, asignar cantidad de mesas y bloquear/activar demos. El link #3 de arriba es el que le pasás al cliente para que cargue sus datos bancarios y gestione sus reservas.
             </div>
           </div>
         </div>
 
         <div class="card">
           <div class="card-title">👥 Crear Usuarios para este Local (Solo 2 Roles)</div>
-          <div class="card-subtitle">Creá los accesos para el dueño del local (Admin) y el personal de puerta (Boletería).</div>
+          <div class="card-subtitle">Creá los accesos para el dueño del local (Admin) y el personal de puerta
+            (Boletería).</div>
 
           <div class="form-grid">
             <div class="form-group">
@@ -723,7 +782,8 @@
       <div id="tab-config" class="tab-content" style="display:none;">
         <div class="card">
           <div class="card-title">⚙️ Datos Comerciales y Transferencia</div>
-          <div class="card-subtitle">Configurá los precios de las mesas, el porcentaje de bebidas y los datos bancarios para las señas.</div>
+          <div class="card-subtitle">Configurá los precios de las mesas, el porcentaje de bebidas y los datos bancarios
+            para las señas.</div>
 
           <div class="form-grid" style="margin-bottom:14px;">
             <div class="form-group">
@@ -952,6 +1012,7 @@
           configActual = doc.data();
           mesasLista = configActual.mesas || [];
           poblarFormularioConfig();
+          renderBotonBloqueo();
           renderTablaMesas();
           renderStats();
         } else {
@@ -964,7 +1025,7 @@
             mesas: Array.from({ length: 15 }, (_, i) => ({
               id: String(i + 1),
               nombre: `Mesa ${i + 1}`,
-              sector: 'Salón',
+              sector: 'Sector Principal',
               capacidad: 4
             }))
           });
@@ -994,6 +1055,41 @@
       document.getElementById('cfgWhatsapp').value = configActual.whatsapp || '';
     }
 
+    function renderBotonBloqueo() {
+      const btn = document.getElementById('btnToggleBloqueo');
+      if (!btn) return;
+      if (configActual.bloqueada) {
+        btn.innerHTML = '🔴 DEMO BLOQUEADA (Activar)';
+        btn.style.borderColor = 'var(--red)';
+        btn.style.color = 'var(--red)';
+        btn.style.background = 'rgba(255, 71, 87, 0.15)';
+      } else {
+        btn.innerHTML = '🟢 DEMO ACTIVA (Bloquear)';
+        btn.style.borderColor = 'var(--green)';
+        btn.style.color = 'var(--green)';
+        btn.style.background = 'rgba(46, 230, 166, 0.1)';
+      }
+    }
+
+    async function toggleBloqueoCliente() {
+      const estaBloqueada = !!configActual.bloqueada;
+      const accion = estaBloqueada ? 'ACTIVAR' : 'BLOQUEAR';
+      const nombre = configActual.nombreLocal || clienteActual;
+      const confirmMsg = estaBloqueada
+        ? `¿Deseás reactivar la demo de "${nombre}"?\nLa botonera y el panel del cliente volverán a estar operativos.`
+        : `¿Deseás BLOQUEAR / PAUSAR la demo de "${nombre}"?\nLos clientes y el local verán un mensaje de demostración finalizada y no podrán operar.`;
+      if (!confirm(confirmMsg)) return;
+
+      try {
+        await db.collection('clientes_externos').doc(clienteActual).set({
+          bloqueada: !estaBloqueada
+        }, { merge: true });
+        showToast(`Estado actualizado: ${!estaBloqueada ? 'DEMO BLOQUEADA' : 'DEMO ACTIVA'}`);
+      } catch (e) {
+        alert('Error al cambiar bloqueo: ' + e.message);
+      }
+    }
+
     async function guardarConfigLocal() {
       try {
         await db.collection('clientes_externos').doc(clienteActual).set({
@@ -1020,13 +1116,13 @@
       const nuevasMesas = Array.from({ length: cant }, (_, i) => ({
         id: String(i + 1),
         nombre: `Mesa ${i + 1}`,
-        sector: i < Math.floor(cant * 0.75) ? 'Sector Principal' : 'Sector VIP',
+        sector: 'Sector Principal',
         capacidad: 4
       }));
 
       try {
         await db.collection('clientes_externos').doc(clienteActual).set({ mesas: nuevasMesas }, { merge: true });
-        showToast(`${cant} mesas generadas.`);
+        showToast(`${cant} mesas generadas (todas en Sector Principal).`);
       } catch (e) {
         alert('Error: ' + e.message);
       }
@@ -1065,6 +1161,22 @@
         // También borrar su reserva si tenía
         await db.collection('clientes_externos').doc(clienteActual).collection('reservas').doc(id).delete();
         showToast('Mesa eliminada.');
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    async function cambiarSectorMesa(id) {
+      const mesa = mesasLista.find(m => m.id === id);
+      if (!mesa) return;
+      const nuevoSector = prompt(`Nuevo sector para "${mesa.nombre}" (ej: Sector Principal, Sector VIP, Terraza, etc.):`, mesa.sector || 'Sector Principal');
+      if (nuevoSector === null) return;
+      const sectorLimpio = nuevoSector.trim() || 'Sector Principal';
+
+      const nuevaLista = mesasLista.map(m => m.id === id ? { ...m, sector: sectorLimpio } : m);
+      try {
+        await db.collection('clientes_externos').doc(clienteActual).set({ mesas: nuevaLista }, { merge: true });
+        showToast(`Mesa #${id} asignada a "${sectorLimpio}".`);
       } catch (e) {
         alert('Error: ' + e.message);
       }
@@ -1110,10 +1222,11 @@
         tr.innerHTML = `
           <td><b>#${m.id}</b></td>
           <td><b>${escapeHtml(m.nombre)}</b></td>
-          <td><span style="color:var(--muted);">${escapeHtml(m.sector || 'General')}</span></td>
+          <td><span style="color:var(--muted); font-weight:600;">${escapeHtml(m.sector || 'General')}</span></td>
           <td>${m.capacidad || 4} pers</td>
           <td><span class="badge-status ${status}">${statusText}</span></td>
           <td>
+            <button class="btn btn-outline" style="padding:4px 8px; font-size:11px; margin-right:4px;" onclick="cambiarSectorMesa('${m.id}')">✏️ Sector</button>
             <button class="btn btn-outline" style="padding:4px 8px; font-size:11px;" onclick="eliminarMesa('${m.id}')">🗑️ Borrar</button>
           </td>
         `;
@@ -1325,7 +1438,7 @@
       const slug = clienteActual;
       document.getElementById('linkPublico').textContent = `${base}/demo.html?cliente=${slug}`;
       document.getElementById('linkBoleteria').textContent = `${base}/demo-boleteria.html?cliente=${slug}`;
-      document.getElementById('linkAdmin').textContent = `${base}/panel-clientes.html?cliente=${slug}`;
+      document.getElementById('linkAdmin').textContent = `${base}/demo-admin.html?cliente=${slug}`;
     }
 
     function copiarLink(elementId) {
@@ -1362,7 +1475,7 @@
         const mesasIniciales = Array.from({ length: cantMesas }, (_, i) => ({
           id: String(i + 1),
           nombre: `Mesa ${i + 1}`,
-          sector: i < Math.floor(cantMesas * 0.75) ? 'Sector Principal' : 'Sector VIP',
+          sector: 'Sector Principal',
           capacidad: 4
         }));
 
@@ -1445,4 +1558,3 @@
 </body>
 
 </html>
-

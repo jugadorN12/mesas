@@ -499,6 +499,16 @@
 
 <body>
 
+  <!-- Pantalla de Bloqueo si la demo está finalizada/pausada -->
+  <div id="screenBloqueada" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(10, 10, 16, 0.98); backdrop-filter:blur(10px); flex-direction:column; align-items:center; justify-content:center; padding:24px; text-align:center;">
+    <div style="font-size:64px; margin-bottom:16px;">🔒</div>
+    <h2 style="font-size:24px; font-weight:800; color:#fff; margin-bottom:12px;">Demostración Finalizada o Pausada</h2>
+    <p style="font-size:15px; color:#94a3b8; max-width:440px; line-height:1.6; margin-bottom:24px;">
+      El acceso a la reserva de mesas de este establecimiento se encuentra pausado.<br>
+      Si sos el responsable del local y querés habilitar o contratar el servicio, contactate con el administrador.
+    </p>
+  </div>
+
   <header class="topbar">
     <div class="brand" id="brandTitle">BOLICHE <span>DEMO</span></div>
     <div class="legend">
@@ -631,6 +641,13 @@
       db.collection('clientes_externos').doc(clienteId).onSnapshot(doc => {
         if (doc.exists) {
           configLocal = doc.data();
+          const lockEl = document.getElementById('screenBloqueada');
+          if (configLocal.bloqueada) {
+            if (lockEl) lockEl.style.display = 'flex';
+            return;
+          } else {
+            if (lockEl) lockEl.style.display = 'none';
+          }
           mesasLista = configLocal.mesas || [];
           actualizarInfoLocal();
           renderBotonera();
@@ -639,7 +656,7 @@
           const mesasDemo = Array.from({ length: 20 }, (_, i) => ({
             id: String(i + 1),
             nombre: `Mesa ${i + 1}`,
-            sector: i < 15 ? 'Sector Principal' : 'Sector VIP',
+            sector: 'Sector Principal',
             capacidad: 4
           }));
           db.collection('clientes_externos').doc(clienteId).set({
