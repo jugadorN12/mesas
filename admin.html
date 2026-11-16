@@ -2221,6 +2221,25 @@
       <div class="event-status" id="terraceDateStatus"></div>
     </section>
 
+    <section class="event-card" id="terraceFooterLogoCard">
+      <h2>Logo inferior de TERRACE SOUL (debajo de la fecha)</h2>
+      <p>Pegá la URL pública del logo que aparecerá debajo de la fecha en el mapa de la terraza (alojado en Cloudinary).</p>
+      <div class="event-controls">
+        <label style="flex:2;">URL pública del logo inferior<input id="terraceFooterLogoUrlInput" type="url"
+            placeholder="https://res.cloudinary.com/..."></label>
+        <button id="saveTerraceFooterLogo" type="button" onclick="guardarTerraceFooterLogo()">Guardar logo inferior</button>
+      </div>
+      <div style="display:flex; gap:12px; align-items:center; margin-top:10px;">
+        <button id="removeTerraceFooterLogo" type="button" class="delete" style="width:auto; margin-top:0;"
+          onclick="quitarTerraceFooterLogo()">Quitar logo inferior</button>
+        <div id="terraceFooterLogoPreview"
+          style="display:none; width:70px; height:50px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background-size:contain; background-position:center; background-repeat:no-repeat; box-shadow:0 2px 6px rgba(0,0,0,0.5); background-color: rgba(0,0,0,0.4);">
+        </div>
+        <span id="terraceFooterLogoPreviewLabel" style="font-size:12px; color:var(--grey); display:none;">Vista previa</span>
+      </div>
+      <div class="event-status" id="terraceFooterLogoStatus"></div>
+    </section>
+
     <!-- ======================================================== -->
     <!-- GESTIÓN DE CLIENTES EXTERNOS (SOLO SUPERUSUARIOS)        -->
     <!-- ======================================================== -->
@@ -2391,6 +2410,12 @@
     const terraceDateInput = document.getElementById('terraceDateInput');
     const saveTerraceDate = document.getElementById('saveTerraceDate');
     const terraceDateStatus = document.getElementById('terraceDateStatus');
+    const terraceFooterLogoUrlInput = document.getElementById('terraceFooterLogoUrlInput');
+    const saveTerraceFooterLogo = document.getElementById('saveTerraceFooterLogo');
+    const removeTerraceFooterLogo = document.getElementById('removeTerraceFooterLogo');
+    const terraceFooterLogoStatus = document.getElementById('terraceFooterLogoStatus');
+    const terraceFooterLogoPreview = document.getElementById('terraceFooterLogoPreview');
+    const terraceFooterLogoPreviewLabel = document.getElementById('terraceFooterLogoPreviewLabel');
     const captureMap = document.getElementById('captureMap');
     const captureStatus = document.getElementById('captureStatus');
     const eventNameInput = document.getElementById('eventNameInput');
@@ -2478,6 +2503,24 @@
       });
     }
 
+    function updateTerraceFooterLogoPreview(url) {
+      if (!terraceFooterLogoPreview) return;
+      if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+        terraceFooterLogoPreview.style.backgroundImage = `url("${url}")`;
+        terraceFooterLogoPreview.style.display = 'block';
+        if (terraceFooterLogoPreviewLabel) terraceFooterLogoPreviewLabel.style.display = 'inline';
+      } else {
+        terraceFooterLogoPreview.style.backgroundImage = 'none';
+        terraceFooterLogoPreview.style.display = 'none';
+        if (terraceFooterLogoPreviewLabel) terraceFooterLogoPreviewLabel.style.display = 'none';
+      }
+    }
+    if (terraceFooterLogoUrlInput) {
+      terraceFooterLogoUrlInput.addEventListener('input', () => {
+        updateTerraceFooterLogoPreview(terraceFooterLogoUrlInput.value.trim());
+      });
+    }
+
     function updateBgPreview(url) {
       if (!eventBgPreview) return;
       if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
@@ -2515,6 +2558,8 @@
       if (terraceBgUrlInput) terraceBgUrlInput.value = data?.terraceBgUrl || '';
       updateTerraceBgPreview(data?.terraceBgUrl || '');
       if (terraceDateInput) terraceDateInput.value = data?.terraceDate || '';
+      if (terraceFooterLogoUrlInput) terraceFooterLogoUrlInput.value = data?.terraceFooterLogoUrl || '';
+      updateTerraceFooterLogoPreview(data?.terraceFooterLogoUrl || '');
     }
 
     function listenReservas() {
@@ -3023,6 +3068,75 @@
         alert('❌ Error al guardar fecha: ' + err.message);
       } finally {
         if (btn) btn.disabled = false;
+      }
+    };
+
+    window.guardarTerraceFooterLogo = async function () {
+      const input = document.getElementById('terraceFooterLogoUrlInput');
+      const status = document.getElementById('terraceFooterLogoStatus');
+      const btn = document.getElementById('saveTerraceFooterLogo');
+      const logoUrl = input ? input.value.trim() : '';
+      const targetDoc = getActiveConfigDoc();
+      const targetName = currentAdminEvent === 'fecha1' ? (configData1.headingText || 'Fecha 1') : (configData2.headingText || 'Fecha 2');
+
+      if (!logoUrl) {
+        alert('⚠️ Por favor pegá la URL pública del logo inferior de terraza.');
+        if (status) status.textContent = 'Pegá la URL pública del logo inferior.';
+        return;
+      }
+      if (!logoUrl.startsWith('http://') && !logoUrl.startsWith('https://')) {
+        alert('⚠️ La URL debe comenzar con https:// o http://');
+        if (status) status.textContent = 'La URL debe comenzar con https:// o http://';
+        return;
+      }
+      if (btn) btn.disabled = true;
+      if (status) {
+        status.style.display = 'block';
+        status.style.color = '#ffbd3e';
+        status.textContent = '⏳ Guardando logo inferior para ' + targetName + '...';
+      }
+      try {
+        await db.collection('config').doc(targetDoc).set({
+          terraceFooterLogoUrl: logoUrl,
+          updatedAt: Date.now(),
+          updatedBy: auth.currentUser?.email || 'admin'
+        }, { merge: true });
+        updateTerraceFooterLogoPreview(logoUrl);
+        if (status) {
+          status.style.color = '#4ade80';
+          status.textContent = '✅ Logo inferior de Terrace Soul (' + targetName + ') guardado correctamente.';
+        }
+        alert('✅ ¡Logo inferior de terraza guardado con éxito para ' + targetName + '!');
+      } catch (err) {
+        if (status) {
+          status.style.color = '#ff5555';
+          status.textContent = '❌ Error: ' + err.message;
+        }
+        alert('❌ Error al guardar en base de datos: ' + err.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    };
+
+    window.quitarTerraceFooterLogo = async function () {
+      const input = document.getElementById('terraceFooterLogoUrlInput');
+      const status = document.getElementById('terraceFooterLogoStatus');
+      const targetDoc = getActiveConfigDoc();
+      const targetName = currentAdminEvent === 'fecha1' ? (configData1.headingText || 'Fecha 1') : (configData2.headingText || 'Fecha 2');
+      try {
+        await db.collection('config').doc(targetDoc).set({
+          terraceFooterLogoUrl: '',
+          updatedAt: Date.now()
+        }, { merge: true });
+        if (input) input.value = '';
+        updateTerraceFooterLogoPreview('');
+        if (status) {
+          status.style.color = '#ffbd3e';
+          status.textContent = 'Logo inferior de Terrace Soul (' + targetName + ') quitado.';
+        }
+        alert('🗑️ Logo inferior de terraza quitado de ' + targetName + '.');
+      } catch (err) {
+        alert('❌ Error al quitar logo inferior: ' + err.message);
       }
     };
 

@@ -472,6 +472,23 @@
       pointer-events: none;
     }
 
+    .map-frame .terrace-footer-logo-overlay {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 77.5%;
+      width: 82% !important;
+      height: 18.5% !important;
+      max-width: 82%;
+      max-height: 18.5%;
+      z-index: 5;
+      display: none;
+      object-fit: contain;
+      object-position: center;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.85));
+    }
+
     .map-bg-layer {
       position: absolute;
       inset: 0;
@@ -1544,6 +1561,8 @@
       <img id="terraceLogoOverlay" class="terrace-logo-overlay" alt="Logo evento Terrace Soul">
       <!-- Badge Fecha exclusiva Terrace Soul (recuadro verde) -->
       <div id="terraceDateBadge" class="terrace-date-badge" style="display:none;" aria-label="Fecha del evento"></div>
+      <!-- Overlay Logo inferior exclusivo Terrace Soul (debajo de la fecha) -->
+      <img id="terraceFooterLogoOverlay" class="terrace-footer-logo-overlay" alt="Logo inferior evento Terrace Soul">
       <div id="mapBgLayer" class="map-bg-layer"></div>
       <img id="mapImg" src="Gemini_Generated_Image_pxpekipxpekipxpe.png" alt="Mapa de mesas Cubano Bar">
       <div class="map-art" aria-label="Plano rediseñado del Cubano Bar">
@@ -2119,12 +2138,26 @@
           }
         }
 
+        // Logo inferior exclusivo de terraza (debajo de la fecha)
+        const terraceFooterLogoEl = document.getElementById("terraceFooterLogoOverlay");
+        if (terraceFooterLogoEl) {
+          if (cfg.terraceFooterLogoUrl) {
+            terraceFooterLogoEl.src = cfg.terraceFooterLogoUrl;
+            terraceFooterLogoEl.style.display = "block";
+          } else {
+            terraceFooterLogoEl.src = "";
+            terraceFooterLogoEl.style.display = "none";
+          }
+        }
+
         if (legendEl) legendEl.textContent = "Sector TERRACE SOUL (al aire libre): mesas 1 a 19 y mesas A, B, C, D, E";
       } else {
         if (mapImgEl) mapImgEl.src = "Gemini_Generated_Image_pxpekipxpekipxpe.png";
         if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "";
         if (terraceLogoOverlay) terraceLogoOverlay.style.display = "none";
         if (terraceDateBadge) terraceDateBadge.style.display = "none";
+        const terraceFooterLogoEl = document.getElementById("terraceFooterLogoOverlay");
+        if (terraceFooterLogoEl) terraceFooterLogoEl.style.display = "none";
 
         const cfg = currentEventKey === 'fecha1' ? configFecha1 : configFecha2;
         if (mapBgLayerEl) {
@@ -2384,6 +2417,17 @@
           }
         }
 
+        const terraceFooterLogoEl = document.getElementById("terraceFooterLogoOverlay");
+        if (terraceFooterLogoEl) {
+          if (cfg.terraceFooterLogoUrl) {
+            terraceFooterLogoEl.src = cfg.terraceFooterLogoUrl;
+            terraceFooterLogoEl.style.display = "block";
+          } else {
+            terraceFooterLogoEl.src = "";
+            terraceFooterLogoEl.style.display = "none";
+          }
+        }
+
         if (mapBgLayer) {
           const terraceBg = cfg.terraceBgUrl || cfg.bgUrl;
           if (terraceBg) {
@@ -2397,6 +2441,8 @@
       } else {
         if (terraceLogoOverlay) terraceLogoOverlay.style.display = "none";
         if (terraceDateBadge) terraceDateBadge.style.display = "none";
+        const terraceFooterLogoEl = document.getElementById("terraceFooterLogoOverlay");
+        if (terraceFooterLogoEl) terraceFooterLogoEl.style.display = "none";
         if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "";
 
         eventLogoOverlay.src = cfg.logoUrl || "";
