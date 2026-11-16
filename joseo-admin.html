@@ -1673,10 +1673,19 @@
   </div>
 
   <script>
-    // Service Worker y soporte PWA Admin
+    // Service Worker y soporte PWA Admin con auto-recarga al publicar nueva versión
     if ('serviceWorker' in navigator) {
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
+      });
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(err => {
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+          reg.update();
+        }).catch(err => {
           console.log('SW registration note:', err);
         });
       });

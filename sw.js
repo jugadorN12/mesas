@@ -1,5 +1,5 @@
-// Service Worker para Cubano Bar y Joseo Terrace (PWA)
-const CACHE_NAME = 'mesas-v8';
+// Service Worker para Cubano Bar, Joseo Terrace y Demos (PWA)
+const CACHE_NAME = 'mesas-v9';
 const STATIC_ASSETS = [
   './shared.css',
   './manifest.json',
@@ -13,16 +13,17 @@ const STATIC_ASSETS = [
   './logo-joseo.png'
 ];
 
-// Instalación: Guardar recursos estáticos en caché
+// Instalación inmediata
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(STATIC_ASSETS);
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
-// Activación: Limpiar versiones viejas de caché
+// Activación inmediata y toma de control de todas las pestañas abiertas
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -33,36 +34,41 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Peticiones: Network-First para asegurar que las reservas y datos en vivo siempre estén actualizados
+// Manejo de peticiones:
+// Las páginas HTML, admin, boletería y llamadas a Firebase SIEMPRE van directo a la red
 self.addEventListener('fetch', (event) => {
-  // Ignorar peticiones que no sean GET o que vayan a Firebase / APIs externas
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
 
+  // Ignorar Firebase, CDNs externos o APIs
   if (url.origin !== self.origin || url.pathname.includes('/__/')) {
     return;
   }
 
-  // NUNCA cachear paneles de gestión ni boletería
-  if (url.pathname.includes('admin') || url.pathname.includes('boleteria')) {
+  // Si es navegación o página HTML (o panel admin / boletería / demo), SIEMPRE de la red
+  const isHtmlOrNavigate = event.request.mode === 'navigate' ||
+    url.pathname.endsWith('.html') ||
+    url.pathname.includes('admin') ||
+    url.pathname.includes('boleteria') ||
+    url.pathname.includes('demo') ||
+    url.pathname === '/';
+
+  if (isHtmlOrNavigate) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-cache' }).catch(() => {
+        return caches.match(event.request);
+      })
+    );
     return;
   }
 
+  // Para assets estáticos (CSS, iconos)
   event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        // Si la red responde bien, actualizamos la caché de recursos estáticos
-        if (networkResponse && networkResponse.status === 200) {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-        }
-        return networkResponse;
-      })
-      .catch(() => {
-        // Si no hay internet, intentamos responder desde la caché
-        return caches.match(event.request);
-      })
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      return fetch(event.request);
+    })
   );
 });

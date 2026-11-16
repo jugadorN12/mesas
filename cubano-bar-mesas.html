@@ -2001,8 +2001,19 @@
       return { totalMesa, consumoCredito, senaAmount, saldoPuerta, pct: isPromoEnabled ? promo.pct : 0 };
     }
 
-    // Escuchar configuración de precios en Firestore
+    // Escuchar configuración de precios en Firestore (tiempo real desde panel de admin)
     if (firebaseDb) {
+      firebaseDb.collection("config").doc("calculadora_mesas").onSnapshot(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          if (data.precioBase !== undefined) pricingConfig.precioBaseMesa = Number(data.precioBase);
+          if (data.precioPersonaExtra !== undefined) pricingConfig.precioPersonaExtra = Number(data.precioPersonaExtra);
+          if (data.montoSena !== undefined) pricingConfig.montoSena = Number(data.montoSena);
+        }
+        updatePromoBanner();
+        updateModalPricingDisplay();
+      });
+
       firebaseDb.collection("config").doc("precios_consumo").onSnapshot(doc => {
         if (doc.exists) {
           const data = doc.data();
@@ -3314,10 +3325,19 @@
     init();
     capturarMapaPublico();
 
-    // Registro de Service Worker para PWA
+    // Registro de Service Worker para PWA con auto-recarga al publicar nueva versión
     if ('serviceWorker' in navigator) {
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
+      });
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch((err) => {
+        navigator.serviceWorker.register('./sw.js').then((reg) => {
+          reg.update();
+        }).catch((err) => {
           console.log('SW registration note:', err);
         });
       });
