@@ -182,6 +182,24 @@
       filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.85));
     }
 
+    /* Logo sponsor inferior */
+    .map-frame .terrace-footer-logo-overlay {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 72%;
+      width: 82% !important;
+      height: 22% !important;
+      max-width: 82%;
+      max-height: 22%;
+      z-index: 5;
+      display: none;
+      object-fit: contain;
+      object-position: center;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.85));
+    }
+
     /* Fecha badge en recuadro verde */
     .terrace-date-badge {
       position: absolute;
@@ -640,6 +658,7 @@
       <div id="mapBgLayer" class="map-bg-layer"></div>
       <img id="terraceLogoOverlay" class="terrace-logo-overlay" alt="Logo Joseo Terrace">
       <div id="terraceDateBadge" class="terrace-date-badge" aria-label="Fecha del evento"></div>
+      <img id="terraceFooterLogoOverlay" class="terrace-footer-logo-overlay" alt="Logo Sponsor Joseo">
       <img id="mapImg" src="terraza_joseo.png" alt="Plano Terraza Joseo">
     </div>
   </main>
@@ -792,6 +811,7 @@
     const planoMesas = document.getElementById("plano-mesas");
     const mapBgLayer = document.getElementById("mapBgLayer");
     const terraceLogoOverlay = document.getElementById("terraceLogoOverlay");
+    const terraceFooterLogoOverlay = document.getElementById("terraceFooterLogoOverlay");
     const terraceDateBadge = document.getElementById("terraceDateBadge");
     const freeTablesCount = document.getElementById("freeTablesCount");
     const modalOverlay = document.getElementById("modalOverlay");
@@ -836,6 +856,15 @@
         terraceLogoOverlay.style.display = "block";
       } else {
         terraceLogoOverlay.style.display = "none";
+      }
+
+      // Sponsor Logo inferior
+      const sponsorLogo = cfg.sponsorLogoUrl || cfg.footerLogoUrl || cfg.terraceFooterLogoUrl;
+      if (sponsorLogo && terraceFooterLogoOverlay) {
+        terraceFooterLogoOverlay.src = sponsorLogo;
+        terraceFooterLogoOverlay.style.display = "block";
+      } else if (terraceFooterLogoOverlay) {
+        terraceFooterLogoOverlay.style.display = "none";
       }
 
       // Fondo
