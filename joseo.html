@@ -986,6 +986,18 @@
           montoSena: Number(custom.montoSena) || Number(configJoseo.montoSena) || 50000
         };
       }
+      try {
+        const local = localStorage.getItem("joseo_precios_mesas");
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (parsed && parsed[mesaId]) {
+            return {
+              valorMesa: Number(parsed[mesaId].valorMesa) || Number(configJoseo.valorMesa) || 385000,
+              montoSena: Number(parsed[mesaId].montoSena) || Number(configJoseo.montoSena) || 50000
+            };
+          }
+        }
+      } catch (e) {}
       return {
         valorMesa: Number(configJoseo.valorMesa) || 385000,
         montoSena: Number(configJoseo.montoSena) || 50000

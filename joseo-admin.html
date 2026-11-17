@@ -1159,12 +1159,13 @@
                   <input type="number" id="customTableSena" placeholder="Ej.: 50000" step="5000">
                 </div>
               </div>
-              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
                 <button type="button" class="btn-action"
                   style="flex:1; max-width:280px; padding:9px 16px; font-size:13px;"
                   onclick="aplicarPrecioAMesasSeleccionadas()">Aplicar a seleccionadas</button>
                 <button type="button" class="btn-logout" style="font-size:12px; border-color:rgba(255,255,255,0.2);"
                   onclick="restablecerMesasSeleccionadas()">Volver a precio estándar</button>
+                <span id="customPriceStatus" style="font-size:12px; font-weight:700; margin-left:6px;"></span>
               </div>
             </div>
 
@@ -1174,6 +1175,11 @@
                 style="font-size:11.5px; font-weight:700; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">
                 📋 Resumen de mesas con precio diferenciado:</div>
               <div id="customPricesList" style="display:flex; flex-direction:column; gap:6px;"></div>
+            </div>
+
+            <div style="margin-top:14px; padding-top:10px; border-top:1px dashed rgba(255,255,255,0.1); display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <button type="button" class="btn-action" id="btnGuardarPreciosMesas" style="padding:9px 18px; font-size:13px; max-width:280px;" onclick="forzarGuardadoPrecios()">💾 Guardar Precios en Vivo</button>
+              <span id="savePreciosDirectStatus" style="font-size:12px; font-weight:700;"></span>
             </div>
           </div>
         </div>
@@ -1494,20 +1500,46 @@
     };
 
     async function guardarPreciosPorMesaEnFirestore() {
+      const status1 = document.getElementById("customPriceStatus");
+      const status2 = document.getElementById("savePreciosDirectStatus");
+      if (status1) { status1.textContent = "⏳ Guardando..."; status1.style.color = "var(--gold)"; }
+      if (status2) { status2.textContent = "⏳ Guardando precios en vivo..."; status2.style.color = "var(--gold)"; }
+
       try {
+        // Respaldo en localStorage inmediato
+        try {
+          localStorage.setItem("joseo_precios_mesas", JSON.stringify(preciosPorMesaState));
+        } catch (e) {}
+
+        const userEmail = (auth && auth.currentUser && auth.currentUser.email) ? auth.currentUser.email : "admin";
         await db.collection("config").doc("joseo").set({
           preciosPorMesa: preciosPorMesaState,
           updatedAt: Date.now(),
-          updatedBy: auth.currentUser ? auth.currentUser.email : "admin"
+          updatedBy: userEmail
         }, { merge: true });
+
         console.log("Precios por mesa guardados en Firestore.");
+        if (status1) { status1.textContent = "✅ Guardado"; status1.style.color = "var(--green)"; setTimeout(() => { if (status1) status1.textContent = ""; }, 3000); }
+        if (status2) { status2.textContent = "✅ Precios guardados en la base de datos"; status2.style.color = "var(--green)"; setTimeout(() => { if (status2) status2.textContent = ""; }, 4000); }
         return true;
       } catch (err) {
         console.error("Error al guardar precios por mesa:", err);
+        if (status1) { status1.textContent = "❌ Error"; status1.style.color = "var(--red)"; }
+        if (status2) { status2.textContent = "❌ Error: " + err.message; status2.style.color = "var(--red)"; }
         alert("⚠️ No se pudieron guardar los precios en la base de datos: " + err.message);
         return false;
       }
     }
+
+    window.forzarGuardadoPrecios = async function () {
+      const btn = document.getElementById("btnGuardarPreciosMesas");
+      if (btn) btn.disabled = true;
+      const ok = await guardarPreciosPorMesaEnFirestore();
+      if (btn) btn.disabled = false;
+      if (ok) {
+        alert("✅ Todos los precios configurados se guardaron exitosamente en la base de datos.");
+      }
+    };
 
     window.aplicarPrecioAMesasSeleccionadas = async function () {
       if (mesasSeleccionadasState.size === 0) {
@@ -1757,7 +1789,29 @@
         if (cfgLogoUrl) cfgLogoUrl.value = c.logoUrl || "";
         if (cfgBgUrl) cfgBgUrl.value = c.bgUrl || "";
 
-        preciosPorMesaState = c.preciosPorMesa ? { ...c.preciosPorMesa } : {};
+        if (c.preciosPorMesa && typeof c.preciosPorMesa === "object" && Object.keys(c.preciosPorMesa).length > 0) {
+          preciosPorMesaState = { ...c.preciosPorMesa };
+          try {
+            localStorage.setItem("joseo_precios_mesas", JSON.stringify(preciosPorMesaState));
+          } catch (e) {}
+        } else {
+          try {
+            const local = localStorage.getItem("joseo_precios_mesas");
+            if (local) {
+              const parsed = JSON.parse(local);
+              if (parsed && typeof parsed === "object" && Object.keys(parsed).length > 0) {
+                preciosPorMesaState = parsed;
+                guardarPreciosPorMesaEnFirestore();
+              } else {
+                preciosPorMesaState = {};
+              }
+            } else {
+              preciosPorMesaState = {};
+            }
+          } catch (e) {
+            preciosPorMesaState = {};
+          }
+        }
         renderTableSelectorChips();
         renderCustomPricesList();
         if (cfgCbu) cfgCbu.value = c.cbu || "";
