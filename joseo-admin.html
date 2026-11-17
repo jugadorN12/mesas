@@ -405,6 +405,13 @@
       box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
     }
 
+    .table-btn.cortesia {
+      background: radial-gradient(circle, #c084fc 20%, #7e22ce 80%) !important;
+      border-color: #f3e8ff !important;
+      color: #fff !important;
+      box-shadow: 0 0 12px rgba(192, 132, 252, 0.75) !important;
+    }
+
     /* Lista de mesas alternativa */
     .mesa-row {
       display: grid;
@@ -454,6 +461,12 @@
     .status-pill.ingresada {
       background: rgba(59, 130, 246, 0.15);
       color: #3b82f6;
+    }
+
+    .status-pill.cortesia {
+      background: rgba(168, 85, 247, 0.15);
+      border-color: #a855f7;
+      color: #d8b4fe;
     }
 
     .btn-calc {
@@ -1035,6 +1048,8 @@
               style="width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold);"></span>Señada</span>
           <span style="display:flex; align-items:center; gap:5px;"><span class="dot approved"
               style="width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 6px var(--red);"></span>Vendida</span>
+          <span style="display:flex; align-items:center; gap:5px;"><span class="dot cortesia"
+              style="width:9px;height:9px;border-radius:50%;background:#c084fc;box-shadow:0 0 6px #c084fc;"></span>Cortesía</span>
           <span style="display:flex; align-items:center; gap:5px;"><span class="dot ingresada"
               style="width:9px;height:9px;border-radius:50%;background:var(--blue);box-shadow:0 0 6px var(--blue);"></span>Dentro
             (Puerta)</span>
@@ -1387,7 +1402,8 @@
       { id: "T-17", num: "17", x: 77.6, y: 40.9 },
       { id: "T-18", num: "18", x: 77.4, y: 45.9 },
       { id: "T-19", num: "19", x: 77.6, y: 50.9 },
-      { id: "T-15", num: "15", x: 89.9, y: 41.3 },
+      { id: "T-15", num: "15", x: 89.9, y: 38.6 },
+      { id: "T-15B", num: "15Bis", x: 89.9, y: 44.8 },
       { id: "T-9", num: "9", x: 30.1, y: 64.8 },
       { id: "T-10", num: "10", x: 39.0, y: 64.8 },
       { id: "T-11", num: "11", x: 48.0, y: 64.9 },
@@ -1407,7 +1423,10 @@
       return [...TABLES_TERRAZA].sort((a, b) => {
         const numA = parseInt(a.num, 10);
         const numB = parseInt(b.num, 10);
-        if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+        if (!isNaN(numA) && !isNaN(numB)) {
+          if (numA !== numB) return numA - numB;
+          return a.num.localeCompare(b.num);
+        }
         if (!isNaN(numA)) return -1;
         if (!isNaN(numB)) return 1;
         return a.num.localeCompare(b.num);
@@ -1501,7 +1520,8 @@
           valorMesa: Math.round(precio),
           montoSena: Math.round(sena)
         };
-        mesasAfectadas.push(mesaId.replace("T-", ""));
+        const tObj = TABLES_TERRAZA.find(t => t.id === mesaId);
+        mesasAfectadas.push(tObj ? tObj.num : mesaId.replace("T-", ""));
       });
 
       const cantAfectada = mesasSeleccionadasState.size;
@@ -1556,7 +1576,8 @@
             mesas: []
           };
         }
-        const num = id.replace("T-", "");
+        const tObj = TABLES_TERRAZA.find(t => t.id === id);
+        const num = tObj ? tObj.num : id.replace("T-", "");
         grupos[keyGroup].mesas.push({ id, num });
       });
 
@@ -1565,7 +1586,12 @@
         grp.mesas.sort((a, b) => {
           const numA = parseInt(a.num, 10);
           const numB = parseInt(b.num, 10);
-          if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+          if (!isNaN(numA) && !isNaN(numB)) {
+            if (numA !== numB) return numA - numB;
+            return a.num.localeCompare(b.num);
+          }
+          if (!isNaN(numA)) return -1;
+          if (!isNaN(numB)) return 1;
           return a.num.localeCompare(b.num);
         });
 
@@ -1804,13 +1830,14 @@
         const mesaId = table.id;
         const r = reservasJoseo[mesaId] || {};
         const status = r.status || "libre";
+        const isCortesia = status === "cortesia" || r.esCortesia === true;
         const isIngresada = status === "ingresada";
         const isApproved = ["aprobada", "confirmada", "vendida", "ocupada"].includes(status);
         const isPending = ["disputa", "pendiente", "seña", "sena"].includes(status);
 
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "table-btn" + (isIngresada ? " ingresada" : isApproved ? " approved" : isPending ? " pending" : "");
+        btn.className = "table-btn" + (isCortesia ? " cortesia" : isIngresada ? " ingresada" : isApproved ? " approved" : isPending ? " pending" : "");
         btn.style.left = table.x + "%";
         btn.style.top = table.y + "%";
         btn.textContent = table.num;
@@ -1818,16 +1845,9 @@
         planoMesas.appendChild(btn);
       });
 
-      // 2. Render Lista Resumen (ordenada naturalmente: 1 a 19, luego A a E)
+      // 2. Render Lista Resumen (ordenada naturalmente: 1 a 19 con 15Bis, luego A a E)
       mesasListContainer.innerHTML = "";
-      const sortedTables = [...TABLES_TERRAZA].sort((a, b) => {
-        const isNumA = /^\d+$/.test(a.num);
-        const isNumB = /^\d+$/.test(b.num);
-        if (isNumA && isNumB) return Number(a.num) - Number(b.num);
-        if (isNumA && !isNumB) return -1;
-        if (!isNumA && isNumB) return 1;
-        return a.num.localeCompare(b.num);
-      });
+      const sortedTables = obtenerMesasOrdenadas();
 
       sortedTables.forEach(table => {
         const mesaId = table.id;
@@ -1849,7 +1869,7 @@
             <span class="status-pill ${status}">${status}</span>
           </div>
           <div class="mesa-saldo-col" style="font-size:12px; color:var(--muted);">
-            ${saldo > 0 ? `<span style="color:var(--gold); font-weight:700;">Resta: $${Number(saldo).toLocaleString('es-AR')}</span>` : (r.nombre ? '<span style="color:var(--green)">Pagada</span>' : 'Libre')}
+            ${isCortesia ? '<span style="color:#c084fc; font-weight:700;">Cortesía VIP</span>' : (saldo > 0 ? `<span style="color:var(--gold); font-weight:700;">Resta: $${Number(saldo).toLocaleString('es-AR')}</span>` : (r.nombre ? '<span style="color:var(--green)">Pagada</span>' : 'Libre'))}
           </div>
           <div class="mesa-action-col">
             <button type="button" class="btn-calc" onclick="abrirCalculadora('${mesaId}')">Calculadora</button>
@@ -1885,7 +1905,8 @@
 
     window.abrirCalculadora = function (mesaId) {
       activeMesaId = mesaId;
-      const num = mesaId.replace("T-", "");
+      const tableObj = TABLES_TERRAZA.find(t => t.id === mesaId);
+      const num = tableObj ? tableObj.num : mesaId.replace("T-", "");
 
       calcModalTitle.textContent = "Calculadora — Mesa " + num;
       const sub = document.getElementById("calcModalSubtitle");
@@ -1918,7 +1939,7 @@
       btnSaveCalc.style.display = "block";
       btnCancelCalc.textContent = "Cerrar";
       const btnLiberarMesa = document.getElementById("btnLiberarMesa");
-      const tieneReserva = r && (r.nombre || r.status === "aprobada" || r.status === "confirmada" || r.status === "ocupada" || r.status === "vendida" || r.status === "pendiente" || r.status === "disputa");
+      const tieneReserva = r && (r.nombre || r.status === "aprobada" || r.status === "confirmada" || r.status === "ocupada" || r.status === "vendida" || r.status === "pendiente" || r.status === "disputa" || r.status === "cortesia" || r.esCortesia);
       if (btnLiberarMesa) btnLiberarMesa.style.display = tieneReserva ? "block" : "none";
 
       recalcularSaldo();
@@ -1927,11 +1948,12 @@
 
     window.cambiarEstadoRapido = async function (nuevoEstado) {
       if (!activeMesaId) return;
-      const num = activeMesaId.replace("T-", "");
+      const tableObj = TABLES_TERRAZA.find(t => t.id === activeMesaId);
+      const num = tableObj ? tableObj.num : activeMesaId.replace("T-", "");
 
       if (nuevoEstado === "libre") {
         const r = reservasJoseo[activeMesaId];
-        const tieneReserva = r && (r.nombre || r.status === "aprobada" || r.status === "confirmada" || r.status === "ocupada" || r.status === "vendida" || r.status === "pendiente" || r.status === "disputa");
+        const tieneReserva = r && (r.nombre || r.status === "aprobada" || r.status === "confirmada" || r.status === "ocupada" || r.status === "vendida" || r.status === "pendiente" || r.status === "disputa" || r.status === "cortesia" || r.esCortesia);
         if (tieneReserva) {
           const ok = confirm(`¿Estás seguro de poner la Mesa ${num} como LIBRE?\nSe eliminará la reserva actual.`);
           if (!ok) return;
@@ -2006,7 +2028,8 @@
     if (btnLiberarMesa) {
       btnLiberarMesa.addEventListener("click", async () => {
         if (!activeMesaId) return;
-        const num = activeMesaId.replace("T-", "");
+        const tableObj = TABLES_TERRAZA.find(t => t.id === activeMesaId);
+        const num = tableObj ? tableObj.num : activeMesaId.replace("T-", "");
         const ok = confirm("¿Estás seguro de LIBERAR la Mesa " + num + "?\n\nSe cancelará la reserva y la mesa quedará libre inmediatamente para todos.");
         if (!ok) return;
         btnLiberarMesa.disabled = true;

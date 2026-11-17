@@ -254,6 +254,12 @@
       border-color: #3b82f6;
       box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
     }
+    .table-btn.cortesia {
+      background: radial-gradient(circle, #c084fc 20%, #7e22ce 80%) !important;
+      border-color: #f3e8ff !important;
+      color: #fff !important;
+      box-shadow: 0 0 12px rgba(192, 132, 252, 0.75) !important;
+    }
     .table-btn.highlight {
       animation: pulseGlow 0.8s infinite alternate ease-in-out;
       z-index: 30;
@@ -455,6 +461,7 @@
         <span class="legend-item"><span class="dot free"></span>Libre</span>
         <span class="legend-item"><span class="dot pending"></span>Señada</span>
         <span class="legend-item"><span class="dot approved"></span>Vendida</span>
+        <span class="legend-item"><span class="dot cortesia" style="background:#c084fc;box-shadow:0 0 6px #c084fc;"></span>Cortesía</span>
         <span class="legend-item"><span class="dot ingresada"></span>Dentro</span>
       </div>
 
@@ -566,7 +573,8 @@
       { id:"T-17", num:"17", x:77.6, y:40.9 },
       { id:"T-18", num:"18", x:77.4, y:45.9 },
       { id:"T-19", num:"19", x:77.6, y:50.9 },
-      { id:"T-15", num:"15", x:89.9, y:41.3 },
+      { id:"T-15", num:"15", x:89.9, y:38.6 },
+      { id:"T-15B", num:"15Bis", x:89.9, y:44.8 },
       { id:"T-9",  num:"9",  x:30.1, y:64.8 },
       { id:"T-10", num:"10", x:39.0, y:64.8 },
       { id:"T-11", num:"11", x:48.0, y:64.9 },
@@ -699,13 +707,14 @@
         const r = reservasData[table.id] || {};
         const nombre = r.nombre || "";
         const status = r.status || "libre";
+        const isCortesia = status === "cortesia" || r.esCortesia === true;
         const isIngresada = status === "ingresada";
         const isApproved = ["aprobada", "confirmada", "vendida", "ocupada"].includes(status);
         const isPending = ["disputa", "pendiente", "seña", "sena"].includes(status);
 
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "table-btn" + (isIngresada ? " ingresada" : isApproved ? " approved" : isPending ? " pending" : "");
+        btn.className = "table-btn" + (isCortesia ? " cortesia" : isIngresada ? " ingresada" : isApproved ? " approved" : isPending ? " pending" : "");
         btn.style.left = table.x + "%";
         btn.style.top = table.y + "%";
         btn.textContent = table.num;
@@ -733,7 +742,7 @@
               </div>
               <div style="text-align:right;">
                 <span style="font-size:12px; color:${saldo > 0 ? 'var(--gold)' : 'var(--green)'}; font-weight:700;">
-                  ${isIngresada ? 'DENTRO' : (saldo > 0 ? 'Resta: $' + saldo.toLocaleString('es-AR') : 'PAGADA')}
+                  ${isCortesia ? 'CORTESÍA' : (isIngresada ? 'DENTRO' : (saldo > 0 ? 'Resta: $' + saldo.toLocaleString('es-AR') : 'PAGADA'))}
                 </span>
               </div>
             `;
@@ -771,19 +780,24 @@
 
     function abrirCobroModal(id) {
       activeMesaId = id;
-      const num = id.replace("T-", "");
+      const tableObj = TABLES_TERRAZA.find(t => t.id === id);
+      const num = tableObj ? tableObj.num : id.replace("T-", "");
       const r = reservasData[id] || {};
       const ex = r.excepcion || {};
       const status = r.status || "libre";
+      const isCortesia = status === "cortesia" || r.esCortesia === true;
 
       modalMesaTitle.textContent = "MESA " + num;
       modalTitular.textContent = "Cliente: " + (r.nombre || "Sin reserva asignada") + (r.contacto ? " — " + r.contacto : "");
 
       // Badge de estado
-      modalStatusBadge.textContent = status.toUpperCase();
+      modalStatusBadge.textContent = isCortesia ? "CORTESÍA" : status.toUpperCase();
       if (status === "ingresada") {
         modalStatusBadge.style.background = "rgba(59, 130, 246, 0.2)";
         modalStatusBadge.style.color = "var(--blue)";
+      } else if (isCortesia) {
+        modalStatusBadge.style.background = "rgba(168, 85, 247, 0.2)";
+        modalStatusBadge.style.color = "#d8b4fe";
       } else if (["aprobada", "confirmada", "vendida", "ocupada"].includes(status)) {
         modalStatusBadge.style.background = "rgba(225, 29, 72, 0.2)";
         modalStatusBadge.style.color = "var(--red)";
