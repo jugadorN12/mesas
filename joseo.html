@@ -126,6 +126,11 @@
       background: var(--red);
     }
 
+    .dot.cortesia {
+      background: #c084fc;
+      box-shadow: 0 0 6px #c084fc;
+    }
+
     /* Plano Mesas Container */
     .map-frame {
       position: relative;
@@ -244,6 +249,14 @@
       border-color: rgba(255, 255, 255, 0.4);
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
       color: #fff;
+      cursor: not-allowed;
+    }
+
+    .table-btn.cortesia {
+      background: radial-gradient(circle, #c084fc 20%, #7e22ce 80%) !important;
+      border-color: #f3e8ff !important;
+      color: #fff !important;
+      box-shadow: 0 0 12px rgba(192, 132, 252, 0.75) !important;
       cursor: not-allowed;
     }
 
@@ -620,6 +633,7 @@
       <div class="legend-item"><span class="dot free"></span> Libre</div>
       <div class="legend-item"><span class="dot dispute"></span> En proceso</div>
       <div class="legend-item"><span class="dot confirmed"></span> Ocupada</div>
+      <div class="legend-item"><span class="dot cortesia"></span> Cortesía</div>
     </div>
 
     <div class="map-frame" id="plano-mesas">
@@ -890,9 +904,14 @@
       renderMesas();
     });
 
+    function isReservaCortesia(r) {
+      if (!r) return false;
+      return r.status === "cortesia" || r.esCortesia === true;
+    }
+
     function isReservaOcupada(r) {
       if (!r) return false;
-      return ["aprobada", "ocupada", "vendida", "ingresada", "confirmada", "cortesia"].includes(r.status) || r.esCortesia === true;
+      return ["aprobada", "ocupada", "vendida", "ingresada", "confirmada"].includes(r.status);
     }
 
     function isReservaDisputa(r) {
@@ -917,7 +936,12 @@
         btn.style.top = table.y + "%";
         btn.style.width = "5.8%";
         btn.style.height = "3.26%";
-        if (isReservaOcupada(r)) {
+        if (isReservaCortesia(r)) {
+          btn.classList.add("cortesia");
+          btn.innerHTML = '<span class="table-label">' + table.num + '</span>';
+          btn.setAttribute("aria-label", "Mesa " + table.num + " (cortesía)");
+          ocupadas++;
+        } else if (isReservaOcupada(r)) {
           btn.classList.add("occupied");
           btn.innerHTML = '<span class="x-mark">X</span>';
           btn.setAttribute("aria-label", "Mesa " + table.num + " (ocupada)");
@@ -933,6 +957,10 @@
         }
 
         btn.addEventListener("click", () => {
+          if (isReservaCortesia(r)) {
+            showToast("La mesa " + table.num + " es de cortesía y no está disponible para reserva.");
+            return;
+          }
           if (isReservaOcupada(r)) {
             showToast("La mesa " + table.num + " ya está reservada.");
             return;
