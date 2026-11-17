@@ -1493,7 +1493,23 @@
       renderTableSelectorChips();
     };
 
-    window.aplicarPrecioAMesasSeleccionadas = function () {
+    async function guardarPreciosPorMesaEnFirestore() {
+      try {
+        await db.collection("config").doc("joseo").set({
+          preciosPorMesa: preciosPorMesaState,
+          updatedAt: Date.now(),
+          updatedBy: auth.currentUser ? auth.currentUser.email : "admin"
+        }, { merge: true });
+        console.log("Precios por mesa guardados en Firestore.");
+        return true;
+      } catch (err) {
+        console.error("Error al guardar precios por mesa:", err);
+        alert("⚠️ No se pudieron guardar los precios en la base de datos: " + err.message);
+        return false;
+      }
+    }
+
+    window.aplicarPrecioAMesasSeleccionadas = async function () {
       if (mesasSeleccionadasState.size === 0) {
         alert("⚠️ Por favor seleccioná al menos una mesa tocándola en la lista de arriba.");
         return;
@@ -1532,10 +1548,13 @@
 
       renderTableSelectorChips();
       renderCustomPricesList();
-      alert(`✅ Se asignó el valor individual de $${precio.toLocaleString('es-AR')} (Seña $${sena.toLocaleString('es-AR')}) a ${cantAfectada} mesa(s): [${mesasAfectadas.join(", ")}].\n\nQuedaron deseleccionadas para que puedas elegir el siguiente grupo de mesas limpiamente.\n\nRecordá presionar "Guardar Configuración y Diseño en Vivo" abajo para guardar los cambios.`);
+
+      await guardarPreciosPorMesaEnFirestore();
+
+      alert(`✅ ¡Precios guardados y activos!\n\nSe asignó el valor individual de $${precio.toLocaleString('es-AR')} (Seña $${sena.toLocaleString('es-AR')}) a ${cantAfectada} mesa(s): [${mesasAfectadas.join(", ")}].\n\nYa quedaron guardados en la base de datos y se reflejan de inmediato en el mapa público.`);
     };
 
-    window.restablecerMesasSeleccionadas = function () {
+    window.restablecerMesasSeleccionadas = async function () {
       if (mesasSeleccionadasState.size === 0) {
         alert("⚠️ Seleccioná las mesas que deseás volver al precio estándar.");
         return;
@@ -1546,13 +1565,15 @@
       mesasSeleccionadasState.clear();
       renderTableSelectorChips();
       renderCustomPricesList();
-      alert("✅ Las mesas seleccionadas volvieron al precio estándar general.");
+      await guardarPreciosPorMesaEnFirestore();
+      alert("✅ Las mesas seleccionadas volvieron al precio estándar general y se guardaron en vivo.");
     };
 
-    window.quitarReglaPrecioMesa = function (mesaId) {
+    window.quitarReglaPrecioMesa = async function (mesaId) {
       delete preciosPorMesaState[mesaId];
       renderTableSelectorChips();
       renderCustomPricesList();
+      await guardarPreciosPorMesaEnFirestore();
     };
 
     function renderCustomPricesList() {
@@ -1608,10 +1629,11 @@
           <button type="button" class="btn-del-rule" title="Quitar precio especial y volver al estándar">✕ Quitar</button>
         `;
 
-        item.querySelector(".btn-del-rule").addEventListener("click", () => {
+        item.querySelector(".btn-del-rule").addEventListener("click", async () => {
           grp.mesas.forEach(m => delete preciosPorMesaState[m.id]);
           renderTableSelectorChips();
           renderCustomPricesList();
+          await guardarPreciosPorMesaEnFirestore();
         });
 
         container.appendChild(item);

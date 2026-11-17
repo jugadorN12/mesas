@@ -865,8 +865,7 @@
 
       // Si el modal de reserva está abierto al momento del cambio, actualizar datos en vivo al instante
       if (typeof modalOverlay !== "undefined" && modalOverlay.classList.contains("open") && selectedTable) {
-        const total = configJoseo.valorMesa !== undefined ? configJoseo.valorMesa : 300000;
-        const sena = configJoseo.montoSena !== undefined ? configJoseo.montoSena : 50000;
+        const { valorMesa: total, montoSena: sena } = obtenerPrecioMesa(selectedTable.id);
         const saldo = Math.max(0, total - sena);
         const limite = configJoseo.horarioLimite || "03:00";
         const pctAntes = configJoseo.porcentajeAntes !== undefined ? configJoseo.porcentajeAntes : 100;
