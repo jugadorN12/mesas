@@ -96,6 +96,32 @@
       background: rgba(255, 255, 255, 0.08);
     }
 
+    .btn-reset-mesas {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-reset-mesas:hover {
+      background: rgba(239, 68, 68, 0.3);
+      border-color: #ef4444;
+      color: #fff;
+    }
+
+    .btn-reset-mesas:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .container {
       max-width: 900px;
       margin: 24px auto;
@@ -824,7 +850,10 @@
   <div id="adminApp" style="display: none;">
     <header class="top-bar">
       <div class="brand">JOSEO <span>TERRACE</span> <span id="adminRoleBadge" class="badge-role">ADMIN</span></div>
-      <button type="button" class="btn-logout" id="btnLogout">Cerrar Sesión</button>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <button type="button" class="btn-reset-mesas" id="btnResetMesasJoseo" onclick="resetearMesasJoseo()">🔄 Resetear Mesas a Cero</button>
+        <button type="button" class="btn-logout" id="btnLogout">Cerrar Sesión</button>
+      </div>
     </header>
 
     <main class="container">
@@ -1700,6 +1729,44 @@
         btnCreateStaff.disabled = false;
       }
     });
+
+    window.resetearMesasJoseo = async function () {
+      const btn = document.getElementById("btnResetMesasJoseo");
+      if (!confirm("⚠️ ¿Estás seguro de que deseás reiniciar a CERO todas las mesas de Joseo?\n\nTodas las reservas actuales quedarán eliminadas, las mesas volverán a estar libres y la recaudación volverá a $0.\n\nEsta acción no se puede deshacer.")) {
+        return;
+      }
+      if (!confirm("Confirmación final: ¿Proceder con el reseteo de todas las mesas de Joseo?")) {
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "⏳ Reseteando mesas...";
+      }
+
+      try {
+        const snap = await db.collection("reservas_joseo").get();
+        if (snap.empty) {
+          alert("Las mesas de Joseo ya están todas libres.");
+          return;
+        }
+
+        const batch = db.batch();
+        snap.forEach(doc => {
+          batch.delete(doc.ref);
+        });
+
+        await batch.commit();
+        alert("✅ ¡Todas las mesas de Joseo fueron reseteadas a cero con éxito!");
+      } catch (err) {
+        alert("❌ Error al resetear mesas de Joseo: " + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "🔄 Resetear Mesas a Cero";
+        }
+      }
+    };
   </script>
 
   <!-- Banner flotante para invitación a instalar PWA (Admin) -->
