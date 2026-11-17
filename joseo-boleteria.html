@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -7,7 +8,8 @@
   <link rel="stylesheet" href="shared.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap"
+    rel="stylesheet">
   <style>
     :root {
       --bg: #060608;
@@ -21,7 +23,12 @@
       --line: rgba(255, 255, 255, 0.08);
       --grey-line: rgba(255, 255, 255, 0.14);
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       margin: 0;
       background: var(--bg);
@@ -30,6 +37,7 @@
       min-height: 100vh;
       overflow-x: hidden;
     }
+
     .top-bar {
       padding: 12px 20px;
       display: flex;
@@ -42,8 +50,17 @@
       top: 0;
       z-index: 40;
     }
-    .brand { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; }
-    .brand span { color: var(--gold); }
+
+    .brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      letter-spacing: 2px;
+    }
+
+    .brand span {
+      color: var(--gold);
+    }
+
     .badge {
       background: rgba(16, 185, 129, 0.15);
       border: 1px solid var(--green);
@@ -54,6 +71,7 @@
       font-weight: 800;
       letter-spacing: 0.5px;
     }
+
     .btn-logout {
       background: transparent;
       border: 1px solid var(--grey-line);
@@ -65,7 +83,10 @@
       cursor: pointer;
       transition: background 0.2s;
     }
-    .btn-logout:hover { background: rgba(255, 255, 255, 0.08); }
+
+    .btn-logout:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
 
     .main-wrap {
       max-width: 520px;
@@ -79,6 +100,7 @@
       display: flex;
       gap: 10px;
     }
+
     .search-box input {
       flex: 1;
       background: #0d0d14;
@@ -90,6 +112,7 @@
       outline: none;
       transition: border-color 0.2s;
     }
+
     .search-box input:focus {
       border-color: var(--gold);
     }
@@ -101,6 +124,7 @@
       gap: 6px;
       margin-bottom: 12px;
     }
+
     .quick-card {
       background: #13131c;
       border: 1px solid var(--line);
@@ -112,6 +136,7 @@
       cursor: pointer;
       transition: background 0.15s, border-color 0.15s;
     }
+
     .quick-card:hover {
       background: #1b1b26;
       border-color: var(--gold);
@@ -127,12 +152,39 @@
       margin-bottom: 12px;
       flex-wrap: wrap;
     }
-    .legend-item { display: flex; align-items: center; gap: 5px; }
-    .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
-    .dot.free { background: var(--green); box-shadow: 0 0 6px var(--green); }
-    .dot.pending { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
-    .dot.approved { background: var(--red); box-shadow: 0 0 6px var(--red); }
-    .dot.ingresada { background: var(--blue); box-shadow: 0 0 6px var(--blue); }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot.free {
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+    }
+
+    .dot.pending {
+      background: var(--gold);
+      box-shadow: 0 0 6px var(--gold);
+    }
+
+    .dot.approved {
+      background: var(--red);
+      box-shadow: 0 0 6px var(--red);
+    }
+
+    .dot.ingresada {
+      background: var(--blue);
+      box-shadow: 0 0 6px var(--blue);
+    }
 
     /* Plano Mesas Container */
     .map-frame {
@@ -146,6 +198,7 @@
       box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
       user-select: none;
     }
+
     .map-bg-layer {
       position: absolute;
       inset: 0;
@@ -155,6 +208,7 @@
       background-repeat: no-repeat;
       pointer-events: none;
     }
+
     #mapImg {
       position: relative;
       z-index: 1;
@@ -232,42 +286,57 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
+
     .table-btn:hover {
       transform: translate(-50%, -50%) scale(1.15);
       z-index: 25;
     }
+
     .table-btn:active {
       transform: translate(-50%, -50%) scale(0.95);
     }
+
     .table-btn.pending {
       background: linear-gradient(145deg, #ffa858, #d45900 55%, #662600);
       border-color: #ff7700;
       box-shadow: 0 0 8px rgba(255, 119, 0, 0.5);
     }
+
     .table-btn.approved {
       background: linear-gradient(145deg, #ff5b66, #d20e21 55%, #70000a);
       border-color: #ff2d3d;
       box-shadow: 0 0 8px rgba(225, 29, 72, 0.5);
     }
+
     .table-btn.ingresada {
       background: linear-gradient(145deg, #58a6ff, #0a56ad 55%, #002e61);
       border-color: #3b82f6;
       box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
     }
+
     .table-btn.cortesia {
       background: radial-gradient(circle, #c084fc 20%, #7e22ce 80%) !important;
       border-color: #f3e8ff !important;
       color: #fff !important;
       box-shadow: 0 0 12px rgba(192, 132, 252, 0.75) !important;
     }
+
     .table-btn.highlight {
       animation: pulseGlow 0.8s infinite alternate ease-in-out;
       z-index: 30;
       border: 2px solid #fff;
     }
+
     @keyframes pulseGlow {
-      0% { transform: translate(-50%, -50%) scale(1.15); box-shadow: 0 0 12px #ff7700; }
-      100% { transform: translate(-50%, -50%) scale(1.45); box-shadow: 0 0 25px #ff7700, 0 0 35px #ff7700; }
+      0% {
+        transform: translate(-50%, -50%) scale(1.15);
+        box-shadow: 0 0 12px #ff7700;
+      }
+
+      100% {
+        transform: translate(-50%, -50%) scale(1.45);
+        box-shadow: 0 0 25px #ff7700, 0 0 35px #ff7700;
+      }
     }
 
     /* Modal de Cobro */
@@ -282,7 +351,11 @@
       justify-content: center;
       padding: 16px;
     }
-    .modal-overlay.open { display: flex; }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
     .modal-box {
       width: 100%;
       max-width: 440px;
@@ -294,6 +367,7 @@
       overflow-y: auto;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
     }
+
     .saldo-box {
       background: rgba(255, 119, 0, 0.12);
       border: 1px solid var(--gold);
@@ -302,8 +376,21 @@
       text-align: center;
       margin: 16px 0;
     }
-    .saldo-label { font-size: 12px; color: var(--gold); text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
-    .saldo-val { font-family: 'Bebas Neue', sans-serif; font-size: 38px; color: #fff; letter-spacing: 1px; }
+
+    .saldo-label {
+      font-size: 12px;
+      color: var(--gold);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .saldo-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 38px;
+      color: #fff;
+      letter-spacing: 1px;
+    }
 
     .voucher-box {
       background: rgba(16, 185, 129, 0.1);
@@ -313,7 +400,15 @@
       margin-bottom: 16px;
       font-size: 13px;
     }
-    .voucher-title { font-weight: 700; color: #10b981; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+
+    .voucher-title {
+      font-weight: 700;
+      color: #10b981;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
     .btn-pay {
       padding: 14px;
@@ -329,17 +424,67 @@
       justify-content: center;
       gap: 6px;
     }
-    .btn-cash { background: #10b981; color: #000; }
-    .btn-transf { background: #3b82f6; color: #fff; }
-    .btn-cancel { background: rgba(255, 255, 255, 0.1); color: #fff; margin-top: 6px; }
+
+    .btn-cash {
+      background: #10b981;
+      color: #000;
+    }
+
+    .btn-transf {
+      background: #3b82f6;
+      color: #fff;
+    }
+
+    .btn-cancel {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      margin-top: 6px;
+    }
 
     /* Login */
-    .login-wrap { max-width: 360px; margin: 15vh auto; padding: 24px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
-    .login-wrap h1 { margin: 0 0 16px; font-size: 22px; text-align: center; font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; }
-    .login-wrap h1 span { color: var(--gold); }
-    .login-wrap input { width: 100%; background: #060608; border: 1px solid var(--grey-line); border-radius: 8px; padding: 12px; color: #fff; margin-bottom: 12px; box-sizing: border-box; }
-    .login-wrap button { width: 100%; padding: 12px; background: var(--gold); color: #fff; font-weight: 800; border: none; border-radius: 8px; cursor: pointer; }
-  
+    .login-wrap {
+      max-width: 360px;
+      margin: 15vh auto;
+      padding: 24px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    .login-wrap h1 {
+      margin: 0 0 16px;
+      font-size: 22px;
+      text-align: center;
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 2px;
+    }
+
+    .login-wrap h1 span {
+      color: var(--gold);
+    }
+
+    .login-wrap input {
+      width: 100%;
+      background: #060608;
+      border: 1px solid var(--grey-line);
+      border-radius: 8px;
+      padding: 12px;
+      color: #fff;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+    }
+
+    .login-wrap button {
+      width: 100%;
+      padding: 12px;
+      background: var(--gold);
+      color: #fff;
+      font-weight: 800;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
     /* Control de Caja en Boletería */
     .bol-caja-card {
       background: rgba(17, 17, 22, 0.95);
@@ -347,8 +492,9 @@
       border-radius: 12px;
       padding: 12px 14px;
       margin-bottom: 12px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
+
     .bol-caja-header {
       display: flex;
       justify-content: space-between;
@@ -358,6 +504,7 @@
       color: #ff7700;
       margin-bottom: 10px;
     }
+
     .bol-caja-pill {
       font-size: 11px;
       background: rgba(59, 130, 246, 0.15);
@@ -367,19 +514,23 @@
       border-radius: 12px;
       font-weight: 700;
     }
+
     .bol-caja-grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 8px;
     }
+
     @media (max-width: 480px) {
       .bol-caja-grid {
         grid-template-columns: 1fr 1fr;
       }
+
       .bol-stat-box.total {
         grid-column: span 2;
       }
     }
+
     .bol-stat-box {
       background: rgba(0, 0, 0, 0.4);
       border: 1px solid var(--line);
@@ -389,12 +540,31 @@
       flex-direction: column;
       gap: 2px;
     }
-    .bol-stat-box.cash { border-color: rgba(16, 185, 129, 0.3); }
-    .bol-stat-box.cash .bol-stat-val { color: #10b981; }
-    .bol-stat-box.transf { border-color: rgba(59, 130, 246, 0.3); }
-    .bol-stat-box.transf .bol-stat-val { color: #3b82f6; }
-    .bol-stat-box.total { border-color: rgba(255, 119, 0, 0.4); }
-    .bol-stat-box.total .bol-stat-val { color: #ff7700; }
+
+    .bol-stat-box.cash {
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .bol-stat-box.cash .bol-stat-val {
+      color: #10b981;
+    }
+
+    .bol-stat-box.transf {
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .bol-stat-box.transf .bol-stat-val {
+      color: #3b82f6;
+    }
+
+    .bol-stat-box.total {
+      border-color: rgba(255, 119, 0, 0.4);
+    }
+
+    .bol-stat-box.total .bol-stat-val {
+      color: #ff7700;
+    }
+
     .bol-stat-label {
       font-size: 10.5px;
       color: var(--muted);
@@ -402,14 +572,15 @@
       text-transform: uppercase;
       letter-spacing: 0.3px;
     }
+
     .bol-stat-val {
       font-size: 15px;
       font-weight: 800;
       font-family: 'Inter', sans-serif;
     }
-
   </style>
 </head>
+
 <body>
 
   <!-- Vista Login -->
@@ -429,7 +600,7 @@
     </header>
 
     <main class="main-wrap">
-            <!-- Control de Caja en Boletería en Tiempo Real -->
+      <!-- Control de Caja en Boletería en Tiempo Real -->
       <div class="bol-caja-card">
         <div class="bol-caja-header">
           <span>💰 Control de Caja en Puerta (En Vivo)</span>
@@ -461,7 +632,8 @@
         <span class="legend-item"><span class="dot free"></span>Libre</span>
         <span class="legend-item"><span class="dot pending"></span>Señada</span>
         <span class="legend-item"><span class="dot approved"></span>Vendida</span>
-        <span class="legend-item"><span class="dot cortesia" style="background:#c084fc;box-shadow:0 0 6px #c084fc;"></span>Cortesía</span>
+        <span class="legend-item"><span class="dot cortesia"
+            style="background:#c084fc;box-shadow:0 0 6px #c084fc;"></span>Cortesía</span>
         <span class="legend-item"><span class="dot ingresada"></span>Dentro</span>
       </div>
 
@@ -480,8 +652,10 @@
   <div class="modal-overlay" id="cobroModal">
     <div class="modal-box">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-        <h2 id="modalMesaTitle" style="margin: 0; font-size: 24px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1.5px;">MESA --</h2>
-        <span id="modalStatusBadge" style="font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px;">ESTADO</span>
+        <h2 id="modalMesaTitle"
+          style="margin: 0; font-size: 24px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1.5px;">MESA --</h2>
+        <span id="modalStatusBadge"
+          style="font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px;">ESTADO</span>
       </div>
       <p id="modalTitular" style="margin: 0 0 14px; font-size: 13px; color: var(--muted);">Cliente: --</p>
 
@@ -493,8 +667,11 @@
 
       <div class="voucher-box" id="voucherBox">
         <div class="voucher-title">🍹 Consumo y Beneficios a Entregar:</div>
-        <div id="consumoBeneficioBox" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px; margin-bottom: 8px;">
-          <div id="consumoBadge" style="display:inline-block; font-size:11px; font-weight:800; padding:2px 8px; border-radius:4px; margin-bottom:4px;">HORARIO</div>
+        <div id="consumoBeneficioBox"
+          style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px; margin-bottom: 8px;">
+          <div id="consumoBadge"
+            style="display:inline-block; font-size:11px; font-weight:800; padding:2px 8px; border-radius:4px; margin-bottom:4px;">
+            HORARIO</div>
           <div id="consumoMontoCalculado" style="font-size:16px; font-weight:800; color:#10b981;">$0 en consumo</div>
           <div id="consumoDetalleRegla" style="font-size:11.5px; color:var(--muted); margin-top:2px;"></div>
         </div>
@@ -512,12 +689,14 @@
         <button type="button" class="btn-pay btn-transf" id="btnCobroTransferencia">
           💳 Cobrar Saldo con Transferencia (Marcar Ingreso)
         </button>
-        <button type="button" class="btn-pay btn-cash" id="btnMarcarIngresadaDirecta" style="background: var(--blue); color:#fff; display:none;">
+        <button type="button" class="btn-pay btn-cash" id="btnMarcarIngresadaDirecta"
+          style="background: var(--blue); color:#fff; display:none;">
           ✅ Marcar Ingreso Directo (Saldo $0)
         </button>
       </div>
 
-      <div id="yaIngresadaNotice" style="display:none; text-align:center; padding: 12px; background: rgba(59, 130, 246, 0.15); border: 1px solid var(--blue); border-radius: 8px; font-size: 13px; color: #93c5fd; margin-bottom: 8px;">
+      <div id="yaIngresadaNotice"
+        style="display:none; text-align:center; padding: 12px; background: rgba(59, 130, 246, 0.15); border: 1px solid var(--blue); border-radius: 8px; font-size: 13px; color: #93c5fd; margin-bottom: 8px;">
         ℹ️ Esta mesa ya ingresó al evento.
       </div>
 
@@ -529,7 +708,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script>
-    const firebaseConfig = {apiKey:"AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY",authDomain:"mesas-cubano-bar.firebaseapp.com",projectId:"mesas-cubano-bar",storageBucket:"mesas-cubano-bar.firebasestorage.app",messagingSenderId:"1072135346765",appId:"1:1072135346765:web:e8a6ee5497366a8b1f5a04"};
+    const firebaseConfig = { apiKey: "AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY", authDomain: "mesas-cubano-bar.firebaseapp.com", projectId: "mesas-cubano-bar", storageBucket: "mesas-cubano-bar.firebasestorage.app", messagingSenderId: "1072135346765", appId: "1:1072135346765:web:e8a6ee5497366a8b1f5a04" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
@@ -556,31 +735,31 @@
 
     // Coordenadas exactas de mesas en Terraza (terraza.png)
     const TABLES_TERRAZA = [
-      { id:"T-3",  num:"3",  x:11.1, y:36.3 },
-      { id:"T-4",  num:"4",  x:19.2, y:34.6 },
-      { id:"T-5",  num:"5",  x:26.4, y:34.6 },
-      { id:"T-6",  num:"6",  x:49.3, y:36.9 },
-      { id:"T-7",  num:"7",  x:37.1, y:41.9 },
-      { id:"T-A",  num:"A",  x:24.0, y:46.1 },
-      { id:"T-B",  num:"B",  x:36.8, y:46.1 },
-      { id:"T-C",  num:"C",  x:49.3, y:46.1 },
-      { id:"T-D",  num:"D",  x:36.8, y:52.6 },
-      { id:"T-E",  num:"E",  x:49.3, y:52.6 },
-      { id:"T-2",  num:"2",  x:11.1, y:43.7 },
-      { id:"T-1",  num:"1",  x:11.1, y:50.9 },
-      { id:"T-8",  num:"8",  x:18.6, y:52.8 },
-      { id:"T-16", num:"16", x:72.3, y:34.2 },
-      { id:"T-17", num:"17", x:77.6, y:40.9 },
-      { id:"T-18", num:"18", x:77.4, y:45.9 },
-      { id:"T-19", num:"19", x:77.6, y:50.9 },
-      { id:"T-15", num:"15", x:89.9, y:38.6 },
-      { id:"T-15B", num:"15Bis", x:89.9, y:44.8 },
-      { id:"T-9",  num:"9",  x:30.1, y:64.8 },
-      { id:"T-10", num:"10", x:39.0, y:64.8 },
-      { id:"T-11", num:"11", x:48.0, y:64.9 },
-      { id:"T-12", num:"12", x:57.0, y:64.8 },
-      { id:"T-13", num:"13", x:80.8, y:64.8 },
-      { id:"T-14", num:"14", x:88.4, y:64.8 }
+      { id: "T-3", num: "3", x: 11.1, y: 36.3 },
+      { id: "T-4", num: "4", x: 19.2, y: 34.6 },
+      { id: "T-5", num: "5", x: 26.4, y: 34.6 },
+      { id: "T-6", num: "6", x: 49.3, y: 36.9 },
+      { id: "T-7", num: "7", x: 37.1, y: 41.9 },
+      { id: "T-A", num: "A", x: 24.0, y: 46.1 },
+      { id: "T-B", num: "B", x: 36.8, y: 46.1 },
+      { id: "T-C", num: "C", x: 49.3, y: 46.1 },
+      { id: "T-D", num: "D", x: 36.8, y: 52.6 },
+      { id: "T-E", num: "E", x: 49.3, y: 52.6 },
+      { id: "T-2", num: "2", x: 11.1, y: 43.7 },
+      { id: "T-1", num: "1", x: 11.1, y: 50.9 },
+      { id: "T-8", num: "8", x: 18.6, y: 52.8 },
+      { id: "T-16", num: "16", x: 72.3, y: 34.2 },
+      { id: "T-17", num: "17", x: 77.6, y: 40.9 },
+      { id: "T-18", num: "18", x: 77.4, y: 45.9 },
+      { id: "T-19", num: "19", x: 77.6, y: 50.9 },
+      { id: "T-15", num: "15", x: 89.9, y: 38.4 },
+      { id: "T-15B", num: "15Bis", x: 89.9, y: 43.9 },
+      { id: "T-9", num: "9", x: 30.1, y: 64.8 },
+      { id: "T-10", num: "10", x: 39.0, y: 64.8 },
+      { id: "T-11", num: "11", x: 48.0, y: 64.9 },
+      { id: "T-12", num: "12", x: 57.0, y: 64.8 },
+      { id: "T-13", num: "13", x: 80.8, y: 64.8 },
+      { id: "T-14", num: "14", x: 88.4, y: 64.8 }
     ];
 
     let reservasData = {};
@@ -662,7 +841,7 @@
       });
     }
 
-    
+
     function updateBoleteriaCaja() {
       let cash = 0;
       let transf = 0;
@@ -949,4 +1128,5 @@
     btnMarcarIngresadaDirecta.addEventListener("click", () => registrarCobro("sin_cobro"));
   </script>
 </body>
+
 </html>
