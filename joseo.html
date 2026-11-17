@@ -950,15 +950,28 @@
       freeTablesCount.textContent = libres + (libres === 1 ? " mesa libre" : " mesas libres");
     }
 
+    function obtenerPrecioMesa(mesaId) {
+      if (configJoseo.preciosPorMesa && configJoseo.preciosPorMesa[mesaId]) {
+        const custom = configJoseo.preciosPorMesa[mesaId];
+        return {
+          valorMesa: Number(custom.valorMesa) || Number(configJoseo.valorMesa) || 385000,
+          montoSena: Number(custom.montoSena) || Number(configJoseo.montoSena) || 50000
+        };
+      }
+      return {
+        valorMesa: Number(configJoseo.valorMesa) || 385000,
+        montoSena: Number(configJoseo.montoSena) || 50000
+      };
+    }
+
     function abrirModal(table) {
       selectedTable = table;
       modalMesaTitle.textContent = "MESA " + table.num + " — JOSEO TERRACE";
       inputNombre.value = "";
       inputContacto.value = "";
 
-      // Cargar valores de configuración en la tarjeta
-      const total = configJoseo.valorMesa !== undefined ? configJoseo.valorMesa : 300000;
-      const sena = configJoseo.montoSena !== undefined ? configJoseo.montoSena : 50000;
+      // Cargar valores de configuración de la mesa (precio personalizado o estándar)
+      const { valorMesa: total, montoSena: sena } = obtenerPrecioMesa(table.id);
       const saldo = Math.max(0, total - sena);
       const limite = configJoseo.horarioLimite || "03:00";
       const pctAntes = configJoseo.porcentajeAntes !== undefined ? configJoseo.porcentajeAntes : 100;
@@ -1034,13 +1047,11 @@
       try {
         const mesaId = selectedTable.id;
         const num = selectedTable.num;
-        const montoSena = configJoseo.montoSena !== undefined ? configJoseo.montoSena : 50000;
+        const { valorMesa: totalMesa, montoSena } = obtenerPrecioMesa(mesaId);
         const alias = configJoseo.alias || "No configurado";
         const titular = configJoseo.titular || "Joseo";
         const cbu = configJoseo.cbu || "";
         const waNumber = (configJoseo.whatsapp || "").replace(/[^0-9]/g, "");
-
-        const totalMesa = configJoseo.valorMesa !== undefined ? configJoseo.valorMesa : 300000;
         const saldoPuerta = Math.max(0, totalMesa - montoSena);
 
         // Guardar reserva temporal en disputa por 15 minutos

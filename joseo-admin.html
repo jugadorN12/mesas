@@ -122,6 +122,105 @@
       cursor: not-allowed;
     }
 
+    /* Selector de Mesas para Precios Personalizados */
+    .btn-sm {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-sm:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--gold);
+    }
+
+    .chip-table {
+      background: #0f1016;
+      border: 1px solid var(--grey-line);
+      color: #94a3b8;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .chip-table:hover {
+      border-color: rgba(255, 189, 62, 0.5);
+      color: #fff;
+    }
+    .chip-table.selected {
+      background: rgba(255, 189, 62, 0.22);
+      border-color: var(--gold);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(255, 189, 62, 0.3);
+      transform: translateY(-1px);
+    }
+    .chip-table.has-custom {
+      border-color: rgba(34, 197, 94, 0.5);
+    }
+    .chip-table.has-custom::after {
+      content: '★';
+      font-size: 10px;
+      color: #4ade80;
+    }
+
+    .custom-price-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12.5px;
+    }
+    .custom-price-item .btn-del-rule {
+      background: transparent;
+      border: none;
+      color: #f87171;
+      font-size: 13px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .custom-price-item .btn-del-rule:hover {
+      background: rgba(239, 68, 68, 0.15);
+    }
+
+    /* Botones de Cambio Rápido de Estado en Modal */
+    .btn-fast-status {
+      padding: 10px 6px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.18s ease;
+      user-select: none;
+    }
+    .btn-fast-status:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.2);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+    }
+    .btn-fast-status:active {
+      transform: translateY(0);
+    }
+
     .container {
       max-width: 900px;
       margin: 24px auto;
@@ -984,15 +1083,58 @@
 
         <!-- Bloque 1: Precios de Mesas y Seña -->
         <div class="config-block">
-          <div class="config-block-title gold">🏷️ Valor de Mesas y Seña</div>
+          <div class="config-block-title gold">🏷️ Valor Estándar de Mesas y Seña (General)</div>
+          <p style="font-size:12px; color:var(--muted); margin:0 0 10px;">Este es el precio por defecto que tendrán todas las mesas, salvo las que configures con precio especial abajo.</p>
           <div class="form-row-2">
             <div class="form-group">
-              <label for="cfgValorMesa">Valor total estándar de la mesa ($)</label>
-              <input type="number" id="cfgValorMesa" placeholder="300000" step="5000">
+              <label for="cfgValorMesa">Valor total estándar por mesa ($)</label>
+              <input type="number" id="cfgValorMesa" placeholder="385000" step="5000">
             </div>
             <div class="form-group">
-              <label for="cfgMontoSena">Monto de seña fija para reservar ($)</label>
+              <label for="cfgMontoSena">Monto de seña fija estándar ($)</label>
               <input type="number" id="cfgMontoSena" placeholder="50000" step="5000">
+            </div>
+          </div>
+
+          <!-- Asignador de precios individuales o por grupos de mesas -->
+          <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--grey-line);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+              <span style="font-size:13px; font-weight:800; color:var(--gold);">🎯 Precios Especiales por Mesa o Grupos de Mesas</span>
+              <div style="display:flex; gap:6px;">
+                <button type="button" class="btn-sm" id="btnSelectAllTables" onclick="toggleSelectAllTables(true)">Seleccionar todas</button>
+                <button type="button" class="btn-sm" id="btnDeselectAllTables" onclick="toggleSelectAllTables(false)">Deseleccionar</button>
+              </div>
+            </div>
+            <p style="font-size:12px; color:var(--muted); margin:0 0 12px;">Tocá una o varias mesas para seleccionarlas y definí el <b>valor individual</b> que tendrá cada una:</p>
+
+            <!-- Pills interactivas de las 24 mesas -->
+            <div id="tableSelectorChips" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px;"></div>
+
+            <div style="background:rgba(255,189,62,0.05); border:1px solid rgba(255,189,62,0.25); border-radius:10px; padding:14px; margin-bottom:12px;">
+              <div style="font-size:12.5px; font-weight:700; color:#fff; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                <span id="selectedTablesCountLabel">0 mesas seleccionadas</span>
+                <span style="font-size:11px; color:var(--gold); font-weight:600;">* El valor asignado aplica a cada mesa individualmente</span>
+              </div>
+              <div class="form-row-2" style="margin-bottom:10px;">
+                <div class="form-group">
+                  <label for="customTablePrice">Valor individual de cada mesa seleccionada ($)</label>
+                  <input type="number" id="customTablePrice" placeholder="Ej.: 400000" step="5000">
+                </div>
+                <div class="form-group">
+                  <label for="customTableSena">Seña individual para cada mesa ($)</label>
+                  <input type="number" id="customTableSena" placeholder="Ej.: 50000" step="5000">
+                </div>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="btn-action" style="flex:1; max-width:280px; padding:9px 16px; font-size:13px;" onclick="aplicarPrecioAMesasSeleccionadas()">Aplicar a seleccionadas</button>
+                <button type="button" class="btn-logout" style="font-size:12px; border-color:rgba(255,255,255,0.2);" onclick="restablecerMesasSeleccionadas()">Volver a precio estándar</button>
+              </div>
+            </div>
+
+            <!-- Resumen de mesas con precios especiales -->
+            <div style="margin-top:12px;">
+              <div style="font-size:11.5px; font-weight:700; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">📋 Resumen de mesas con precio diferenciado:</div>
+              <div id="customPricesList" style="display:flex; flex-direction:column; gap:6px;"></div>
             </div>
           </div>
         </div>
@@ -1078,6 +1220,18 @@
         Mesa --</h2>
       <p id="calcModalSubtitle" style="margin:0 0 16px; font-size:13px; color:var(--muted);">Configurá precios, señas,
         cobro en puerta y vouchers de bebidas.</p>
+
+      <!-- Botonera de Estado Rápido a 1 Toque -->
+      <div style="margin-bottom: 16px; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+        <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gold); display: block; margin-bottom: 8px; font-weight: 800;">⚡ Cambiar estado rápido (1 toque):</label>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(95px, 1fr)); gap: 6px;">
+          <button type="button" class="btn-fast-status" onclick="cambiarEstadoRapido('libre')" style="background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.4); color: #4ade80;">🟢 LIBRE</button>
+          <button type="button" class="btn-fast-status" onclick="cambiarEstadoRapido('disputa')" style="background: rgba(234,179,8,0.12); border: 1px solid rgba(234,179,8,0.4); color: #fde047;">🟡 DISPUTA</button>
+          <button type="button" class="btn-fast-status" onclick="cambiarEstadoRapido('aprobada')" style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.4); color: #fca5a5;">🔴 VENDIDA</button>
+          <button type="button" class="btn-fast-status" onclick="cambiarEstadoRapido('cortesia')" style="background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.4); color: #d8b4fe;">🟣 CORTESÍA</button>
+          <button type="button" class="btn-fast-status" onclick="cambiarEstadoRapido('ingresada')" style="background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.4); color: #93c5fd;">🔵 PUERTA</button>
+        </div>
+      </div>
 
       <div class="calc-grid">
         <div>
@@ -1209,6 +1363,175 @@
     let reservasJoseo = {};
     let configJoseo = {};
     let activeMesaId = null;
+    let preciosPorMesaState = {};
+    let mesasSeleccionadasState = new Set();
+
+    function obtenerMesasOrdenadas() {
+      return [...TABLES_TERRAZA].sort((a, b) => {
+        const numA = parseInt(a.num, 10);
+        const numB = parseInt(b.num, 10);
+        if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+        if (!isNaN(numA)) return -1;
+        if (!isNaN(numB)) return 1;
+        return a.num.localeCompare(b.num);
+      });
+    }
+
+    function renderTableSelectorChips() {
+      const container = document.getElementById("tableSelectorChips");
+      const labelCount = document.getElementById("selectedTablesCountLabel");
+      if (!container) return;
+
+      container.innerHTML = "";
+      const mesasOrdenadas = obtenerMesasOrdenadas();
+
+      mesasOrdenadas.forEach(table => {
+        const isSelected = mesasSeleccionadasState.has(table.id);
+        const hasCustom = !!preciosPorMesaState[table.id];
+
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "chip-table" + (isSelected ? " selected" : "") + (hasCustom ? " has-custom" : "");
+        chip.textContent = "Mesa " + table.num;
+        chip.title = hasCustom ? `Precio individual: $${Number(preciosPorMesaState[table.id].valorMesa).toLocaleString('es-AR')}` : "Usa precio estándar";
+
+        chip.addEventListener("click", () => {
+          if (mesasSeleccionadasState.has(table.id)) {
+            mesasSeleccionadasState.delete(table.id);
+          } else {
+            mesasSeleccionadasState.add(table.id);
+          }
+          renderTableSelectorChips();
+        });
+
+        container.appendChild(chip);
+      });
+
+      if (labelCount) {
+        const cant = mesasSeleccionadasState.size;
+        labelCount.textContent = cant === 0
+          ? "0 mesas seleccionadas"
+          : (cant === 1 ? "1 mesa seleccionada" : `${cant} mesas seleccionadas`);
+      }
+    }
+
+    window.toggleSelectAllTables = function (selectAll) {
+      if (selectAll) {
+        TABLES_TERRAZA.forEach(t => mesasSeleccionadasState.add(t.id));
+      } else {
+        mesasSeleccionadasState.clear();
+      }
+      renderTableSelectorChips();
+    };
+
+    window.aplicarPrecioAMesasSeleccionadas = function () {
+      if (mesasSeleccionadasState.size === 0) {
+        alert("⚠️ Por favor seleccioná al menos una mesa tocándola en la lista de arriba.");
+        return;
+      }
+      const priceInput = document.getElementById("customTablePrice");
+      const senaInput = document.getElementById("customTableSena");
+      const precio = Number(priceInput.value);
+      const sena = Number(senaInput.value);
+
+      if (isNaN(precio) || precio <= 0) {
+        alert("⚠️ Ingresá un valor válido para la mesa.");
+        if (priceInput) priceInput.focus();
+        return;
+      }
+      if (isNaN(sena) || sena < 0) {
+        alert("⚠️ Ingresá un monto de seña válido.");
+        if (senaInput) senaInput.focus();
+        return;
+      }
+
+      mesasSeleccionadasState.forEach(mesaId => {
+        preciosPorMesaState[mesaId] = {
+          valorMesa: Math.round(precio),
+          montoSena: Math.round(sena)
+        };
+      });
+
+      renderTableSelectorChips();
+      renderCustomPricesList();
+      alert(`✅ Se asignó el valor individual de $${precio.toLocaleString('es-AR')} (Seña $${sena.toLocaleString('es-AR')}) a ${mesasSeleccionadasState.size} mesa(s).\n\nRecordá presionar "Guardar Configuración y Diseño en Vivo" abajo para guardar los cambios.`);
+    };
+
+    window.restablecerMesasSeleccionadas = function () {
+      if (mesasSeleccionadasState.size === 0) {
+        alert("⚠️ Seleccioná las mesas que deseás volver al precio estándar.");
+        return;
+      }
+      mesasSeleccionadasState.forEach(mesaId => {
+        delete preciosPorMesaState[mesaId];
+      });
+      renderTableSelectorChips();
+      renderCustomPricesList();
+      alert("✅ Las mesas seleccionadas volvieron al precio estándar general.");
+    };
+
+    window.quitarReglaPrecioMesa = function (mesaId) {
+      delete preciosPorMesaState[mesaId];
+      renderTableSelectorChips();
+      renderCustomPricesList();
+    };
+
+    function renderCustomPricesList() {
+      const container = document.getElementById("customPricesList");
+      if (!container) return;
+
+      const keys = Object.keys(preciosPorMesaState);
+      if (keys.length === 0) {
+        container.innerHTML = `<div style="font-size:12px; color:var(--muted); font-style:italic; padding:6px 0;">Todas las mesas usan actualmente el precio estándar general.</div>`;
+        return;
+      }
+
+      const grupos = {};
+      keys.forEach(id => {
+        const c = preciosPorMesaState[id];
+        const keyGroup = `${c.valorMesa}_${c.montoSena}`;
+        if (!grupos[keyGroup]) {
+          grupos[keyGroup] = {
+            valorMesa: c.valorMesa,
+            montoSena: c.montoSena,
+            mesas: []
+          };
+        }
+        const num = id.replace("T-", "");
+        grupos[keyGroup].mesas.push({ id, num });
+      });
+
+      container.innerHTML = "";
+      Object.values(grupos).forEach(grp => {
+        grp.mesas.sort((a, b) => {
+          const numA = parseInt(a.num, 10);
+          const numB = parseInt(b.num, 10);
+          if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+          return a.num.localeCompare(b.num);
+        });
+
+        const item = document.createElement("div");
+        item.className = "custom-price-item";
+        const nombresMesas = grp.mesas.map(m => "Mesa " + m.num).join(", ");
+
+        item.innerHTML = `
+          <div>
+            <strong style="color:var(--gold);">${nombresMesas}</strong>
+            <span style="color:#fff; margin-left:8px; font-weight:700;">$${Number(grp.valorMesa).toLocaleString('es-AR')}</span>
+            <small style="color:var(--muted); margin-left:6px;">(Seña: $${Number(grp.montoSena).toLocaleString('es-AR')} c/u)</small>
+          </div>
+          <button type="button" class="btn-del-rule" title="Quitar precio especial y volver al estándar">✕ Quitar</button>
+        `;
+
+        item.querySelector(".btn-del-rule").addEventListener("click", () => {
+          grp.mesas.forEach(m => delete preciosPorMesaState[m.id]);
+          renderTableSelectorChips();
+          renderCustomPricesList();
+        });
+
+        container.appendChild(item);
+      });
+    }
 
     window.switchView = function (view) {
       if (view === 'map') {
@@ -1326,6 +1649,10 @@
         if (cfgEventDate) cfgEventDate.value = c.eventDate || c.terraceDate || "";
         if (cfgLogoUrl) cfgLogoUrl.value = c.logoUrl || "";
         if (cfgBgUrl) cfgBgUrl.value = c.bgUrl || "";
+
+        preciosPorMesaState = c.preciosPorMesa ? { ...c.preciosPorMesa } : {};
+        renderTableSelectorChips();
+        renderCustomPricesList();
         if (cfgCbu) cfgCbu.value = c.cbu || "";
         if (cfgWhatsapp) cfgWhatsapp.value = c.whatsapp || "";
       });
@@ -1512,8 +1839,9 @@
 
       calcNombre.value = r.nombre || "";
       calcContacto.value = r.contacto || "";
-      const defaultTotal = configJoseo.valorMesa !== undefined ? configJoseo.valorMesa : 300000;
-      const defaultSena = configJoseo.montoSena !== undefined ? configJoseo.montoSena : 50000;
+      const customPrice = preciosPorMesaState[mesaId] || (configJoseo.preciosPorMesa && configJoseo.preciosPorMesa[mesaId]) || null;
+      const defaultTotal = customPrice ? Number(customPrice.valorMesa) : (configJoseo.valorMesa !== undefined ? configJoseo.valorMesa : 385000);
+      const defaultSena = customPrice ? Number(customPrice.montoSena) : (configJoseo.montoSena !== undefined ? configJoseo.montoSena : 50000);
       calcValorTotal.value = ex.valorPactado !== undefined ? ex.valorPactado : (r.valorTotal !== undefined ? r.valorTotal : defaultTotal);
       calcMontoSena.value = ex.senaPactada !== undefined ? ex.senaPactada : (r.montoSenado !== undefined ? r.montoSenado : (r.nombre ? 0 : defaultSena));
       calcPersonas.value = ex.personas !== undefined ? ex.personas : 4;
@@ -1536,6 +1864,78 @@
 
       recalcularSaldo();
       calcModalOverlay.classList.add("open");
+    };
+
+    window.cambiarEstadoRapido = async function (nuevoEstado) {
+      if (!activeMesaId) return;
+      const num = activeMesaId.replace("T-", "");
+
+      if (nuevoEstado === "libre") {
+        const r = reservasJoseo[activeMesaId];
+        const tieneReserva = r && (r.nombre || r.status === "aprobada" || r.status === "confirmada" || r.status === "ocupada" || r.status === "vendida" || r.status === "pendiente" || r.status === "disputa");
+        if (tieneReserva) {
+          const ok = confirm(`¿Estás seguro de poner la Mesa ${num} como LIBRE?\nSe eliminará la reserva actual.`);
+          if (!ok) return;
+        }
+        try {
+          await db.collection("reservas_joseo").doc(activeMesaId).delete();
+          calcModalOverlay.classList.remove("open");
+          activeMesaId = null;
+        } catch (err) {
+          alert("Error: " + err.message);
+        }
+        return;
+      }
+
+      const total = Number(calcValorTotal.value) || 0;
+      const sena = Number(calcMontoSena.value) || 0;
+      const saldo = Math.max(0, total - sena);
+      const nombre = calcNombre.value.trim() || (nuevoEstado === "cortesia" ? "Cortesía VIP" : `Mesa ${num}`);
+      const contacto = calcContacto.value.trim();
+      const medioSena = document.getElementById("calcMedioPagoSena") ? document.getElementById("calcMedioPagoSena").value : "transferencia";
+
+      let valorFinal = total;
+      let senaFinal = sena;
+      let saldoFinal = saldo;
+      let esCortesia = false;
+      if (nuevoEstado === "cortesia") {
+        esCortesia = true;
+        valorFinal = 0;
+        senaFinal = 0;
+        saldoFinal = 0;
+      }
+
+      try {
+        await db.collection("reservas_joseo").doc(activeMesaId).set({
+          nombre: nombre,
+          contacto: contacto,
+          status: nuevoEstado,
+          esCortesia: esCortesia,
+          valorTotal: valorFinal,
+          montoSenado: senaFinal,
+          medioPagoSena: medioSena,
+          saldoPuerta: saldoFinal,
+          sector: "terrace_soul",
+          updatedAt: Date.now(),
+          updatedBy: auth.currentUser ? auth.currentUser.email : "admin",
+          excepcion: {
+            activa: true,
+            valorPactado: valorFinal,
+            senaPactada: senaFinal,
+            saldoEnPuerta: saldoFinal,
+            personas: Number(calcPersonas.value) || 4,
+            bebidas: calcBebidas.value.trim(),
+            nota: calcNota.value.trim(),
+            updatedAt: Date.now(),
+            responsable: auth.currentUser ? auth.currentUser.email : "admin"
+          }
+        }, { merge: true });
+
+        calcModalOverlay.classList.remove("open");
+        activeMesaId = null;
+      } catch (err) {
+        alert("Error al actualizar estado: " + err.message);
+      }
     };
 
     btnCancelCalc.addEventListener("click", () => {
@@ -1604,6 +2004,7 @@
             terraceDate: document.getElementById("cfgEventDate") ? document.getElementById("cfgEventDate").value.trim() : "",
             logoUrl: document.getElementById("cfgLogoUrl") ? document.getElementById("cfgLogoUrl").value.trim() : "",
             bgUrl: document.getElementById("cfgBgUrl") ? document.getElementById("cfgBgUrl").value.trim() : "",
+            preciosPorMesa: preciosPorMesaState,
             updatedAt: Date.now(),
             updatedBy: auth.currentUser.email
           }, { merge: true });
