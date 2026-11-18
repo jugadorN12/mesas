@@ -1196,8 +1196,11 @@
               <div id="customPricesList" style="display:flex; flex-direction:column; gap:6px;"></div>
             </div>
 
-            <div style="margin-top:14px; padding-top:10px; border-top:1px dashed rgba(255,255,255,0.1); display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-              <button type="button" class="btn-action" id="btnGuardarPreciosMesas" style="padding:9px 18px; font-size:13px; max-width:280px;" onclick="forzarGuardadoPrecios()">💾 Guardar Precios en Vivo</button>
+            <div
+              style="margin-top:14px; padding-top:10px; border-top:1px dashed rgba(255,255,255,0.1); display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <button type="button" class="btn-action" id="btnGuardarPreciosMesas"
+                style="padding:9px 18px; font-size:13px; max-width:280px;" onclick="forzarGuardadoPrecios()">💾 Guardar
+                Precios en Vivo</button>
               <span id="savePreciosDirectStatus" style="font-size:12px; font-weight:700;"></span>
             </div>
           </div>
@@ -1258,7 +1261,8 @@
             <input type="text" id="cfgEventDate" placeholder="Ej.: SABADO 21 NOV">
           </div>
           <div class="form-group" style="margin-bottom: 12px;">
-            <label for="cfgLogoUrl">URL pública del Logo Superior del Evento (Opcional, formato PNG transparente)</label>
+            <label for="cfgLogoUrl">URL pública del Logo Superior del Evento (Opcional, formato PNG
+              transparente)</label>
             <input type="url" id="cfgLogoUrl" placeholder="https://res.cloudinary.com/... o vacío para quitarlo">
           </div>
           <div class="form-group" style="margin-bottom: 12px;">
@@ -1531,7 +1535,7 @@
 
       try {
         // Respaldo en localStorage inmediato
-        try {
+        try { 
           localStorage.setItem("joseo_precios_mesas", JSON.stringify(preciosPorMesaState));
         } catch (e) {}
 
@@ -1814,7 +1818,7 @@
 
         const cfgEventDate = document.getElementById("cfgEventDate");
         const cfgLogoUrl = document.getElementById("cfgLogoUrl");
-        const cfgSponsorLogoUrl = document.getElementById("cfgSponsorLogoUrl");
+        const cfgSponsorLogoUrl = document.getElementById("cfgSponsorLogoUrl" );
         const cfgBgUrl = document.getElementById("cfgBgUrl");
 
         if (cfgEventDate) cfgEventDate.value = c.eventDate || c.terraceDate || "";
@@ -2231,6 +2235,7 @@
           nombre: calcNombre.value.trim(),
           contacto: calcContacto.value.trim(),
           status: sena > 0 ? "aprobada" : (calcNombre.value.trim() ? "pendiente" : "libre"),
+          valorTotal: total,
           montoSenado: sena,
           medioPagoSena: document.getElementById("calcMedioPagoSena") ? document.getElementById("calcMedioPagoSena").value : "transferencia",
           saldoPuerta: saldo,
@@ -2328,7 +2333,7 @@
       if (!confirm("⚠️ ¿Estás seguro de que deseás reiniciar a CERO todas las mesas de Joseo?\n\nTodas las reservas actuales quedarán eliminadas, las mesas volverán a estar libres y la recaudación volverá a $0.\n\nEsta acción no se puede deshacer.")) {
         return;
       }
-      if (!confirm("Confirmación final: ¿Proceder con el reseteo de todas las mesas de Joseo?")) {
+      if (!confirm("Confirmación final: ¿Proceder conl reseteo de todas de Joseo?")) {
         return;
       }
 
@@ -2423,8 +2428,7 @@
             deferredAdminInstallPrompt = null;
           } else {
             alert("Para instalar en iPhone: tocá el botón Compartir de Safari y seleccioná 'Agregar al inicio'.");
-          }
-        });
+           });
       }
 
       if (pwaAdminDismissBtn) {

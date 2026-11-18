@@ -679,6 +679,10 @@
       <p id="modalTitular" style="margin: 0 0 14px; font-size: 13px; color: var(--muted);">Cliente: --</p>
 
       <div class="saldo-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 13px;">
+          <span style="color:var(--muted); font-weight:600;">Valor Total de la Mesa:</span>
+          <strong id="modalValorTotalDisplay" style="color:var(--gold); font-size:16px;">$0</strong>
+        </div>
         <div class="saldo-label">Saldo a cobrar en puerta</div>
         <div class="saldo-val" id="saldoMontoDisplay">$0</div>
         <div id="senaPreviaText" style="font-size: 12px; color: var(--muted); margin-top: 4px;">Seña previa: $0</div>
@@ -856,6 +860,13 @@
         } else {
           terraceDateBadge.style.display = "none";
         }
+
+        if (c.preciosPorMesa && typeof c.preciosPorMesa === "object" && Object.keys(c.preciosPorMesa).length > 0) {
+          try {
+            localStorage.setItem("joseo_precios_mesas", JSON.stringify(c.preciosPorMesa));
+          } catch (e) {}
+        }
+        renderMap();
       });
 
       // 2. Escuchar reservas de Joseo (reservas_joseo)
@@ -901,6 +912,48 @@
       if (elCount) elCount.textContent = ingresadasCount + " Mesas Dentro";
     }
 
+    function obtenerPrecioMesa(mesaId) {
+      if (!mesaId) {
+        return {
+          valorMesa: Number(configJoseo.valorMesa) || 385000,
+          montoSena: Number(configJoseo.montoSena) || 50000
+        };
+      }
+      const rawId = String(mesaId);
+      const cleanNum = rawId.replace(/^T-/, "");
+      const fullId = rawId.startsWith("T-") ? rawId : ("T-" + rawId);
+
+      if (configJoseo.preciosPorMesa && typeof configJoseo.preciosPorMesa === "object") {
+        const custom = configJoseo.preciosPorMesa[fullId] || configJoseo.preciosPorMesa[cleanNum] || configJoseo.preciosPorMesa[rawId];
+        if (custom) {
+          return {
+            valorMesa: Number(custom.valorMesa) || Number(configJoseo.valorMesa) || 385000,
+            montoSena: Number(custom.montoSena) || Number(configJoseo.montoSena) || 50000
+          };
+        }
+      }
+      try {
+        const local = localStorage.getItem("joseo_precios_mesas");
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (parsed && typeof parsed === "object") {
+            const custom = parsed[fullId] || parsed[cleanNum] || parsed[rawId];
+            if (custom) {
+              return {
+                valorMesa: Number(custom.valorMesa) || Number(configJoseo.valorMesa) || 385000,
+                montoSena: Number(custom.montoSena) || Number(configJoseo.montoSena) || 50000
+              };
+            }
+          }
+        }
+      } catch (e) {}
+
+      return {
+        valorMesa: Number(configJoseo.valorMesa) || 385000,
+        montoSena: Number(configJoseo.montoSena) || 50000
+      };
+    }
+
     function renderMap() {
       updateBoleteriaCaja();
       // Eliminar botones viejos
@@ -938,7 +991,10 @@
 
             // Agregar a resultados rápidos
             const ex = r.excepcion || {};
-            const saldo = ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : (r.saldoPuerta || 0);
+            const precioCfg = obtenerPrecioMesa(table.id);
+            const totalMesa = isCortesia ? 0 : (ex.valorPactado !== undefined ? Number(ex.valorPactado) : (r.valorTotal !== undefined ? Number(r.valorTotal) : precioCfg.valorMesa));
+            const sena = isCortesia ? 0 : (ex.senaPactada !== undefined ? Number(ex.senaPactada) : (r.montoSenado !== undefined ? Number(r.montoSenado) : 0));
+            const saldo = isCortesia ? 0 : (ex.saldoEnPuerta !== undefined ? Number(ex.saldoEnPuerta) : (r.saldoPuerta !== undefined ? Number(r.saldoPuerta) : Math.max(0, totalMesa - sena)));
             const qRow = document.createElement("div");
             qRow.className = "quick-card";
             qRow.innerHTML = `
@@ -1015,14 +1071,20 @@
         modalStatusBadge.style.color = "var(--green)";
       }
 
-      const saldo = ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : (r.saldoPuerta !== undefined ? r.saldoPuerta : 0);
-      const sena = ex.senaPactada !== undefined ? ex.senaPactada : (r.montoSenado || 0);
+      const precioCfg = obtenerPrecioMesa(id);
+      const totalMesa = isCortesia ? 0 : (ex.valorPactado !== undefined ? Number(ex.valorPactado) : (r.valorTotal !== undefined ? Number(r.valorTotal) : precioCfg.valorMesa));
+      const sena = isCortesia ? 0 : (ex.senaPactada !== undefined ? Number(ex.senaPactada) : (r.montoSenado !== undefined ? Number(r.montoSenado) : 0));
+      const saldo = isCortesia ? 0 : (ex.saldoEnPuerta !== undefined ? Number(ex.saldoEnPuerta) : (r.saldoPuerta !== undefined ? Number(r.saldoPuerta) : Math.max(0, totalMesa - sena)));
+
+      const modalValorTotalDisplay = document.getElementById("modalValorTotalDisplay");
+      if (modalValorTotalDisplay) {
+        modalValorTotalDisplay.textContent = isCortesia ? "$0 (Cortesía)" : ("$" + Number(totalMesa).toLocaleString("es-AR"));
+      }
 
       saldoMontoDisplay.textContent = "$" + Number(saldo).toLocaleString("es-AR");
-      senaPreviaText.textContent = "Seña previa: $" + Number(sena).toLocaleString("es-AR");
+      senaPreviaText.textContent = isCortesia ? "Mesa sin costo (Invitación)" : ("Seña previa: $" + Number(sena).toLocaleString("es-AR"));
 
       // Cálculo dinámico de beneficio de consumo por horario
-      const totalMesa = ex.valorPactado !== undefined ? ex.valorPactado : (r.valorTotal !== undefined ? r.valorTotal : (configJoseo.valorMesa || 300000));
       const limite = configJoseo.horarioLimite || "03:00";
       const pctAntes = configJoseo.porcentajeAntes !== undefined ? configJoseo.porcentajeAntes : 100;
       const pctDespues = configJoseo.porcentajeDespues !== undefined ? configJoseo.porcentajeDespues : 75;
@@ -1109,7 +1171,11 @@
       if (!activeMesaId) return;
       const r = reservasData[activeMesaId] || {};
       const ex = r.excepcion || {};
-      const saldo = ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : (r.saldoPuerta !== undefined ? r.saldoPuerta : 0);
+      const precioCfg = obtenerPrecioMesa(activeMesaId);
+      const isCortesia = r.status === "cortesia" || r.esCortesia === true;
+      const totalMesa = isCortesia ? 0 : (ex.valorPactado !== undefined ? Number(ex.valorPactado) : (r.valorTotal !== undefined ? Number(r.valorTotal) : precioCfg.valorMesa));
+      const sena = isCortesia ? 0 : (ex.senaPactada !== undefined ? Number(ex.senaPactada) : (r.montoSenado !== undefined ? Number(r.montoSenado) : 0));
+      const saldo = isCortesia ? 0 : (ex.saldoEnPuerta !== undefined ? Number(ex.saldoEnPuerta) : (r.saldoPuerta !== undefined ? Number(r.saldoPuerta) : Math.max(0, totalMesa - sena)));
 
       btnCobroEfectivo.disabled = true;
       btnCobroTransferencia.disabled = true;

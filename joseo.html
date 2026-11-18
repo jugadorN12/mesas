@@ -1008,22 +1008,37 @@
     }
 
     function obtenerPrecioMesa(mesaId) {
-      if (configJoseo.preciosPorMesa && configJoseo.preciosPorMesa[mesaId]) {
-        const custom = configJoseo.preciosPorMesa[mesaId];
+      if (!mesaId) {
         return {
-          valorMesa: Number(custom.valorMesa) || Number(configJoseo.valorMesa) || 385000,
-          montoSena: Number(custom.montoSena) || Number(configJoseo.montoSena) || 50000
+          valorMesa: Number(configJoseo.valorMesa) || 385000,
+          montoSena: Number(configJoseo.montoSena) || 50000
         };
+      }
+      const rawId = String(mesaId);
+      const cleanNum = rawId.replace(/^T-/, "");
+      const fullId = rawId.startsWith("T-") ? rawId : ("T-" + rawId);
+
+      if (configJoseo.preciosPorMesa && typeof configJoseo.preciosPorMesa === "object") {
+        const custom = configJoseo.preciosPorMesa[fullId] || configJoseo.preciosPorMesa[cleanNum] || configJoseo.preciosPorMesa[rawId];
+        if (custom) {
+          return {
+            valorMesa: Number(custom.valorMesa) || Number(configJoseo.valorMesa) || 385000,
+            montoSena: Number(custom.montoSena) || Number(configJoseo.montoSena) || 50000
+          };
+        }
       }
       try {
         const local = localStorage.getItem("joseo_precios_mesas");
         if (local) {
           const parsed = JSON.parse(local);
-          if (parsed && parsed[mesaId]) {
-            return {
-              valorMesa: Number(parsed[mesaId].valorMesa) || Number(configJoseo.valorMesa) || 385000,
-              montoSena: Number(parsed[mesaId].montoSena) || Number(configJoseo.montoSena) || 50000
-            };
+          if (parsed && typeof parsed === "object") {
+            const custom = parsed[fullId] || parsed[cleanNum] || parsed[rawId];
+            if (custom) {
+              return {
+                valorMesa: Number(custom.valorMesa) || Number(configJoseo.valorMesa) || 385000,
+                montoSena: Number(custom.montoSena) || Number(configJoseo.montoSena) || 50000
+              };
+            }
           }
         }
       } catch (e) {}
