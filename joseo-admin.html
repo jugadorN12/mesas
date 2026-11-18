@@ -315,6 +315,7 @@
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
+      transform-origin: center bottom;
       top: 1.5%;
       width: 78% !important;
       height: 21% !important;
@@ -326,6 +327,7 @@
       object-position: bottom center;
       pointer-events: none;
       filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.85));
+      transition: transform 0.2s ease;
     }
 
     /* Logo sponsor inferior */
@@ -1266,6 +1268,17 @@
               transparente)</label>
             <input type="url" id="cfgLogoUrl" placeholder="https://res.cloudinary.com/... o vacío para quitarlo">
           </div>
+          <div class="form-group" style="margin-bottom: 12px; background:rgba(255,255,255,0.02); border:1px solid var(--grey-line); border-radius:8px; padding:10px 12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label for="cfgLogoScale" style="margin:0; font-weight:700;">🔍 Tamaño del Logo en el Mapa: <span id="cfgLogoScaleVal" style="color:var(--gold);">100%</span></label>
+              <button type="button" class="btn-sec" style="padding:2px 8px; font-size:11px;" onclick="resetCfgLogoScale()">100%</button>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:11px; color:var(--grey-text);">Más chico (40%)</span>
+              <input type="range" id="cfgLogoScale" min="40" max="160" step="5" value="100" style="flex:1; cursor:pointer; accent-color:var(--gold);">
+              <span style="font-size:11px; color:var(--grey-text);">Más grande (160%)</span>
+            </div>
+          </div>
           <div class="form-group" style="margin-bottom: 12px;">
             <label for="cfgSponsorLogoUrl">URL pública del Logo / Sponsor Inferior (Opcional, debajo del plano)</label>
             <input type="url" id="cfgSponsorLogoUrl" placeholder="https://res.cloudinary.com/... o vacío para quitarlo">
@@ -1774,6 +1787,9 @@
         } else {
           mapBgLayer.style.backgroundImage = "";
         }
+        const logoScale = typeof c.logoScale === 'number' ? (c.logoScale / 100) : 1;
+        terraceLogoOverlay.style.transform = `translateX(-50%) scale(${logoScale})`;
+        terraceLogoOverlay.style.transformOrigin = "center bottom";
         if (c.logoUrl) {
           terraceLogoOverlay.src = c.logoUrl;
           terraceLogoOverlay.style.display = "block";
@@ -1824,6 +1840,13 @@
 
         if (cfgEventDate) cfgEventDate.value = c.eventDate || c.terraceDate || "";
         if (cfgLogoUrl) cfgLogoUrl.value = c.logoUrl || "";
+
+        const cfgLogoScale = document.getElementById("cfgLogoScale");
+        const cfgLogoScaleVal = document.getElementById("cfgLogoScaleVal");
+        const sVal = typeof c.logoScale === 'number' ? c.logoScale : 100;
+        if (cfgLogoScale && document.activeElement !== cfgLogoScale) cfgLogoScale.value = sVal;
+        if (cfgLogoScaleVal) cfgLogoScaleVal.textContent = sVal + "%";
+
         if (cfgSponsorLogoUrl) cfgSponsorLogoUrl.value = c.sponsorLogoUrl || c.footerLogoUrl || c.terraceFooterLogoUrl || "";
         if (cfgBgUrl) cfgBgUrl.value = c.bgUrl || "";
 
@@ -2202,6 +2225,7 @@
             eventDate: document.getElementById("cfgEventDate") ? document.getElementById("cfgEventDate").value.trim() : "",
             terraceDate: document.getElementById("cfgEventDate") ? document.getElementById("cfgEventDate").value.trim() : "",
             logoUrl: document.getElementById("cfgLogoUrl") ? document.getElementById("cfgLogoUrl").value.trim() : "",
+            logoScale: document.getElementById("cfgLogoScale") ? (parseInt(document.getElementById("cfgLogoScale").value, 10) || 100) : 100,
             sponsorLogoUrl: document.getElementById("cfgSponsorLogoUrl") ? document.getElementById("cfgSponsorLogoUrl").value.trim() : "",
             bgUrl: document.getElementById("cfgBgUrl") ? document.getElementById("cfgBgUrl").value.trim() : "",
             preciosPorMesa: preciosPorMesaState,
@@ -2224,6 +2248,27 @@
         }
       });
     }
+
+    const cfgLogoScaleInp = document.getElementById("cfgLogoScale");
+    if (cfgLogoScaleInp) {
+      cfgLogoScaleInp.addEventListener("input", (e) => {
+        const val = parseInt(e.target.value, 10) || 100;
+        const lbl = document.getElementById("cfgLogoScaleVal");
+        if (lbl) lbl.textContent = val + "%";
+        if (terraceLogoOverlay) {
+          terraceLogoOverlay.style.transform = `translateX(-50%) scale(${val / 100})`;
+          terraceLogoOverlay.style.transformOrigin = "center bottom";
+        }
+      });
+    }
+
+    window.resetCfgLogoScale = function () {
+      const s = document.getElementById("cfgLogoScale");
+      if (s) {
+        s.value = 100;
+        s.dispatchEvent(new Event("input"));
+      }
+    };
 
     btnSaveCalc.addEventListener("click", async () => {
       if (!activeMesaId) return;
@@ -2432,7 +2477,8 @@
             deferredAdminInstallPrompt = null;
           } else {
             alert("Para instalar en iPhone: tocá el botón Compartir de Safari y seleccioná 'Agregar al inicio'.");
-           });
+          }
+        });
       }
 
       if (pwaAdminDismissBtn) {

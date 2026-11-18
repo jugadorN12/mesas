@@ -2321,6 +2321,21 @@
               logo</span>
           </div>
 
+          <!-- Ajuste de tamaño del logo (Slider) -->
+          <div id="joseoLogoScaleGroup" style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px 14px; margin-top:2px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:12px; font-weight:600; color:var(--text);">
+                🔍 Tamaño del logo en el mapa: <span id="joseoLogoScaleLabel" style="color:var(--gold); font-weight:bold;">100%</span>
+              </span>
+              <button type="button" style="background:#262833; border:1px solid #444; color:#ccc; border-radius:4px; padding:2px 8px; font-size:11px; cursor:pointer;" onclick="resetearJoseoLogoScale()">Restablecer (100%)</button>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:11px; color:var(--grey);">Más chico (40%)</span>
+              <input type="range" id="joseoLogoScaleInput" min="40" max="160" step="5" value="100" style="flex:1; cursor:pointer; accent-color:var(--gold);" oninput="onJoseoLogoScaleInput(this.value)">
+              <span style="font-size:11px; color:var(--grey);">Más grande (160%)</span>
+            </div>
+          </div>
+
           <!-- Fondo Joseo -->
           <div class="event-controls">
             <label style="flex:2;">URL pública del fondo interactivo de Joseo (Cloudinary)<input id="joseoBgUrlInput"
@@ -3217,13 +3232,17 @@
       }
     };
 
-    function updateJoseoLogoPreview(url) {
+    function updateJoseoLogoPreview(url, scale) {
       const p = document.getElementById('joseoLogoPreview');
       const l = document.getElementById('joseoLogoPreviewLabel');
       if (!p) return;
       if (url) {
         p.style.backgroundImage = 'url("' + url + '")';
         p.style.display = 'block';
+        if (typeof scale === 'number') {
+          p.style.transform = 'scale(' + (scale / 100) + ')';
+          p.style.transformOrigin = 'center center';
+        }
         if (l) l.style.display = 'inline';
       } else {
         p.style.backgroundImage = '';
@@ -3231,6 +3250,42 @@
         if (l) l.style.display = 'none';
       }
     }
+
+    let _joseoScaleTimer = null;
+    window.onJoseoLogoScaleInput = function (val) {
+      const numVal = parseInt(val, 10) || 100;
+      const lbl = document.getElementById('joseoLogoScaleLabel');
+      if (lbl) lbl.textContent = numVal + '%';
+
+      const p = document.getElementById('joseoLogoPreview');
+      if (p) {
+        p.style.transform = 'scale(' + (numVal / 100) + ')';
+        p.style.transformOrigin = 'center center';
+        p.style.transition = 'transform 0.1s ease';
+      }
+
+      // Auto-guardar escala en background con debounce
+      clearTimeout(_joseoScaleTimer);
+      _joseoScaleTimer = setTimeout(async () => {
+        try {
+          await db.collection('config').doc('joseo').set({
+            logoScale: numVal,
+            updatedAt: Date.now(),
+            updatedBy: auth.currentUser?.email || 'admin'
+          }, { merge: true });
+        } catch (e) {
+          console.warn('Error auto-guardando escala de logo:', e);
+        }
+      }, 500);
+    };
+
+    window.resetearJoseoLogoScale = function () {
+      const inp = document.getElementById('joseoLogoScaleInput');
+      if (inp) {
+        inp.value = 100;
+        window.onJoseoLogoScaleInput(100);
+      }
+    };
 
     function updateJoseoBgPreview(url) {
       const p = document.getElementById('joseoBgPreview');
@@ -3249,9 +3304,11 @@
 
     window.guardarJoseoLogo = async function () {
       const input = document.getElementById('joseoLogoUrlInput');
+      const scaleInput = document.getElementById('joseoLogoScaleInput');
       const status = document.getElementById('joseoDesignStatus');
       const btn = document.getElementById('saveJoseoLogo');
       const url = input ? input.value.trim() : '';
+      const scale = scaleInput ? (parseInt(scaleInput.value, 10) || 100) : 100;
 
       if (!url) {
         alert('⚠️ Pegá la URL pública del logo antes de guardar.');
@@ -3266,10 +3323,11 @@
       try {
         await db.collection('config').doc('joseo').set({
           logoUrl: url,
+          logoScale: scale,
           updatedAt: Date.now(),
           updatedBy: auth.currentUser?.email || 'admin'
         }, { merge: true });
-        updateJoseoLogoPreview(url);
+        updateJoseoLogoPreview(url, scale);
         if (status) {
           status.style.color = '#4ade80';
           status.textContent = '✅ Logo de Joseo guardado correctamente.';
@@ -3434,7 +3492,14 @@
         const dateIn = document.getElementById('joseoDateInput');
 
         if (logoIn && document.activeElement !== logoIn) logoIn.value = data.logoUrl || '';
-        updateJoseoLogoPreview(data.logoUrl || '');
+
+        const scaleIn = document.getElementById('joseoLogoScaleInput');
+        const scaleLbl = document.getElementById('joseoLogoScaleLabel');
+        const sVal = typeof data.logoScale === 'number' ? data.logoScale : 100;
+        if (scaleIn && document.activeElement !== scaleIn) scaleIn.value = sVal;
+        if (scaleLbl) scaleLbl.textContent = sVal + '%';
+
+        updateJoseoLogoPreview(data.logoUrl || '', sVal);
 
         if (bgIn && document.activeElement !== bgIn) bgIn.value = data.bgUrl || '';
         updateJoseoBgPreview(data.bgUrl || '');

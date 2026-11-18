@@ -224,6 +224,7 @@
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
+      transform-origin: center bottom;
       top: 1.5%;
       width: 78% !important;
       height: 21% !important;
@@ -235,6 +236,7 @@
       object-position: bottom center;
       pointer-events: none;
       filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.85));
+      transition: transform 0.2s ease;
     }
 
     /* Logo sponsor inferior */
@@ -900,6 +902,9 @@
         } else {
           mapBgLayer.style.backgroundImage = "";
         }
+        const logoScale = typeof c.logoScale === 'number' ? (c.logoScale / 100) : 1;
+        terraceLogoOverlay.style.transform = `translateX(-50%) scale(${logoScale})`;
+        terraceLogoOverlay.style.transformOrigin = "center bottom";
         if (c.logoUrl) {
           terraceLogoOverlay.src = c.logoUrl;
           terraceLogoOverlay.style.display = "block";
