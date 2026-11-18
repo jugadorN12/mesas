@@ -26,10 +26,10 @@ service cloud.firestore {
       allow read: if request.auth != null && (
         request.auth.token.email == userId ||
         hasRole('admin') ||
-        (hasRole('admin_joseo') && resource.data.role in ['assistant_joseo', 'boleteria_joseo'])
+        (hasRole('admin_joseo') && resource.data.role in ['admin_joseo', 'assistant_joseo', 'boleteria_joseo'])
       );
       allow write: if hasRole('admin') ||
-        (hasRole('admin_joseo') && request.resource.data.role in ['assistant_joseo', 'boleteria_joseo']);
+        (hasRole('admin_joseo') && request.resource.data.role in ['admin_joseo', 'assistant_joseo', 'boleteria_joseo']);
     }
 
     match /config/{configId} {
