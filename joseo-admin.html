@@ -1268,14 +1268,18 @@
               transparente)</label>
             <input type="url" id="cfgLogoUrl" placeholder="https://res.cloudinary.com/... o vacío para quitarlo">
           </div>
-          <div class="form-group" style="margin-bottom: 12px; background:rgba(255,255,255,0.02); border:1px solid var(--grey-line); border-radius:8px; padding:10px 12px;">
+          <div class="form-group"
+            style="margin-bottom: 12px; background:rgba(255,255,255,0.02); border:1px solid var(--grey-line); border-radius:8px; padding:10px 12px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <label for="cfgLogoScale" style="margin:0; font-weight:700;">🔍 Tamaño del Logo en el Mapa: <span id="cfgLogoScaleVal" style="color:var(--gold);">100%</span></label>
-              <button type="button" class="btn-sec" style="padding:2px 8px; font-size:11px;" onclick="resetCfgLogoScale()">100%</button>
+              <label for="cfgLogoScale" style="margin:0; font-weight:700;">🔍 Tamaño del Logo en el Mapa: <span
+                  id="cfgLogoScaleVal" style="color:var(--gold);">100%</span></label>
+              <button type="button" class="btn-sec" style="padding:2px 8px; font-size:11px;"
+                onclick="resetCfgLogoScale()">100%</button>
             </div>
             <div style="display:flex; align-items:center; gap:10px;">
               <span style="font-size:11px; color:var(--grey-text);">Más chico (40%)</span>
-              <input type="range" id="cfgLogoScale" min="40" max="160" step="5" value="100" style="flex:1; cursor:pointer; accent-color:var(--gold);">
+              <input type="range" id="cfgLogoScale" min="40" max="160" step="5" value="100"
+                style="flex:1; cursor:pointer; accent-color:var(--gold);">
               <span style="font-size:11px; color:var(--grey-text);">Más grande (160%)</span>
             </div>
           </div>
@@ -1549,9 +1553,9 @@
 
       try {
         // Respaldo en localStorage inmediato
-        try { 
+        try {
           localStorage.setItem("joseo_precios_mesas", JSON.stringify(preciosPorMesaState));
-        } catch (e) {}
+        } catch (e) { }
 
         const userEmail = (auth && auth.currentUser && auth.currentUser.email) ? auth.currentUser.email : "admin";
         await db.collection("config").doc("joseo").set({
@@ -1835,7 +1839,7 @@
 
         const cfgEventDate = document.getElementById("cfgEventDate");
         const cfgLogoUrl = document.getElementById("cfgLogoUrl");
-        const cfgSponsorLogoUrl = document.getElementById("cfgSponsorLogoUrl" );
+        const cfgSponsorLogoUrl = document.getElementById("cfgSponsorLogoUrl");
         const cfgBgUrl = document.getElementById("cfgBgUrl");
 
         if (cfgEventDate) cfgEventDate.value = c.eventDate || c.terraceDate || "";
@@ -1854,7 +1858,7 @@
           preciosPorMesaState = { ...c.preciosPorMesa };
           try {
             localStorage.setItem("joseo_precios_mesas", JSON.stringify(preciosPorMesaState));
-          } catch (e) {}
+          } catch (e) { }
         } else {
           try {
             const local = localStorage.getItem("joseo_precios_mesas");
