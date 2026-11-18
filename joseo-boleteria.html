@@ -453,6 +453,17 @@
       color: #fff;
     }
 
+    .btn-mixed {
+      background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+      color: #fff;
+    }
+
+    .btn-cortesia-pay {
+      background: rgba(168, 85, 247, 0.2);
+      border: 1px solid #a855f7;
+      color: #e9d5ff;
+    }
+
     .btn-cancel {
       background: rgba(255, 255, 255, 0.1);
       color: #fff;
@@ -678,6 +689,26 @@
       </div>
       <p id="modalTitular" style="margin: 0 0 14px; font-size: 13px; color: var(--muted);">Cliente: --</p>
 
+      <!-- Formulario de Venta Directa en Puerta para Mesas Libres -->
+      <div id="ventaPuertaBox" style="display:none; margin-bottom: 14px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 10px; padding: 12px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <span style="font-size: 11px; font-weight: 800; color: #10b981; text-transform: uppercase; letter-spacing: 0.5px;">⚡ Venta Directa en Puerta</span>
+          <span style="font-size: 10px; color: var(--muted);">Mesa Libre</span>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <label style="display: block; font-size: 11px; color: var(--muted); margin-bottom: 3px; font-weight: 600;">Nombre y Apellido del Cliente:</label>
+          <input type="text" id="ventaNombre" placeholder="Ej: Carlos Gómez" style="width: 100%; background: #060608; border: 1px solid var(--grey-line); border-radius: 6px; padding: 9px 10px; color: #fff; font-size: 13px; box-sizing: border-box;">
+        </div>
+        <div style="margin-bottom: 8px;">
+          <label style="display: block; font-size: 11px; color: var(--muted); margin-bottom: 3px; font-weight: 600;">Teléfono / WhatsApp (Opcional):</label>
+          <input type="text" id="ventaContacto" placeholder="Ej: 11 2345-6789" style="width: 100%; background: #060608; border: 1px solid var(--grey-line); border-radius: 6px; padding: 9px 10px; color: #fff; font-size: 13px; box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="display: block; font-size: 11px; color: var(--muted); margin-bottom: 3px; font-weight: 600;">Precio pactado en puerta ($):</label>
+          <input type="number" id="ventaPrecio" placeholder="0" style="width: 100%; background: #060608; border: 1px solid var(--gold); border-radius: 6px; padding: 9px 10px; color: var(--gold); font-size: 15px; font-weight: 800; box-sizing: border-box;">
+        </div>
+      </div>
+
       <div class="saldo-box">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 13px;">
           <span style="color:var(--muted); font-weight:600;">Valor Total de la Mesa:</span>
@@ -707,14 +738,42 @@
 
       <div id="cobroActions">
         <button type="button" class="btn-pay btn-cash" id="btnCobroEfectivo">
-          💵 Cobrar Saldo en Efectivo (Marcar Ingreso)
+          💵 Cobrar en Efectivo (Marcar Ingreso)
         </button>
         <button type="button" class="btn-pay btn-transf" id="btnCobroTransferencia">
-          💳 Cobrar Saldo con Transferencia (Marcar Ingreso)
+          💳 Cobrar con Transferencia (Marcar Ingreso)
+        </button>
+        <button type="button" class="btn-pay btn-mixed" id="btnCobroMixto">
+          🔀 Cobro Mixto (Efectivo + Transferencia)
+        </button>
+        <button type="button" class="btn-pay btn-cortesia-pay" id="btnCobroCortesia">
+          🎁 Marcar como Cortesía ($0)
         </button>
         <button type="button" class="btn-pay btn-cash" id="btnMarcarIngresadaDirecta"
           style="background: var(--blue); color:#fff; display:none;">
           ✅ Marcar Ingreso Directo (Saldo $0)
+        </button>
+      </div>
+
+      <!-- Sección Desplegable de Pago Mixto -->
+      <div id="mixedPayBox" style="display:none; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 10px; padding: 14px; margin-bottom: 10px;">
+        <div style="font-size: 12px; font-weight: 800; color: var(--gold); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+          <span>🔀 CONFIGURAR PAGO MIXTO</span>
+          <span id="mixedSaldoObjetivo" style="font-size: 12px; color: #fff;">Saldo: $0</span>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <label style="display: block; font-size: 11px; color: var(--muted); margin-bottom: 3px;">💵 Efectivo recibido ($):</label>
+          <input type="number" id="mixCashVal" placeholder="0" style="width: 100%; background: #060608; border: 1px solid #10b981; border-radius: 6px; padding: 10px; color: #10b981; font-size: 16px; font-weight: 800; box-sizing: border-box;">
+        </div>
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-size: 11px; color: var(--muted); margin-bottom: 3px;">💳 Restante por Transferencia / QR ($) [Automático]:</label>
+          <input type="number" id="mixTransfVal" readonly style="width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid #3b82f6; border-radius: 6px; padding: 10px; color: #60a5fa; font-size: 16px; font-weight: 800; box-sizing: border-box;">
+        </div>
+        <button type="button" class="btn-pay" id="btnConfirmarMixto" style="background: var(--gold); color: #000; font-weight: 800;">
+          ✅ Confirmar Cobro Mixto e Ingreso
+        </button>
+        <button type="button" class="btn-pay" id="btnCancelarMixto" style="background: transparent; border: 1px solid var(--grey-line); color: var(--muted); font-size: 12px; padding: 8px; margin-top: 4px;">
+          Volver a opciones de cobro
         </button>
       </div>
 
@@ -891,12 +950,13 @@
           ingresadasCount++;
           const ex = r.excepcion || {};
           const cobrado = Number(r.saldoCobradoEnPuerta !== undefined ? r.saldoCobradoEnPuerta : (ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : (r.saldoPuerta || 0)));
-          if (cobrado > 0) {
-            if (r.medioPagoPuerta === "transferencia") {
-              transf += cobrado;
-            } else {
-              cash += cobrado;
-            }
+          if (r.medioPagoPuerta === "mixto") {
+            cash += Number(r.pagoMixtoEfectivo || 0);
+            transf += Number(r.pagoMixtoTransf || 0);
+          } else if (r.medioPagoPuerta === "transferencia") {
+            transf += cobrado;
+          } else if (cobrado > 0) {
+            cash += cobrado;
           }
         }
       }
@@ -1022,23 +1082,125 @@
 
     searchInput.addEventListener("input", renderMap);
 
-    // Modal de Cobro
+    // Modal de Cobro y Venta en Puerta
     const cobroModal = document.getElementById("cobroModal");
     const modalMesaTitle = document.getElementById("modalMesaTitle");
     const modalStatusBadge = document.getElementById("modalStatusBadge");
     const modalTitular = document.getElementById("modalTitular");
+    const ventaPuertaBox = document.getElementById("ventaPuertaBox");
+    const ventaNombre = document.getElementById("ventaNombre");
+    const ventaContacto = document.getElementById("ventaContacto");
+    const ventaPrecio = document.getElementById("ventaPrecio");
+    const modalValorTotalDisplay = document.getElementById("modalValorTotalDisplay");
     const saldoMontoDisplay = document.getElementById("saldoMontoDisplay");
     const senaPreviaText = document.getElementById("senaPreviaText");
     const voucherBox = document.getElementById("voucherBox");
     const voucherContent = document.getElementById("voucherContent");
+    const consumoBadge = document.getElementById("consumoBadge");
+    const consumoMontoCalculado = document.getElementById("consumoMontoCalculado");
+    const consumoDetalleRegla = document.getElementById("consumoDetalleRegla");
     const modalNotaBox = document.getElementById("modalNotaBox");
     const modalNotaText = document.getElementById("modalNotaText");
     const cobroActions = document.getElementById("cobroActions");
     const btnCobroEfectivo = document.getElementById("btnCobroEfectivo");
     const btnCobroTransferencia = document.getElementById("btnCobroTransferencia");
+    const btnCobroMixto = document.getElementById("btnCobroMixto");
+    const btnCobroCortesia = document.getElementById("btnCobroCortesia");
     const btnMarcarIngresadaDirecta = document.getElementById("btnMarcarIngresadaDirecta");
+    const mixedPayBox = document.getElementById("mixedPayBox");
+    const mixedSaldoObjetivo = document.getElementById("mixedSaldoObjetivo");
+    const mixCashVal = document.getElementById("mixCashVal");
+    const mixTransfVal = document.getElementById("mixTransfVal");
+    const btnConfirmarMixto = document.getElementById("btnConfirmarMixto");
+    const btnCancelarMixto = document.getElementById("btnCancelarMixto");
     const yaIngresadaNotice = document.getElementById("yaIngresadaNotice");
     const btnCancelCobro = document.getElementById("btnCancelCobro");
+
+    let modalCurrentState = {
+      isLibre: false,
+      isCortesia: false,
+      totalMesa: 0,
+      sena: 0,
+      saldo: 0
+    };
+
+    function recalcularModalCobro() {
+      if (!activeMesaId) return;
+      const r = reservasData[activeMesaId] || {};
+      const ex = r.excepcion || {};
+      const precioCfg = obtenerPrecioMesa(activeMesaId);
+      const isCortesia = modalCurrentState.isCortesia;
+
+      let totalMesa = 0;
+      let sena = 0;
+
+      if (isCortesia) {
+        totalMesa = 0;
+        sena = 0;
+      } else if (modalCurrentState.isLibre) {
+        const valInput = Number(ventaPrecio.value);
+        totalMesa = isNaN(valInput) ? precioCfg.valorMesa : Math.max(0, valInput);
+        sena = 0;
+      } else {
+        totalMesa = ex.valorPactado !== undefined ? Number(ex.valorPactado) : (r.valorTotal !== undefined ? Number(r.valorTotal) : precioCfg.valorMesa);
+        sena = ex.senaPactada !== undefined ? Number(ex.senaPactada) : (r.montoSenado !== undefined ? Number(r.montoSenado) : 0);
+      }
+
+      const saldo = isCortesia ? 0 : (modalCurrentState.isLibre ? totalMesa : (ex.saldoEnPuerta !== undefined ? Number(ex.saldoEnPuerta) : (r.saldoPuerta !== undefined ? Number(r.saldoPuerta) : Math.max(0, totalMesa - sena))));
+
+      modalCurrentState.totalMesa = totalMesa;
+      modalCurrentState.sena = sena;
+      modalCurrentState.saldo = saldo;
+
+      if (modalValorTotalDisplay) {
+        modalValorTotalDisplay.textContent = isCortesia ? "$0 (Cortesía)" : ("$" + Number(totalMesa).toLocaleString("es-AR"));
+      }
+      saldoMontoDisplay.textContent = "$" + Number(saldo).toLocaleString("es-AR");
+      senaPreviaText.textContent = isCortesia ? "Mesa sin costo (Invitación)" : ("Seña previa: $" + Number(sena).toLocaleString("es-AR"));
+
+      // Cálculo de consumo
+      const limite = configJoseo.horarioLimite || "03:00";
+      const pctAntes = configJoseo.porcentajeAntes !== undefined ? configJoseo.porcentajeAntes : 100;
+      const pctDespues = configJoseo.porcentajeDespues !== undefined ? configJoseo.porcentajeDespues : 75;
+
+      const now = new Date();
+      const h = now.getHours();
+      const m = now.getMinutes();
+      const [limH, limM] = limite.split(":").map(Number);
+      const horaStr = String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
+
+      const esAntes = (h >= 12) || (h < limH) || (h === limH && m < limM);
+      const pctAplicable = esAntes ? pctAntes : pctDespues;
+      const montoConsumo = Math.round((totalMesa * pctAplicable) / 100);
+
+      if (esAntes) {
+        consumoBadge.textContent = "🟢 DENTRO DE HORARIO (" + horaStr + " hs — ANTES DE LAS " + limite + " AM)";
+        consumoBadge.style.background = "rgba(16, 185, 129, 0.2)";
+        consumoBadge.style.color = "var(--green)";
+        consumoMontoCalculado.style.color = "var(--green)";
+        consumoMontoCalculado.textContent = "$" + Number(montoConsumo).toLocaleString("es-AR") + " en consumo (" + pctAplicable + "% reintegro)";
+        consumoDetalleRegla.textContent = "Aplica reintegro completo del " + pctAplicable + "% del valor total de la mesa ($" + Number(totalMesa).toLocaleString("es-AR") + ").";
+      } else {
+        consumoBadge.textContent = "🟡 FUERA DE HORARIO (" + horaStr + " hs — DESPUÉS DE LAS " + limite + " AM)";
+        consumoBadge.style.background = "rgba(255, 119, 0, 0.2)";
+        consumoBadge.style.color = "var(--gold)";
+        consumoMontoCalculado.style.color = "var(--gold)";
+        consumoMontoCalculado.textContent = "$" + Number(montoConsumo).toLocaleString("es-AR") + " en consumo (" + pctAplicable + "% reintegro)";
+        consumoDetalleRegla.textContent = "Ingresó después de las " + limite + " AM. Aplica el " + pctAplicable + "% del valor total ($" + Number(totalMesa).toLocaleString("es-AR") + ").";
+      }
+
+      if (mixedPayBox && mixedPayBox.style.display !== "none") {
+        if (mixedSaldoObjetivo) {
+          mixedSaldoObjetivo.textContent = "Saldo: $" + Number(saldo).toLocaleString("es-AR");
+        }
+        const cashVal = Math.max(0, parseInt(mixCashVal.value) || 0);
+        mixTransfVal.value = Math.max(0, saldo - cashVal);
+      }
+    }
+
+    if (ventaPrecio) {
+      ventaPrecio.addEventListener("input", recalcularModalCobro);
+    }
 
     function abrirCobroModal(id) {
       activeMesaId = id;
@@ -1048,9 +1210,12 @@
       const ex = r.excepcion || {};
       const status = r.status || "libre";
       const isCortesia = status === "cortesia" || r.esCortesia === true;
+      const isLibre = !r.nombre && (status === "libre");
+
+      modalCurrentState.isLibre = isLibre;
+      modalCurrentState.isCortesia = isCortesia;
 
       modalMesaTitle.textContent = "MESA " + num;
-      modalTitular.textContent = "Cliente: " + (r.nombre || "Sin reserva asignada") + (r.contacto ? " — " + r.contacto : "");
 
       // Badge de estado
       modalStatusBadge.textContent = isCortesia ? "CORTESÍA" : status.toUpperCase();
@@ -1071,54 +1236,25 @@
         modalStatusBadge.style.color = "var(--green)";
       }
 
+      if (mixedPayBox) mixedPayBox.style.display = "none";
+      if (cobroActions) cobroActions.style.display = "block";
+
       const precioCfg = obtenerPrecioMesa(id);
-      const totalMesa = isCortesia ? 0 : (ex.valorPactado !== undefined ? Number(ex.valorPactado) : (r.valorTotal !== undefined ? Number(r.valorTotal) : precioCfg.valorMesa));
-      const sena = isCortesia ? 0 : (ex.senaPactada !== undefined ? Number(ex.senaPactada) : (r.montoSenado !== undefined ? Number(r.montoSenado) : 0));
-      const saldo = isCortesia ? 0 : (ex.saldoEnPuerta !== undefined ? Number(ex.saldoEnPuerta) : (r.saldoPuerta !== undefined ? Number(r.saldoPuerta) : Math.max(0, totalMesa - sena)));
-
-      const modalValorTotalDisplay = document.getElementById("modalValorTotalDisplay");
-      if (modalValorTotalDisplay) {
-        modalValorTotalDisplay.textContent = isCortesia ? "$0 (Cortesía)" : ("$" + Number(totalMesa).toLocaleString("es-AR"));
-      }
-
-      saldoMontoDisplay.textContent = "$" + Number(saldo).toLocaleString("es-AR");
-      senaPreviaText.textContent = isCortesia ? "Mesa sin costo (Invitación)" : ("Seña previa: $" + Number(sena).toLocaleString("es-AR"));
-
-      // Cálculo dinámico de beneficio de consumo por horario
-      const limite = configJoseo.horarioLimite || "03:00";
-      const pctAntes = configJoseo.porcentajeAntes !== undefined ? configJoseo.porcentajeAntes : 100;
-      const pctDespues = configJoseo.porcentajeDespues !== undefined ? configJoseo.porcentajeDespues : 75;
-
-      const now = new Date();
-      const h = now.getHours();
-      const m = now.getMinutes();
-      const [limH, limM] = limite.split(":").map(Number);
-      const horaStr = String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
-
-      // Regla horaria nocturna: antes de las 12hs se compara con el límite, de 12hs a 23hs es antes
-      const esAntes = (h >= 12) || (h < limH) || (h === limH && m < limM);
-      const pctAplicable = esAntes ? pctAntes : pctDespues;
-      const montoConsumo = Math.round((totalMesa * pctAplicable) / 100);
-
-      const consumoBadge = document.getElementById("consumoBadge");
-      const consumoMontoCalculado = document.getElementById("consumoMontoCalculado");
-      const consumoDetalleRegla = document.getElementById("consumoDetalleRegla");
-
-      if (esAntes) {
-        consumoBadge.textContent = "🟢 DENTRO DE HORARIO (" + horaStr + " hs — ANTES DE LAS " + limite + " AM)";
-        consumoBadge.style.background = "rgba(16, 185, 129, 0.2)";
-        consumoBadge.style.color = "var(--green)";
-        consumoMontoCalculado.style.color = "var(--green)";
-        consumoMontoCalculado.textContent = "$" + Number(montoConsumo).toLocaleString("es-AR") + " en consumo (" + pctAplicable + "% reintegro)";
-        consumoDetalleRegla.textContent = "Aplica reintegro completo del " + pctAplicable + "% del valor total de la mesa ($" + Number(totalMesa).toLocaleString("es-AR") + ").";
+      if (isLibre) {
+        modalTitular.style.display = "none";
+        if (ventaPuertaBox) {
+          ventaPuertaBox.style.display = "block";
+          ventaNombre.value = "";
+          ventaContacto.value = "";
+          ventaPrecio.value = precioCfg.valorMesa;
+        }
       } else {
-        consumoBadge.textContent = "🟡 FUERA DE HORARIO (" + horaStr + " hs — DESPUÉS DE LAS " + limite + " AM)";
-        consumoBadge.style.background = "rgba(255, 119, 0, 0.2)";
-        consumoBadge.style.color = "var(--gold)";
-        consumoMontoCalculado.style.color = "var(--gold)";
-        consumoMontoCalculado.textContent = "$" + Number(montoConsumo).toLocaleString("es-AR") + " en consumo (" + pctAplicable + "% reintegro)";
-        consumoDetalleRegla.textContent = "Ingresó después de las " + limite + " AM. Aplica el " + pctAplicable + "% del valor total ($" + Number(totalMesa).toLocaleString("es-AR") + ").";
+        modalTitular.style.display = "block";
+        modalTitular.textContent = "Cliente: " + (r.nombre || "Sin reserva asignada") + (r.contacto ? " — " + r.contacto : "");
+        if (ventaPuertaBox) ventaPuertaBox.style.display = "none";
       }
+
+      recalcularModalCobro();
 
       // Vouchers y notas adicionales
       const bebidas = ex.bebidas || (r.vouchersBebida ? (r.vouchersBebida + " vouchers de bebida") : "");
@@ -1131,7 +1267,6 @@
       }
       voucherBox.style.display = "block";
 
-      // Nota
       const nota = ex.nota || r.nota || "";
       if (nota) {
         modalNotaText.textContent = nota;
@@ -1148,13 +1283,17 @@
         cobroActions.style.display = "block";
         yaIngresadaNotice.style.display = "none";
 
-        if (saldo === 0) {
+        if (modalCurrentState.saldo === 0 && !isLibre && !isCortesia) {
           btnCobroEfectivo.style.display = "none";
           btnCobroTransferencia.style.display = "none";
+          btnCobroMixto.style.display = "none";
+          btnCobroCortesia.style.display = "none";
           btnMarcarIngresadaDirecta.style.display = "block";
         } else {
           btnCobroEfectivo.style.display = "block";
           btnCobroTransferencia.style.display = "block";
+          btnCobroMixto.style.display = "block";
+          btnCobroCortesia.style.display = "block";
           btnMarcarIngresadaDirecta.style.display = "none";
         }
       }
@@ -1167,58 +1306,214 @@
       activeMesaId = null;
     });
 
-    async function registrarCobro(medioPago) {
+    // Control de Pago Mixto
+    if (btnCobroMixto) {
+      btnCobroMixto.addEventListener("click", () => {
+        const saldo = modalCurrentState.saldo;
+        if (saldo <= 0) {
+          alert("El saldo a cobrar es $0, no requiere cobro mixto.");
+          return;
+        }
+        cobroActions.style.display = "none";
+        mixedPayBox.style.display = "block";
+        mixedSaldoObjetivo.textContent = "Saldo: $" + Number(saldo).toLocaleString("es-AR");
+        mixCashVal.value = "";
+        mixTransfVal.value = saldo;
+        mixCashVal.focus();
+      });
+    }
+
+    if (btnCancelarMixto) {
+      btnCancelarMixto.addEventListener("click", () => {
+        mixedPayBox.style.display = "none";
+        cobroActions.style.display = "block";
+      });
+    }
+
+    if (mixCashVal) {
+      mixCashVal.addEventListener("input", () => {
+        const saldo = modalCurrentState.saldo;
+        const cash = Math.max(0, parseInt(mixCashVal.value) || 0);
+        mixTransfVal.value = Math.max(0, saldo - cash);
+      });
+    }
+
+    if (btnConfirmarMixto) {
+      btnConfirmarMixto.addEventListener("click", () => {
+        const saldo = modalCurrentState.saldo;
+        const cash = Math.max(0, parseInt(mixCashVal.value) || 0);
+        const transf = Math.max(0, parseInt(mixTransfVal.value) || 0);
+        if (cash + transf !== saldo) {
+          alert(`La suma del efectivo ($${cash.toLocaleString("es-AR")}) y la transferencia ($${transf.toLocaleString("es-AR")}) debe dar el saldo total de $${saldo.toLocaleString("es-AR")}.`);
+          return;
+        }
+        registrarCobro("mixto", cash, transf);
+      });
+    }
+
+    if (btnCobroCortesia) {
+      btnCobroCortesia.addEventListener("click", () => {
+        const tableObj = TABLES_TERRAZA.find(t => t.id === activeMesaId);
+        const num = tableObj ? tableObj.num : (activeMesaId ? activeMesaId.replace("T-", "") : "");
+        const ok = confirm(`¿Confirmar ingreso de la Mesa ${num} como CORTESÍA / INVITACIÓN ($0)?`);
+        if (!ok) return;
+        registrarCobro("cortesia", 0, 0);
+      });
+    }
+
+    async function registrarCobro(medioPago, cobroEfectivo, cobroTransf) {
       if (!activeMesaId) return;
+      const tableObj = TABLES_TERRAZA.find(t => t.id === activeMesaId);
+      const num = tableObj ? tableObj.num : activeMesaId.replace("T-", "");
       const r = reservasData[activeMesaId] || {};
-      const ex = r.excepcion || {};
-      const precioCfg = obtenerPrecioMesa(activeMesaId);
-      const isCortesia = r.status === "cortesia" || r.esCortesia === true;
-      const totalMesa = isCortesia ? 0 : (ex.valorPactado !== undefined ? Number(ex.valorPactado) : (r.valorTotal !== undefined ? Number(r.valorTotal) : precioCfg.valorMesa));
-      const sena = isCortesia ? 0 : (ex.senaPactada !== undefined ? Number(ex.senaPactada) : (r.montoSenado !== undefined ? Number(r.montoSenado) : 0));
-      const saldo = isCortesia ? 0 : (ex.saldoEnPuerta !== undefined ? Number(ex.saldoEnPuerta) : (r.saldoPuerta !== undefined ? Number(r.saldoPuerta) : Math.max(0, totalMesa - sena)));
+      const isCortesia = (medioPago === "cortesia");
+      const isLibre = modalCurrentState.isLibre;
+
+      let totalMesa = modalCurrentState.totalMesa;
+      let sena = modalCurrentState.sena;
+      let saldo = modalCurrentState.saldo;
+
+      if (isCortesia) {
+        totalMesa = 0;
+        sena = 0;
+        saldo = 0;
+      }
+
+      let cashToLog = 0;
+      let transfToLog = 0;
+
+      if (medioPago === "efectivo") {
+        cashToLog = saldo;
+        transfToLog = 0;
+      } else if (medioPago === "transferencia") {
+        cashToLog = 0;
+        transfToLog = saldo;
+      } else if (medioPago === "mixto") {
+        cashToLog = Number(cobroEfectivo) || 0;
+        transfToLog = Number(cobroTransf) || 0;
+        if (cashToLog + transfToLog !== saldo) {
+          alert(`La suma ($${(cashToLog + transfToLog).toLocaleString("es-AR")}) no coincide con el saldo ($${saldo.toLocaleString("es-AR")}).`);
+          return;
+        }
+      }
+
+      let nombreCliente = "";
+      let contactoCliente = "";
+
+      if (isLibre) {
+        nombreCliente = ventaNombre.value.trim() || ("Venta en Puerta — Mesa " + num);
+        contactoCliente = ventaContacto.value.trim();
+      } else {
+        nombreCliente = r.nombre || (isCortesia ? "Cortesía VIP" : ("Mesa " + num));
+        contactoCliente = r.contacto || "";
+      }
 
       btnCobroEfectivo.disabled = true;
       btnCobroTransferencia.disabled = true;
+      btnCobroMixto.disabled = true;
+      btnCobroCortesia.disabled = true;
+      btnConfirmarMixto.disabled = true;
       btnMarcarIngresadaDirecta.disabled = true;
 
       try {
-        // 1. Actualizar mesa en reservas_joseo
-        await db.collection("reservas_joseo").doc(activeMesaId).set({
-          status: "ingresada",
+        const payload = {
+          nombre: nombreCliente,
+          contacto: contactoCliente,
+          status: isCortesia ? "cortesia" : "ingresada",
+          esCortesia: isCortesia,
+          sector: "terrace_soul",
+          valorTotal: totalMesa,
+          montoSenado: isLibre ? 0 : sena,
+          saldoPuerta: 0,
           saldoCobradoEnPuerta: saldo,
-          medioPagoPuerta: medioPago,
+          pagoMixtoEfectivo: cashToLog,
+          pagoMixtoTransf: transfToLog,
+          medioPagoPuerta: isCortesia ? "cortesia" : medioPago,
           ingresadoAt: Date.now(),
-          cobradoPor: auth.currentUser.email
-        }, { merge: true });
+          cobradoPor: auth.currentUser ? auth.currentUser.email : "boleteria",
+          origen: isLibre ? "puerta" : (r.origen || "reserva")
+        };
 
-        // 2. Registrar en caja_joseo si hubo cobro
-        if (saldo > 0 && medioPago !== "sin_cobro") {
-          await db.collection("caja_joseo").add({
-            mesaId: activeMesaId,
-            monto: saldo,
-            medioPago: medioPago,
-            tipo: "cobro_puerta",
-            cliente: r.nombre || "Mesa " + activeMesaId,
-            responsable: auth.currentUser.email,
-            ts: Date.now()
-          });
+        if (isLibre) {
+          payload.createdAt = Date.now();
+        }
+
+        await db.collection("reservas_joseo").doc(activeMesaId).set(payload, { merge: true });
+
+        // Registrar en caja_joseo
+        if (!isCortesia && saldo > 0 && medioPago !== "sin_cobro") {
+          if (medioPago === "mixto") {
+            if (cashToLog > 0) {
+              await db.collection("caja_joseo").add({
+                mesaId: activeMesaId,
+                monto: cashToLog,
+                medioPago: "efectivo",
+                tipo: isLibre ? "venta_puerta_efectivo" : "cobro_puerta_efectivo",
+                cliente: nombreCliente,
+                responsable: auth.currentUser ? auth.currentUser.email : "boleteria",
+                ts: Date.now()
+              });
+            }
+            if (transfToLog > 0) {
+              await db.collection("caja_joseo").add({
+                mesaId: activeMesaId,
+                monto: transfToLog,
+                medioPago: "transferencia",
+                tipo: isLibre ? "venta_puerta_transf" : "cobro_puerta_transf",
+                cliente: nombreCliente,
+                responsable: auth.currentUser ? auth.currentUser.email : "boleteria",
+                ts: Date.now()
+              });
+            }
+          } else {
+            await db.collection("caja_joseo").add({
+              mesaId: activeMesaId,
+              monto: saldo,
+              medioPago: medioPago,
+              tipo: isLibre ? "venta_puerta" : "cobro_puerta",
+              cliente: nombreCliente,
+              responsable: auth.currentUser ? auth.currentUser.email : "boleteria",
+              ts: Date.now()
+            });
+          }
         }
 
         cobroModal.classList.remove("open");
         activeMesaId = null;
-        alert("✅ Ingreso confirmado." + (saldo > 0 ? " Cobro de $" + Number(saldo).toLocaleString("es-AR") + " registrado." : ""));
+        let msgExito = `✅ Ingreso confirmado para Mesa ${num} (${nombreCliente}).`;
+        if (isCortesia) {
+          msgExito += ` Registrada como Cortesía ($0).`;
+        } else if (medioPago === "mixto") {
+          msgExito += ` Cobro Mixto: $${cashToLog.toLocaleString("es-AR")} en Efectivo + $${transfToLog.toLocaleString("es-AR")} por Transferencia.`;
+        } else if (saldo > 0) {
+          msgExito += ` Cobro de $${saldo.toLocaleString("es-AR")} (${medioPago.toUpperCase()}) registrado en caja.`;
+        }
+        alert(msgExito);
       } catch (err) {
         alert("Error al registrar cobro: " + err.message);
       } finally {
         btnCobroEfectivo.disabled = false;
         btnCobroTransferencia.disabled = false;
+        btnCobroMixto.disabled = false;
+        btnCobroCortesia.disabled = false;
+        btnConfirmarMixto.disabled = false;
         btnMarcarIngresadaDirecta.disabled = false;
       }
     }
 
-    btnCobroEfectivo.addEventListener("click", () => registrarCobro("efectivo"));
-    btnCobroTransferencia.addEventListener("click", () => registrarCobro("transferencia"));
-    btnMarcarIngresadaDirecta.addEventListener("click", () => registrarCobro("sin_cobro"));
+    btnCobroEfectivo.addEventListener("click", () => {
+      const saldo = modalCurrentState.saldo;
+      registrarCobro("efectivo", saldo, 0);
+    });
+
+    btnCobroTransferencia.addEventListener("click", () => {
+      const saldo = modalCurrentState.saldo;
+      registrarCobro("transferencia", 0, saldo);
+    });
+
+    btnMarcarIngresadaDirecta.addEventListener("click", () => {
+      registrarCobro("sin_cobro", 0, 0);
+    });
   </script>
 </body>
 

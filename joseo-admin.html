@@ -1895,7 +1895,10 @@
           if (status === "ingresada") {
             const cobrado = Number(r.saldoCobradoEnPuerta !== undefined ? r.saldoCobradoEnPuerta : (ex.saldoEnPuerta !== undefined ? ex.saldoEnPuerta : (r.saldoPuerta || 0)));
             const puertaMedio = r.medioPagoPuerta || "efectivo";
-            if (cobrado > 0) {
+            if (puertaMedio === "mixto") {
+              puertaCash += Number(r.pagoMixtoEfectivo || 0);
+              puertaTransf += Number(r.pagoMixtoTransf || 0);
+            } else if (cobrado > 0) {
               if (puertaMedio === "transferencia") {
                 puertaTransf += cobrado;
               } else {
