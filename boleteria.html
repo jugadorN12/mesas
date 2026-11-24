@@ -1,458 +1,837 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Cubano Bar — Boletería</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="shared.css">
-<style>
-  :root{
-    --bg: #060608;
-    --panel: #101014;
-    --panel-2: #17171d;
-    --red: #ff2d3d;
-    --red-glow: rgba(255,45,61,0.55);
-    --white: #f3f1ee;
-    --grey: #8b8b93;
-    --grey-line: #2a2a31;
-    --green: #2ee6a6;
-    --blue: #58a6ff;
-    --amber: #ffbd3e;
-    --muted: #8b8b93;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--white);font-family:'Inter',sans-serif;}
-
-  /* App Layout */
-  .topbar{
-    position:sticky; top:0; z-index:20;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:16px 20px;
-    background:rgba(6,6,8,0.86);
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--grey-line);
-  }
-  .brand{ font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:1.5px; color:var(--white); line-height:1; }
-  .brand span{color:var(--red);}
-
-  .legend{display:flex; gap:12px; font-size:11px; color:var(--grey);}
-  .legend .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle;}
-  .dot.free{background:var(--green);}
-  .dot.pending{background:var(--amber);}
-  .dot.approved{background:var(--red);}
-  .dot.ingresada{background:var(--blue);}
-
-  @media(max-width:580px){
-    .topbar {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 12px;
-      padding: 12px 16px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cubano Bar — Boletería</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    :root {
+      --bg: #060608;
+      --panel: #101014;
+      --panel-2: #17171d;
+      --red: #ff2d3d;
+      --red-glow: rgba(255, 45, 61, 0.55);
+      --white: #f3f1ee;
+      --grey: #8b8b93;
+      --grey-line: #2a2a31;
+      --green: #2ee6a6;
+      --blue: #58a6ff;
+      --amber: #ffbd3e;
+      --muted: #8b8b93;
     }
-    .topbar-header {
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* App Layout */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: rgba(6, 6, 8, 0.86);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--grey-line);
+    }
+
+    .brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 1.5px;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .brand span {
+      color: var(--red);
+    }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--grey);
+    }
+
+    .legend .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    .dot.free {
+      background: var(--green);
+    }
+
+    .dot.pending {
+      background: var(--amber);
+    }
+
+    .dot.approved {
+      background: var(--red);
+    }
+
+    .dot.ingresada {
+      background: var(--blue);
+    }
+
+    @media(max-width:580px) {
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 12px 16px;
+      }
+
+      .topbar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+      }
+
+      .cash-tools {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        width: 100%;
+      }
+
+      .cash-tools .btn-tool {
+        width: 100%;
+        padding: 10px 4px;
+        font-size: 12px;
+      }
+
+      .legend {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: 10px;
+        border-top: 1px solid var(--grey-line);
+        padding-top: 8px;
+        width: 100%;
+      }
+    }
+
+    .map-wrap {
+      position: relative;
+      max-width: 520px;
+      margin: 20px auto 40px;
+      padding: 0 16px;
+    }
+
+    .map-frame {
+      position: relative;
+      width: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: #09090c;
+    }
+
+    .map-bg-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      pointer-events: none;
+      transition: background-image 0.4s ease;
+    }
+
+    .map-frame img {
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      height: auto;
+      pointer-events: none;
+    }
+
+    .ultra-vip-overlay {
+      position: absolute;
+      left: 52%;
+      top: 11.5%;
+      z-index: 3;
+      width: 34%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--green);
+      font: clamp(15px, 3.5vw, 24px) 'Bebas Neue', sans-serif;
+      letter-spacing: 1px;
+      cursor: pointer;
+      text-shadow: 0 1px 3px #000;
+    }
+
+    .ultra-vip-overlay.dispute {
+      color: var(--amber)
+    }
+
+    .ultra-vip-overlay.confirmed {
+      color: var(--red)
+    }
+
+    .ultra-vip-overlay.ingresada {
+      color: var(--blue)
+    }
+
+    .table-btn {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      width: 7.8%;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      background: linear-gradient(145deg, #66f5bf, #16b878 55%, #08734b);
+      color: var(--white);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(12px, 2.6vw, 16px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      z-index: 10;
+    }
+
+    .table-btn.terraza-btn {
+      font-size: clamp(9.5px, 2.1vw, 13px);
+    }
+
+    .table-btn.pending {
+      background: linear-gradient(145deg, #ffcf58, #b66a08 55%, #613000);
+    }
+
+    .table-btn.approved {
+      background: linear-gradient(145deg, #ff5b66, #d20e21 55%, #70000a);
+    }
+
+    .table-btn.ingresada {
+      background: linear-gradient(145deg, #58a6ff, #0a56ad 55%, #002e61);
+    }
+
+    .table-btn.cortesia {
+      background: linear-gradient(145deg, #c084fc, #9333ea 55%, #581c87) !important;
+      border-color: #e9d5ff !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 14px rgba(168, 85, 247, 0.7) !important;
+    }
+
+    .table-btn.cortesia-ingresada {
+      background: linear-gradient(145deg, #58a6ff, #9333ea 60%, #581c87) !important;
+      border-color: #c084fc !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 16px rgba(88, 166, 255, 0.8), inset 0 0 8px rgba(192, 132, 252, 0.6) !important;
+    }
+
+    .dot.cortesia {
+      background: #a855f7;
+      box-shadow: 0 0 6px rgba(168, 85, 247, 0.6);
+    }
+
+    .dot.cortesia-ingresada {
+      background: linear-gradient(135deg, #58a6ff, #a855f7);
+      box-shadow: 0 0 6px rgba(168, 85, 247, 0.8);
+    }
+
+    .ultra-vip-overlay.cortesia {
+      color: #c084fc !important;
+      text-shadow: 0 1px 4px #000, 0 0 10px rgba(192, 132, 252, 0.8) !important;
+    }
+
+    .ultra-vip-overlay.cortesia-ingresada {
+      color: #58a6ff !important;
+      text-shadow: 0 1px 4px #000, 0 0 12px rgba(192, 132, 252, 0.9) !important;
+    }
+
+    .btn-cortesia-action {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(168, 85, 247, 0.14);
+      border: 1.5px solid #a855f7;
+      color: #e9d5ff;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all .2s ease;
+      margin-bottom: 12px;
+    }
+
+    .btn-cortesia-action:hover {
+      background: rgba(168, 85, 247, 0.26);
+      border-color: #c084fc;
+      color: #fff;
+    }
+
+    .table-btn .table-label,
+    .table-btn .x-mark {
+      pointer-events: none;
+      color: #fff;
+      text-shadow: 0 1px 3px #000;
+    }
+
+    /* Modal */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(4, 4, 6, 0.85);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .overlay.open {
+      display: flex;
+    }
+
+    .sheet {
+      width: 100%;
+      max-width: 440px;
+      background: var(--panel-2);
+      border: 1px solid var(--grey-line);
+      border-radius: 24px;
+      padding: 32px 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      max-height: 90vh;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .sheet::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .sheet::-webkit-scrollbar-thumb {
+      background: var(--grey-line);
+      border-radius: 4px;
+    }
+
+    .sheet h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      margin: 0 0 4px;
+      letter-spacing: 1px;
+    }
+
+    .sheet-sub {
+      color: var(--grey);
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .calc-item {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--grey-line);
+    }
+
+    .calc-label {
+      color: var(--grey);
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .calc-val {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .calc-val small {
+      font-size: 14px;
+      color: var(--grey);
+      margin-right: 2px;
+    }
+
+    .people-ctrl {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin: 20px 0;
+      justify-content: center;
+    }
+
+    .people-btn {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      border: 1px solid var(--grey-line);
+      background: var(--panel);
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .people-num {
+      font-size: 48px;
+      font-family: 'Bebas Neue', sans-serif;
+      width: 60px;
+      text-align: center;
+    }
+
+    .ex-btn {
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      border: 1px dashed var(--grey-line);
+      color: var(--grey);
+      border-radius: 8px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .ex-btn:hover {
+      color: #fff;
+      border-color: var(--grey);
+    }
+
+    .final-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(88, 166, 255, 0.3);
+    }
+
+    .final-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Payment Method Buttons */
+    .pay-method-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn-pay {
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--grey-line);
+      background: var(--panel);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      width: 100%;
     }
+
+    .btn-pay:hover {
+      background: var(--panel-2);
+      border-color: var(--muted);
+    }
+
+    .btn-pay b {
+      color: var(--blue);
+      font-size: 18px;
+    }
+
     .cash-tools {
-      display: grid !important;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-tool {
+      background: transparent;
+      border: 1px solid var(--grey-line);
+      color: var(--white);
+      font-size: 11px;
+      padding: 9px 13px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-transform: none;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .btn-tool:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--muted);
+    }
+
+    /* Selector de Sector en Boletería */
+    .sector-tabs-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       gap: 8px;
       width: 100%;
+      box-sizing: border-box;
+      margin: 0 0 12px 0;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--grey-line);
     }
-    .cash-tools .btn-tool {
+
+    .sector-tab-btn {
+      flex: 1;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--grey);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .sector-tab-btn.active {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(255, 45, 61, 0.3);
+    }
+
+    .close-btn {
       width: 100%;
-      padding: 10px 4px;
-      font-size: 12px;
+      padding: 12px;
+      background: transparent;
+      border: 1px solid var(--grey-line);
+      color: var(--grey);
+      border-radius: 12px;
+      margin-top: 12px;
+      cursor: pointer;
+      font-weight: 600;
     }
-    .legend {
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      font-size: 10px;
+
+    /* Exception Form */
+    #exceptionForm {
+      display: none;
+      margin-top: 16px;
+      padding-top: 16px;
       border-top: 1px solid var(--grey-line);
-      padding-top: 8px;
-      width: 100%;
     }
-  }
 
-  .map-wrap{ position:relative; max-width:520px; margin:20px auto 40px; padding:0 16px; }
-  .map-frame{
-    position:relative; width:100%; border-radius:18px; overflow:hidden;
-    border:1px solid rgba(255,255,255,0.16); background:#09090c;
-  }
-  .map-bg-layer{
-    position:absolute; inset:0; z-index:0;
-    background-size:cover; background-position:center; background-repeat:no-repeat;
-    pointer-events:none; transition:background-image 0.4s ease;
-  }
-  .map-frame img{ position:relative; z-index:1; display:block; width:100%; height:auto; pointer-events:none; }
+    .field-row {
+      margin-bottom: 12px;
+    }
 
-  .ultra-vip-overlay{
-    position:absolute; left:52%; top:11.5%; z-index:3; width:34%; padding:0; border:0; background:transparent;
-    color:var(--green); font:clamp(15px,3.5vw,24px) 'Bebas Neue',sans-serif; letter-spacing:1px; cursor:pointer;
-    text-shadow:0 1px 3px #000;
-  }
-  .ultra-vip-overlay.dispute{color:var(--amber)}
-  .ultra-vip-overlay.confirmed{color:var(--red)}
-  .ultra-vip-overlay.ingresada{color:var(--blue)}
+    .field-row label {
+      display: block;
+      font-size: 11px;
+      color: var(--grey);
+      margin-bottom: 4px;
+    }
 
-  .table-btn{
-    position:absolute; transform:translate(-50%,-50%); width:7.8%; border-radius:50%;
-    border:1px solid rgba(255,255,255,0.7);
-    background:linear-gradient(145deg, #66f5bf, #16b878 55%, #08734b);
-    color:var(--white); font-family:'Bebas Neue',sans-serif; font-size:clamp(12px, 2.6vw, 16px);
-    cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; z-index: 10;
-  }
-  .table-btn.terraza-btn{ font-size:clamp(9.5px, 2.1vw, 13px); }
-  .table-btn.pending{ background:linear-gradient(145deg, #ffcf58, #b66a08 55%, #613000); }
-  .table-btn.approved{ background:linear-gradient(145deg, #ff5b66, #d20e21 55%, #70000a); }
-  .table-btn.ingresada{ background:linear-gradient(145deg, #58a6ff, #0a56ad 55%, #002e61); }
-  .table-btn.cortesia{
-    background:linear-gradient(145deg, #c084fc, #9333ea 55%, #581c87) !important;
-    border-color:#e9d5ff !important;
-    box-shadow:0 4px 12px rgba(0,0,0,0.5), 0 0 14px rgba(168,85,247,0.7) !important;
-  }
-  .table-btn.cortesia-ingresada{
-    background:linear-gradient(145deg, #58a6ff, #9333ea 60%, #581c87) !important;
-    border-color:#c084fc !important;
-    box-shadow:0 4px 12px rgba(0,0,0,0.5), 0 0 16px rgba(88,166,255,0.8), inset 0 0 8px rgba(192,132,252,0.6) !important;
-  }
-  .dot.cortesia{ background:#a855f7; box-shadow:0 0 6px rgba(168,85,247,0.6); }
-  .dot.cortesia-ingresada{ background:linear-gradient(135deg, #58a6ff, #a855f7); box-shadow:0 0 6px rgba(168,85,247,0.8); }
-  .ultra-vip-overlay.cortesia{ color:#c084fc !important; text-shadow:0 1px 4px #000, 0 0 10px rgba(192,132,252,0.8) !important; }
-  .ultra-vip-overlay.cortesia-ingresada{ color:#58a6ff !important; text-shadow:0 1px 4px #000, 0 0 12px rgba(192,132,252,0.9) !important; }
-  .btn-cortesia-action{
-    width:100%; padding:11px 14px; background:rgba(168,85,247,0.14); border:1.5px solid #a855f7;
-    color:#e9d5ff; border-radius:12px; cursor:pointer; font-weight:700; font-size:13px;
-    display:flex; align-items:center; justify-content:center; gap:8px; transition:all .2s ease; margin-bottom:12px;
-  }
-  .btn-cortesia-action:hover{ background:rgba(168,85,247,0.26); border-color:#c084fc; color:#fff; }
-  .table-btn .table-label, .table-btn .x-mark{ pointer-events:none; color:#fff; text-shadow:0 1px 3px #000; }
+    .field-row input {
+      width: 100%;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--grey-line);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 16px;
+    }
 
-  /* Modal */
-  .overlay{
-    position:fixed; inset:0; z-index:50;
-    background:rgba(4,4,6,0.85); backdrop-filter:blur(6px);
-    display:none; align-items:center; justify-content:center; padding:20px;
-    overflow-y:auto;
-  }
-  .overlay.open{ display:flex; }
-  .sheet{
-    width:100%; max-width:440px; background:var(--panel-2);
-    border:1px solid var(--grey-line); border-radius:24px;
-    padding:32px 24px; box-shadow:0 20px 60px rgba(0,0,0,0.6);
-    max-height: 90vh;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-  }
-  .sheet::-webkit-scrollbar{ width:6px; }
-  .sheet::-webkit-scrollbar-thumb{ background:var(--grey-line); border-radius:4px; }
-  .sheet h2{ font-family:'Bebas Neue',sans-serif; font-size:32px; margin:0 0 4px; letter-spacing:1px; }
-  .sheet-sub{ color:var(--grey); font-size:14px; margin-bottom:24px; }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      background: var(--panel-2);
+      border: 1px solid var(--grey-line);
+      color: var(--white);
+      font-size: 13px;
+      padding: 12px 24px;
+      border-radius: 30px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all .25s ease;
+      z-index: 200;
+    }
 
-  .calc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
-  .calc-item{ background:rgba(0,0,0,0.2); padding:16px; border-radius:12px; border:1px solid var(--grey-line); }
-  .calc-label{ color:var(--grey); font-size:11px; text-transform:uppercase; font-weight:700; margin-bottom:4px; }
-  .calc-val{ font-size:24px; font-weight:700; }
-  .calc-val small{ font-size:14px; color:var(--grey); margin-right:2px; }
+    .toast.show {
+      opacity: 1;
+    }
 
-  .people-ctrl{ display:flex; align-items:center; gap:20px; margin:20px 0; justify-content:center; }
-  .people-btn{
-    width:54px; height:54px; border-radius:50%; border:1px solid var(--grey-line);
-    background:var(--panel); color:#fff; font-size:24px; cursor:pointer;
-  }
-  .people-num{ font-size:48px; font-family:'Bebas Neue',sans-serif; width:60px; text-align:center; }
+    @media(max-width:480px) {
+      .calc-val {
+        font-size: 20px;
+      }
 
-  .ex-btn{
-    width:100%; padding:10px; background:transparent; border:1px dashed var(--grey-line);
-    color:var(--grey); border-radius:8px; margin-bottom:16px; cursor:pointer; font-size:12px;
-  }
-  .ex-btn:hover{ color:#fff; border-color:var(--grey); }
-
-  .final-btn{
-    width:100%; padding:16px; background:var(--blue); color:#fff;
-    border:none; border-radius:12px; font-weight:700; font-size:16px; cursor:pointer;
-    box-shadow:0 8px 20px rgba(88,166,255,0.3);
-  }
-  .final-btn:disabled{ opacity:0.5; cursor:not-allowed; }
-
-  /* Payment Method Buttons */
-  .pay-method-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 20px; }
-  .btn-pay {
-    width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--grey-line);
-    background: var(--panel); color: #fff; font-weight: 600; cursor: pointer; text-align: left;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .btn-pay:hover { background: var(--panel-2); border-color: var(--muted); }
-  .btn-pay b { color: var(--blue); font-size: 18px; }
-
-  .cash-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .btn-tool {
-    background: transparent; border: 1px solid var(--grey-line); color: var(--white);
-    font-size: 11px; padding: 9px 13px; border-radius: 8px; cursor: pointer; text-transform: none; font-weight: bold;
-    text-decoration: none; display: inline-block; text-align: center;
-  }
-  .btn-tool:hover { background: rgba(255,255,255,0.05); border-color: var(--muted); }
-
-  /* Selector de Sector en Boletería */
-  .sector-tabs-wrap{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:8px;
-    width:100%;
-    box-sizing:border-box;
-    margin:0 0 12px 0;
-    background:rgba(255,255,255,0.04);
-    padding:4px;
-    border-radius:10px;
-    border:1px solid var(--grey-line);
-  }
-  .sector-tab-btn{
-    flex:1;
-    border:1px solid transparent;
-    background:transparent;
-    color:var(--grey);
-    font-weight:700;
-    font-size:13px;
-    padding:8px 12px;
-    border-radius:7px;
-    cursor:pointer;
-    transition:all 0.2s ease;
-    white-space:nowrap;
-    text-align:center;
-  }
-  .sector-tab-btn.active{
-    background:var(--red);
-    color:#fff;
-    box-shadow:0 2px 10px rgba(255,45,61,0.3);
-  }
-
-  .close-btn{
-    width:100%; padding:12px; background:transparent; border:1px solid var(--grey-line);
-    color:var(--grey); border-radius:12px; margin-top:12px; cursor:pointer; font-weight:600;
-  }
-
-  /* Exception Form */
-  #exceptionForm{ display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--grey-line); }
-  .field-row{ margin-bottom:12px; }
-  .field-row label{ display:block; font-size:11px; color:var(--grey); margin-bottom:4px; }
-  .field-row input{
-    width:100%; padding:10px; background:rgba(0,0,0,0.2); border:1px solid var(--grey-line);
-    border-radius:6px; color:#fff; font-size:16px;
-  }
-
-  .toast{
-    position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
-    background:var(--panel-2); border:1px solid var(--grey-line);
-    color:var(--white); font-size:13px; padding:12px 24px; border-radius:30px;
-    opacity:0; pointer-events:none; transition:all .25s ease; z-index:200;
-  }
-  .toast.show{ opacity:1; }
-
-  @media(max-width:480px){
-    .calc-val{ font-size:20px; }
-    .people-num{ font-size:36px; }
-  }
-</style>
+      .people-num {
+        font-size: 36px;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<div id="appView" style="display:none;">
-  <div class="topbar">
-    <div class="topbar-header">
-      <div class="brand">CUBANO<span>BAR</span></div>
-      <button id="logoutBtn" style="background:transparent; border:none; color:var(--grey); font-size:12px; cursor:pointer;">Salir</button>
+  <div id="appView" style="display:none;">
+    <div class="topbar">
+      <div class="topbar-header">
+        <div class="brand">CUBANO<span>BAR</span></div>
+        <button id="logoutBtn"
+          style="background:transparent; border:none; color:var(--grey); font-size:12px; cursor:pointer;">Salir</button>
+      </div>
+      <div id="boleteriaEventBanner"
+        style="display:none; margin: 8px 0 12px; padding: 8px 14px; background: rgba(245, 197, 24, 0.08); border: 1px solid rgba(245, 197, 24, 0.25); border-radius: 8px; text-align: center;">
+        <span
+          style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--grey); display: block;">Turno
+          de Boletería Activo</span>
+        <span id="boleteriaEventTitle"
+          style="font-size: 15px; font-weight: 800; color: var(--amber); letter-spacing: 0.5px;"></span>
+      </div>
+      <div class="cash-tools" id="cashTools">
+        <button class="btn-tool" id="btnCajaInicial">Caja Inicial</button>
+        <button class="btn-tool" id="btnRetiro">Retiro</button>
+        <button class="btn-tool" id="btnVerCaja" style="border-color:var(--blue); color:var(--blue);">Ver Caja</button>
+        <button class="btn-tool" id="btnCierreDefinitivo" style="border-color:var(--red); color:var(--red);">Cerrar Caja
+          de Turno</button>
+      </div>
+      <div class="legend">
+        <span><span class="dot free"></span>Libre</span>
+        <span><span class="dot pending"></span>Pendiente</span>
+        <span><span class="dot approved"></span>Vendida</span>
+        <span><span class="dot ingresada"></span>Dentro</span>
+        <span><span class="dot cortesia"></span>Cortesía</span>
+        <span><span class="dot cortesia-ingresada"></span>Cortesía Dentro</span>
+      </div>
     </div>
-    <div id="boleteriaEventBanner" style="display:none; margin: 8px 0 12px; padding: 8px 14px; background: rgba(245, 197, 24, 0.08); border: 1px solid rgba(245, 197, 24, 0.25); border-radius: 8px; text-align: center;">
-      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--grey); display: block;">Turno de Boletería Activo</span>
-      <span id="boleteriaEventTitle" style="font-size: 15px; font-weight: 800; color: var(--amber); letter-spacing: 0.5px;"></span>
-    </div>
-    <div class="cash-tools" id="cashTools">
-      <button class="btn-tool" id="btnCajaInicial">Caja Inicial</button>
-      <button class="btn-tool" id="btnRetiro">Retiro</button>
-      <button class="btn-tool" id="btnVerCaja" style="border-color:var(--blue); color:var(--blue);">Ver Caja</button>
-      <button class="btn-tool" id="btnCierreDefinitivo" style="border-color:var(--red); color:var(--red);">Cerrar Caja de Turno</button>
-    </div>
-    <div class="legend">
-      <span><span class="dot free"></span>Libre</span>
-      <span><span class="dot pending"></span>Pendiente</span>
-      <span><span class="dot approved"></span>Vendida</span>
-      <span><span class="dot ingresada"></span>Dentro</span>
-      <span><span class="dot cortesia"></span>Cortesía</span>
-      <span><span class="dot cortesia-ingresada"></span>Cortesía Dentro</span>
+
+    <div class="map-wrap">
+      <div class="sector-tabs-wrap" id="sectorTabsWrap">
+        <button type="button" id="tabSectorSalon" class="sector-tab-btn active">🏢 MAIN STAGE</button>
+        <button type="button" id="tabSectorTerraza" class="sector-tab-btn">🌙 TERRACE SOUL</button>
+      </div>
+      <div class="map-frame" id="plano-mesas">
+        <div id="mapBgLayer" class="map-bg-layer"></div>
+        <button class="ultra-vip-overlay" id="ultraVipBtn">RESERVAR</button>
+        <img src="Gemini_Generated_Image_pxpekipxpekipxpe.png" alt="Mapa de mesas" id="mapImg">
+      </div>
     </div>
   </div>
 
-  <div class="map-wrap">
-    <div class="sector-tabs-wrap" id="sectorTabsWrap">
-      <button type="button" id="tabSectorSalon" class="sector-tab-btn active">🏢 MAIN STAGE</button>
-      <button type="button" id="tabSectorTerraza" class="sector-tab-btn">🌙 TERRACE SOUL</button>
-    </div>
-    <div class="map-frame" id="plano-mesas">
-      <div id="mapBgLayer" class="map-bg-layer"></div>
-      <button class="ultra-vip-overlay" id="ultraVipBtn">RESERVAR</button>
-      <img src="Gemini_Generated_Image_pxpekipxpekipxpe.png" alt="Mapa de mesas" id="mapImg">
-    </div>
-  </div>
-</div>
+  <div id="modalOverlay" class="overlay">
+    <div class="sheet">
+      <h2 id="modalTitle">MESA --</h2>
+      <p id="modalSub" class="sheet-sub">Cargando datos...</p>
+      <div id="modalPromoBadge"
+        style="display:none; margin:-14px 0 18px 0; padding:8px 12px; background:rgba(102,245,191,0.08); border:1px solid rgba(102,245,191,0.25); border-radius:10px; font-size:13px; color:#66f5bf; align-items:center; gap:8px;">
+      </div>
 
-<div id="modalOverlay" class="overlay">
-  <div class="sheet">
-    <h2 id="modalTitle">MESA --</h2>
-    <p id="modalSub" class="sheet-sub">Cargando datos...</p>
-    <div id="modalPromoBadge" style="display:none; margin:-14px 0 18px 0; padding:8px 12px; background:rgba(102,245,191,0.08); border:1px solid rgba(102,245,191,0.25); border-radius:10px; font-size:13px; color:#66f5bf; align-items:center; gap:8px;"></div>
-    
-    <!-- Cartel Destacado de Excepción de Venta -->
-    <div id="modalExcepcionBadge" style="display:none; margin:-10px 0 16px 0; padding:12px 14px; background:rgba(255,189,62,0.12); border:1.5px solid var(--amber); border-radius:12px; font-size:12.5px; line-height:1.55;">
-      <div style="font-weight:800; font-size:13.5px; color:var(--amber); display:flex; align-items:center; gap:6px; margin-bottom:6px;">
-        <span>⚡ ESTA MESA TIENE EXCEPCIÓN DE VENTA</span>
+      <!-- Cartel Destacado de Excepción de Venta -->
+      <div id="modalExcepcionBadge"
+        style="display:none; margin:-10px 0 16px 0; padding:12px 14px; background:rgba(255,189,62,0.12); border:1.5px solid var(--amber); border-radius:12px; font-size:12.5px; line-height:1.55;">
+        <div
+          style="font-weight:800; font-size:13.5px; color:var(--amber); display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+          <span>⚡ ESTA MESA TIENE EXCEPCIÓN DE VENTA</span>
+        </div>
+        <div id="modalExcepcionDetails" style="color:var(--white);"></div>
       </div>
-      <div id="modalExcepcionDetails" style="color:var(--white);"></div>
-    </div>
 
-    <!-- Cartel Destacado de Reserva desde Calculadora Admin -->
-    <div id="modalCalcReservaBadge" style="display:none; margin:-10px 0 16px 0; padding:12px 14px; background:rgba(88,166,255,0.08); border:1.5px solid var(--blue); border-radius:12px; font-size:12.5px; line-height:1.55;">
-      <div style="font-weight:800; font-size:13.5px; color:var(--blue); display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-        <span>📋 RESERVA CONFIRMADA (ADMIN)</span>
-        <span id="modalCalcPaymentBadge" style="font-size:11px; padding:3px 9px; border-radius:6px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;"></span>
-      </div>
-      <div id="modalCalcReservaDetails" style="color:var(--white);"></div>
-      <div style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(88,166,255,0.25); display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12px;">
-        <span style="color:var(--muted);">Forma de pago en puerta:</span>
-        <div style="display:flex; gap:6px;">
-          <button type="button" id="btnTogglePayCash" style="padding:4px 10px; font-size:11px; font-weight:700; border-radius:6px; border:1px solid var(--green); background:rgba(46,230,166,0.15); color:var(--green); cursor:pointer;">💵 Efectivo</button>
-          <button type="button" id="btnTogglePayTransf" style="padding:4px 10px; font-size:11px; font-weight:700; border-radius:6px; border:1px solid var(--blue); background:transparent; color:var(--blue); cursor:pointer;">💳 Transferencia</button>
+      <!-- Cartel Destacado de Reserva desde Calculadora Admin -->
+      <div id="modalCalcReservaBadge"
+        style="display:none; margin:-10px 0 16px 0; padding:12px 14px; background:rgba(88,166,255,0.08); border:1.5px solid var(--blue); border-radius:12px; font-size:12.5px; line-height:1.55;">
+        <div
+          style="font-weight:800; font-size:13.5px; color:var(--blue); display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+          <span>📋 RESERVA CONFIRMADA (ADMIN)</span>
+          <span id="modalCalcPaymentBadge"
+            style="font-size:11px; padding:3px 9px; border-radius:6px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;"></span>
         </div>
-      </div>
-    </div>
-
-    <!-- Cartel Destacado de Mesa de Cortesía -->
-    <div id="modalCortesiaBadge" style="display:none; margin:-10px 0 16px 0; padding:12px 14px; background:rgba(168,85,247,0.12); border:1.5px solid #a855f7; border-radius:12px; font-size:12.5px; line-height:1.55;">
-      <div style="font-weight:800; font-size:13.5px; color:#c084fc; display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
-        <span>🎁 MESA DE CORTESÍA / INVITACIÓN ($0)</span>
-        <span style="font-size:11px; background:#581c87; color:#e9d5ff; padding:3px 8px; border-radius:6px; font-weight:bold;">PÚRPURA</span>
-      </div>
-      <div id="modalCortesiaDetails" style="color:var(--white);"></div>
-      <div style="display:flex; gap:8px; margin-top:10px;">
-        <button type="button" class="btn-tool" id="btnQuitarCortesia" style="flex:1; border-color:#e0aaff; color:#e0aaff; padding:8px;">🔄 Quitar Cortesía / Dejar Libre</button>
-      </div>
-    </div>
-
-    <div id="calcView">
-      <div class="calc-grid">
-        <div class="calc-item">
-          <div class="calc-label">Total Mesa</div>
-          <div class="calc-val"><small>$</small><span id="valTotal">0</span></div>
-        </div>
-        <div class="calc-item" style="border-color:var(--green);">
-          <div class="calc-label" id="labelDrinks" style="color:var(--green);">En Bebidas</div>
-          <div class="calc-val" style="color:var(--green);"><small>$</small><span id="valDrinks">0</span></div>
-        </div>
-        <div class="calc-item">
-          <div class="calc-label">Ya señó</div>
-          <div class="calc-val" style="color:var(--amber);"><small>$</small><span id="valPaid">0</span></div>
-        </div>
-        <div class="calc-item" style="border-color:var(--red);">
-          <div class="calc-label" style="color:var(--red);">Saldo a Cobrar</div>
-          <div class="calc-val" style="color:var(--red);"><small>$</small><span id="valBalance">0</span></div>
+        <div id="modalCalcReservaDetails" style="color:var(--white);"></div>
+        <div
+          style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(88,166,255,0.25); display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12px;">
+          <span style="color:var(--muted);">Forma de pago en puerta:</span>
+          <div style="display:flex; gap:6px;">
+            <button type="button" id="btnTogglePayCash"
+              style="padding:4px 10px; font-size:11px; font-weight:700; border-radius:6px; border:1px solid var(--green); background:rgba(46,230,166,0.15); color:var(--green); cursor:pointer;">💵
+              Efectivo</button>
+            <button type="button" id="btnTogglePayTransf"
+              style="padding:4px 10px; font-size:11px; font-weight:700; border-radius:6px; border:1px solid var(--blue); background:transparent; color:var(--blue); cursor:pointer;">💳
+              Transferencia</button>
+          </div>
         </div>
       </div>
 
-      <div class="people-ctrl">
-        <button type="button" class="people-btn" onclick="adjustPeople(-1)">-</button>
-        <div style="display:flex; flex-direction:column; align-items:center;">
-          <input type="number" min="1" class="people-num" id="peopleCount" value="4" oninput="onPeopleInput()" style="background:transparent; border:none; color:#fff; text-align:center; width:90px; outline:none; -moz-appearance:textfield; font-family:'Bebas Neue',sans-serif; font-size:48px;">
-          <span style="font-size:11px; color:var(--muted); margin-top:-6px; font-weight:600;">personas</span>
+      <!-- Cartel Destacado de Mesa de Cortesía -->
+      <div id="modalCortesiaBadge"
+        style="display:none; margin:-10px 0 16px 0; padding:12px 14px; background:rgba(168,85,247,0.12); border:1.5px solid #a855f7; border-radius:12px; font-size:12.5px; line-height:1.55;">
+        <div
+          style="font-weight:800; font-size:13.5px; color:#c084fc; display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+          <span>🎁 MESA DE CORTESÍA / INVITACIÓN ($0)</span>
+          <span
+            style="font-size:11px; background:#581c87; color:#e9d5ff; padding:3px 8px; border-radius:6px; font-weight:bold;">PÚRPURA</span>
         </div>
-        <button type="button" class="people-btn" onclick="adjustPeople(1)">+</button>
-      </div>
-
-      <button class="ex-btn" id="toggleException">¿ES UNA EXCEPCIÓN? (Precio manual)</button>
-
-      <div id="exceptionForm">
-        <div class="field-row">
-          <label>Precio por persona ($)</label>
-          <input type="number" id="exPrecioPersona" placeholder="Ej: 25000">
-        </div>
-        <div class="field-row">
-          <label>Total Mesa ($)</label>
-          <input type="number" id="exTotal" placeholder="0">
-        </div>
-        <div class="field-row">
-          <label>Total a entregar en bebidas ($)</label>
-          <input type="number" id="exDrinks" placeholder="0">
+        <div id="modalCortesiaDetails" style="color:var(--white);"></div>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <button type="button" class="btn-tool" id="btnQuitarCortesia"
+            style="flex:1; border-color:#e0aaff; color:#e0aaff; padding:8px;">🔄 Quitar Cortesía / Dejar Libre</button>
         </div>
       </div>
 
-      <button type="button" class="btn-cortesia-action" id="btnMarcarCortesia">
-        🎁 Pasar esta Mesa a Cortesía ($0)
-      </button>
-      <button class="final-btn" id="confirmIngreso">COBRAR</button>
-    </div>
+      <div id="calcView">
+        <div class="calc-grid">
+          <div class="calc-item">
+            <div class="calc-label">Total Mesa</div>
+            <div class="calc-val"><small>$</small><span id="valTotal">0</span></div>
+          </div>
+          <div class="calc-item" style="border-color:var(--green);">
+            <div class="calc-label" id="labelDrinks" style="color:var(--green);">En Bebidas</div>
+            <div class="calc-val" style="color:var(--green);"><small>$</small><span id="valDrinks">0</span></div>
+          </div>
+          <div class="calc-item">
+            <div class="calc-label">Ya señó</div>
+            <div class="calc-val" style="color:var(--amber);"><small>$</small><span id="valPaid">0</span></div>
+          </div>
+          <div class="calc-item" style="border-color:var(--red);">
+            <div class="calc-label" style="color:var(--red);">Saldo a Cobrar</div>
+            <div class="calc-val" style="color:var(--red);"><small>$</small><span id="valBalance">0</span></div>
+          </div>
+        </div>
 
-    <div id="paymentMethodsView" style="display:none;">
-      <h3 style="margin-bottom:10px;">Seleccioná Medio de Pago</h3>
-      <p style="color:var(--muted); font-size:13px; margin-bottom:20px;">Saldo a cobrar: <b style="color:#fff;" id="payBalanceLabel">$0</b></p>
+        <div class="people-ctrl">
+          <button type="button" class="people-btn" onclick="adjustPeople(-1)">-</button>
+          <div style="display:flex; flex-direction:column; align-items:center;">
+            <input type="number" min="1" class="people-num" id="peopleCount" value="4" oninput="onPeopleInput()"
+              style="background:transparent; border:none; color:#fff; text-align:center; width:90px; outline:none; -moz-appearance:textfield; font-family:'Bebas Neue',sans-serif; font-size:48px;">
+            <span style="font-size:11px; color:var(--muted); margin-top:-6px; font-weight:600;">personas</span>
+          </div>
+          <button type="button" class="people-btn" onclick="adjustPeople(1)">+</button>
+        </div>
 
-      <div class="pay-method-grid">
-        <button class="btn-pay" data-method="efectivo">
-          <span>Efectivo</span>
-          <b class="pay-total-val"></b>
+        <button class="ex-btn" id="toggleException">¿ES UNA EXCEPCIÓN? (Precio manual)</button>
+
+        <div id="exceptionForm">
+          <div class="field-row">
+            <label>Precio por persona ($)</label>
+            <input type="number" id="exPrecioPersona" placeholder="Ej: 25000">
+          </div>
+          <div class="field-row">
+            <label>Total Mesa ($)</label>
+            <input type="number" id="exTotal" placeholder="0">
+          </div>
+          <div class="field-row">
+            <label>Total a entregar en bebidas ($)</label>
+            <input type="number" id="exDrinks" placeholder="0">
+          </div>
+        </div>
+
+        <button type="button" class="btn-cortesia-action" id="btnMarcarCortesia">
+          🎁 Pasar esta Mesa a Cortesía ($0)
         </button>
-        <button class="btn-pay" data-method="transferencia">
-          <span>Transferencia / QR</span>
-          <b class="pay-total-val"></b>
-        </button>
-        <button class="btn-pay" data-method="cortesia" style="border-color:#a855f7;">
-          <span style="color:#e9d5ff;">🎁 Cortesía / Invitación Especial</span>
-          <b style="color:#c084fc;">$0</b>
-        </button>
-        <button class="btn-pay" data-method="mixto">
-          <span>Mixto (Efe + Transf)</span>
-          <b style="font-size:12px; color:var(--muted);">CONFIGURAR</b>
-        </button>
+        <button class="final-btn" id="confirmIngreso">COBRAR</button>
       </div>
-      <button class="close-btn" id="backToCalc">Volver</button>
-    </div>
 
-    <div id="mixedPayView" style="display:none;">
-      <h3 style="margin-bottom:20px;">Pago Mixto</h3>
-      <div class="field-row">
-        <label>Efectivo recibido</label>
-        <input type="number" id="mixCash" placeholder="0" autofocus>
-      </div>
-      <div class="field-row">
-        <label>Restante por Transferencia / QR</label>
-        <input type="number" id="mixTransf" readonly style="background:rgba(255,255,255,0.05); color:var(--blue); font-weight:bold;">
-      </div>
-      <p style="font-size:11px; color:var(--muted); margin:15px 0;">* El monto de transferencia se calcula solo.</p>
-      <button class="final-btn" id="confirmMixed">CONFIRMAR COBRO MIXTO</button>
-      <button class="close-btn" id="backToMethods">Volver</button>
-    </div>
+      <div id="paymentMethodsView" style="display:none;">
+        <h3 style="margin-bottom:10px;">Seleccioná Medio de Pago</h3>
+        <p style="color:var(--muted); font-size:13px; margin-bottom:20px;">Saldo a cobrar: <b style="color:#fff;"
+            id="payBalanceLabel">$0</b></p>
 
-    <div id="cashManagerView" style="display:none;">
-      <h3 id="cashManagerTitle">Caja</h3>
-      <div id="cashManagerForm">
+        <div class="pay-method-grid">
+          <button class="btn-pay" data-method="efectivo">
+            <span>Efectivo</span>
+            <b class="pay-total-val"></b>
+          </button>
+          <button class="btn-pay" data-method="transferencia">
+            <span>Transferencia / QR</span>
+            <b class="pay-total-val"></b>
+          </button>
+          <button class="btn-pay" data-method="cortesia" style="border-color:#a855f7;">
+            <span style="color:#e9d5ff;">🎁 Cortesía / Invitación Especial</span>
+            <b style="color:#c084fc;">$0</b>
+          </button>
+          <button class="btn-pay" data-method="mixto">
+            <span>Mixto (Efe + Transf)</span>
+            <b style="font-size:12px; color:var(--muted);">CONFIGURAR</b>
+          </button>
+        </div>
+        <button class="close-btn" id="backToCalc">Volver</button>
+      </div>
+
+      <div id="mixedPayView" style="display:none;">
+        <h3 style="margin-bottom:20px;">Pago Mixto</h3>
         <div class="field-row">
-          <label id="cashAmountLabel">Monto</label>
-          <input type="number" id="cashAmount" placeholder="0">
+          <label>Efectivo recibido</label>
+          <input type="number" id="mixCash" placeholder="0" autofocus>
         </div>
         <div class="field-row">
-          <label>Nota / Concepto</label>
-          <input type="text" id="cashNote" placeholder="Ej: Cambio inicial">
+          <label>Restante por Transferencia / QR</label>
+          <input type="number" id="mixTransf" readonly
+            style="background:rgba(255,255,255,0.05); color:var(--blue); font-weight:bold;">
         </div>
-        <button class="final-btn" id="saveCashMove">GUARDAR</button>
+        <p style="font-size:11px; color:var(--muted); margin:15px 0;">* El monto de transferencia se calcula solo.</p>
+        <button class="final-btn" id="confirmMixed">CONFIRMAR COBRO MIXTO</button>
+        <button class="close-btn" id="backToMethods">Volver</button>
       </div>
-      <div id="cashStatusReport" style="display:none; margin-top:10px;">
-         <div class="calc-grid" style="grid-template-columns:1fr;">
+
+      <div id="cashManagerView" style="display:none;">
+        <h3 id="cashManagerTitle">Caja</h3>
+        <div id="cashManagerForm">
+          <div class="field-row">
+            <label id="cashAmountLabel">Monto</label>
+            <input type="number" id="cashAmount" placeholder="0">
+          </div>
+          <div class="field-row">
+            <label>Nota / Concepto</label>
+            <input type="text" id="cashNote" placeholder="Ej: Cambio inicial">
+          </div>
+          <button class="final-btn" id="saveCashMove">GUARDAR</button>
+        </div>
+        <div id="cashStatusReport" style="display:none; margin-top:10px;">
+          <div class="calc-grid" style="grid-template-columns:1fr;">
             <div class="calc-item">
               <div class="calc-label">Efectivo en Caja (Teórico)</div>
-              <div class="calc-val" style="color:var(--green); font-size:32px;"><small>$</small><span id="reportCash">0</span></div>
+              <div class="calc-val" style="color:var(--green); font-size:32px;"><small>$</small><span
+                  id="reportCash">0</span></div>
               <div style="font-size:10px; color:var(--muted); margin-top:4px;">(Inicial + Cobros - Retiros)</div>
             </div>
             <div class="calc-item">
@@ -461,437 +840,482 @@
             </div>
             <div class="calc-item" style="opacity:0.7;">
               <div class="calc-label">Adelantos (Semana - No en caja)</div>
-              <div class="calc-val" style="color:var(--amber);"><small>$</small><span id="reportAdelantos">0</span></div>
+              <div class="calc-val" style="color:var(--amber);"><small>$</small><span id="reportAdelantos">0</span>
+              </div>
             </div>
-         </div>
+          </div>
+        </div>
       </div>
+
+      <div id="infoView" style="display:none; text-align:center;">
+        <div style="font-size:18px; font-weight:700; color:var(--blue); margin-bottom:10px;">ESTA MESA YA INGRESÓ</div>
+        <div id="infoDetails" style="color:var(--grey); font-size:14px; line-height:1.6;"></div>
+        <button type="button" class="btn-cortesia-action" id="btnMarcarCortesiaInfo" style="margin-top:16px;">
+          🎁 Cambiar estado a Cortesía ($0)
+        </button>
+      </div>
+
+      <!-- Formulario para asignar / pasar a Cortesía -->
+      <div id="cortesiaFormView" style="display:none; text-align:left;">
+        <div style="font-size:16px; font-weight:800; color:#c084fc; margin-bottom:4px;">🎁 Asignar Mesa de Cortesía
+        </div>
+        <p style="font-size:12px; color:var(--grey); margin-bottom:14px; line-height:1.5;">Esta mesa quedará de color
+          púrpura en el mapa, con saldo $0 y no afectará la caja.</p>
+
+        <div class="field-row">
+          <label>Nombre del Invitado / Beneficiario *</label>
+          <input type="text" id="cortesiaBeneficiarioInput" placeholder="Ej: DJ Lucas, Prensa, Amigo de la casa...">
+        </div>
+        <div class="field-row">
+          <label>Cantidad de Personas (Pulseras)</label>
+          <input type="number" id="cortesiaPersonasInput" min="1" max="25" value="4">
+        </div>
+        <div class="field-row">
+          <label>Nota / Autorizado por (Opcional)</label>
+          <input type="text" id="cortesiaNotaInput" placeholder="Ej: Autorizado por Aníbal">
+        </div>
+
+        <button type="button" class="final-btn" id="btnConfirmarGuardarCortesia"
+          style="background:linear-gradient(145deg, #c084fc, #9333ea); color:#fff; box-shadow:0 8px 20px rgba(168,85,247,0.35); margin-top:8px;">
+          CONFIRMAR CORTESÍA (PÚRPURA $0)
+        </button>
+        <button type="button" class="close-btn" id="btnCancelarCortesiaForm" style="margin-top:8px;">Volver</button>
+      </div>
+
+      <button class="close-btn" id="closeModal">Cerrar</button>
     </div>
-
-    <div id="infoView" style="display:none; text-align:center;">
-      <div style="font-size:18px; font-weight:700; color:var(--blue); margin-bottom:10px;">ESTA MESA YA INGRESÓ</div>
-      <div id="infoDetails" style="color:var(--grey); font-size:14px; line-height:1.6;"></div>
-      <button type="button" class="btn-cortesia-action" id="btnMarcarCortesiaInfo" style="margin-top:16px;">
-        🎁 Cambiar estado a Cortesía ($0)
-      </button>
-    </div>
-
-    <!-- Formulario para asignar / pasar a Cortesía -->
-    <div id="cortesiaFormView" style="display:none; text-align:left;">
-      <div style="font-size:16px; font-weight:800; color:#c084fc; margin-bottom:4px;">🎁 Asignar Mesa de Cortesía</div>
-      <p style="font-size:12px; color:var(--grey); margin-bottom:14px; line-height:1.5;">Esta mesa quedará de color púrpura en el mapa, con saldo $0 y no afectará la caja.</p>
-      
-      <div class="field-row">
-        <label>Nombre del Invitado / Beneficiario *</label>
-        <input type="text" id="cortesiaBeneficiarioInput" placeholder="Ej: DJ Lucas, Prensa, Amigo de la casa...">
-      </div>
-      <div class="field-row">
-        <label>Cantidad de Personas (Pulseras)</label>
-        <input type="number" id="cortesiaPersonasInput" min="1" max="25" value="4">
-      </div>
-      <div class="field-row">
-        <label>Nota / Autorizado por (Opcional)</label>
-        <input type="text" id="cortesiaNotaInput" placeholder="Ej: Autorizado por Aníbal">
-      </div>
-
-      <button type="button" class="final-btn" id="btnConfirmarGuardarCortesia" style="background:linear-gradient(145deg, #c084fc, #9333ea); color:#fff; box-shadow:0 8px 20px rgba(168,85,247,0.35); margin-top:8px;">
-        CONFIRMAR CORTESÍA (PÚRPURA $0)
-      </button>
-      <button type="button" class="close-btn" id="btnCancelarCortesiaForm" style="margin-top:8px;">Volver</button>
-    </div>
-
-    <button class="close-btn" id="closeModal">Cerrar</button>
   </div>
-</div>
 
-<div class="toast" id="toast"></div>
+  <div class="toast" id="toast"></div>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script>
-  const firebaseConfig = { apiKey:"AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY", authDomain:"mesas-cubano-bar.firebaseapp.com", projectId:"mesas-cubano-bar", storageBucket:"mesas-cubano-bar.firebasestorage.app", messagingSenderId:"1072135346765", appId:"1:1072135346765:web:e8a6ee5497366a8b1f5a04" };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const auth = firebase.auth();
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = { apiKey: "AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY", authDomain: "mesas-cubano-bar.firebaseapp.com", projectId: "mesas-cubano-bar", storageBucket: "mesas-cubano-bar.firebasestorage.app", messagingSenderId: "1072135346765", appId: "1:1072135346765:web:e8a6ee5497366a8b1f5a04" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
 
-  if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-    db.useEmulator("localhost", 8085);
-    auth.useEmulator("http://localhost:9099");
-  }
-
-  const TABLES_SALON = [
-    { id:"19", num:"19", x:59.1, y:18.0 }, { id:"18", num:"18", x:79.8, y:17.3 }, { id:"17", num:"17", x:79.9, y:24.1 },
-    { id:"16", num:"16", x:66.0, y:26.6 }, { id:"15", num:"15", x:80.3, y:30.5 }, { id:"D",  num:"D",  x:52.1, y:35.1 },
-    { id:"14", num:"14", x:80.2, y:37.3 }, { id:"13", num:"13", x:22.9, y:38.0 }, { id:"12", num:"12", x:32.4, y:37.9 },
-    { id:"11", num:"11", x:42.7, y:38.0 }, { id:"10", num:"10", x:63.4, y:38.4 }, { id:"9",  num:"9",  x:80.6, y:44.3 },
-    { id:"C",  num:"C",  x:57.9, y:45.5 }, { id:"8",  num:"8",  x:80.7, y:50.9 }, { id:"7",  num:"7",  x:81.8, y:58.2 },
-    { id:"B",  num:"B",  x:58.2, y:61.1 }, { id:"6",  num:"6",  x:81.8, y:65.7 }, { id:"4",  num:"4",  x:58.2, y:68.0 },
-    { id:"3",  num:"3",  x:58.2, y:74.0 }, { id:"20", num:"20", x:70.8, y:74.1 }, { id:"5",  num:"5",  x:81.9, y:73.7 },
-    { id:"1",  num:"1",  x:58.5, y:80.5 }, { id:"2",  num:"2",  x:81.9, y:81.7 }
-  ];
-
-  const TABLES_TERRAZA = [
-    { id: "T-1", num: "1", x: 12.2, y: 49.5 },
-    { id: "T-2", num: "2", x: 14.0, y: 44.2 },
-    { id: "T-3", num: "3", x: 16.3, y: 38.9 },
-    { id: "T-4", num: "4", x: 23.6, y: 37.6 },
-    { id: "T-5", num: "5", x: 30.0, y: 37.6 },
-    { id: "T-6", num: "6", x: 52.8, y: 39.0 },
-    { id: "T-7", num: "7", x: 40.5, y: 42.7 },
-    { id: "T-8", num: "8", x: 19.6, y: 51.4 },
-    { id: "T-9", num: "9", x: 26.8, y: 59.5 },
-    { id: "T-10", num: "10", x: 36.5, y: 59.5 },
-    { id: "T-11", num: "11", x: 45.9, y: 59.5 },
-    { id: "T-12", num: "12", x: 55.6, y: 59.5 },
-    { id: "T-13", num: "13", x: 80.0, y: 59.4 },
-    { id: "T-14", num: "14", x: 90.7, y: 59.5 },
-    { id: "T-15", num: "15", x: 88.9, y: 43.9 },
-    { id: "T-16", num: "16", x: 73.4, y: 37.2 },
-    { id: "T-17", num: "17", x: 77.7, y: 41.9 },
-    { id: "T-18", num: "18", x: 78.5, y: 46.0 },
-    { id: "T-19", num: "19", x: 79.7, y: 50.1 },
-    { id: "T-A", num: "A", x: 27.1, y: 46.3 },
-    { id: "T-B", num: "B", x: 39.4, y: 46.4 },
-    { id: "T-C", num: "C", x: 51.3, y: 46.3 },
-    { id: "T-D", num: "D", x: 38.9, y: 51.5 },
-    { id: "T-E", num: "E", x: 51.4, y: 51.5 }
-  ];
-
-  let currentSector = 'salon';
-  let currentBolEvent = 'fecha2';
-  let bolReservasUnsub = null;
-  let config1 = {};
-  let config2 = {};
-
-  function getActiveSectorTables() {
-    return currentSector === 'terraza' ? TABLES_TERRAZA : TABLES_SALON;
-  }
-
-  function setSector(sector, force = false) {
-    if (currentSector === sector && !force) return;
-    currentSector = sector;
-
-    const tabSalon = document.getElementById("tabSectorSalon");
-    const tabTerraza = document.getElementById("tabSectorTerraza");
-    if (tabSalon) tabSalon.classList.toggle("active", sector === "salon");
-    if (tabTerraza) tabTerraza.classList.toggle("active", sector === "terraza");
-
-    const mapImgEl = document.getElementById("mapImg");
-    const ultraVipBtn = document.getElementById("ultraVipBtn");
-    const mapBgLayerEl = document.getElementById("mapBgLayer");
-
-    const cfg = (currentBolEvent === 'fecha1') ? config1 : config2;
-    if (sector === "terraza") {
-      if (mapImgEl) {
-        if (!mapImgEl.src.endsWith("terraza.png")) {
-          mapImgEl.onload = () => renderMesas();
-          mapImgEl.src = "terraza.png";
-        }
-      }
-      if (ultraVipBtn) ultraVipBtn.style.display = "none";
-      if (mapBgLayerEl) {
-        const bg = (cfg && (cfg.terraceBgUrl || cfg.bgUrl)) || "";
-        if (bg) {
-          mapBgLayerEl.style.backgroundImage = `url("${bg}")`;
-          mapBgLayerEl.style.display = "";
-        } else {
-          mapBgLayerEl.style.backgroundImage = "none";
-          mapBgLayerEl.style.display = "none";
-        }
-      }
-    } else {
-      if (mapImgEl) {
-        if (!mapImgEl.src.endsWith("Gemini_Generated_Image_pxpekipxpekipxpe.png")) {
-          mapImgEl.onload = () => renderMesas();
-          mapImgEl.src = "Gemini_Generated_Image_pxpekipxpekipxpe.png";
-        }
-      }
-      if (ultraVipBtn) ultraVipBtn.style.display = "";
-      if (mapBgLayerEl) {
-        const bg = (cfg && cfg.bgUrl) || "";
-        if (bg) {
-          mapBgLayerEl.style.backgroundImage = `url("${cfg.bgUrl}")`;
-          mapBgLayerEl.style.display = "";
-        } else {
-          mapBgLayerEl.style.backgroundImage = "none";
-        }
-      }
+    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+      db.useEmulator("localhost", 8085);
+      auth.useEmulator("http://localhost:9099");
     }
 
-    renderMesas();
-    actualizarUltraVip();
-  }
+    const TABLES_SALON = [
+      { id: "19", num: "19", x: 59.1, y: 18.0 }, { id: "18", num: "18", x: 79.8, y: 17.3 }, { id: "17", num: "17", x: 79.9, y: 24.1 },
+      { id: "16", num: "16", x: 66.0, y: 26.6 }, { id: "15", num: "15", x: 80.3, y: 30.5 }, { id: "D", num: "D", x: 52.1, y: 35.1 },
+      { id: "14", num: "14", x: 80.2, y: 37.3 }, { id: "13", num: "13", x: 22.9, y: 38.0 }, { id: "12", num: "12", x: 32.4, y: 37.9 },
+      { id: "11", num: "11", x: 42.7, y: 38.0 }, { id: "10", num: "10", x: 63.4, y: 38.4 }, { id: "9", num: "9", x: 80.6, y: 44.3 },
+      { id: "C", num: "C", x: 57.9, y: 45.5 }, { id: "8", num: "8", x: 80.7, y: 50.9 }, { id: "7", num: "7", x: 81.8, y: 58.2 },
+      { id: "B", num: "B", x: 58.2, y: 61.1 }, { id: "6", num: "6", x: 81.8, y: 65.7 }, { id: "4", num: "4", x: 58.2, y: 68.0 },
+      { id: "3", num: "3", x: 58.2, y: 74.0 }, { id: "20", num: "20", x: 70.8, y: 74.1 }, { id: "5", num: "5", x: 81.9, y: 73.7 },
+      { id: "1", num: "1", x: 58.5, y: 80.5 }, { id: "2", num: "2", x: 81.9, y: 81.7 }
+    ];
 
-  let estado = {};
-  let currentMesa = null;
-  let currentPeople = 4;
-  let isException = false;
-  let currentBalance = 0;
-  let cajaMovimientos = [];
-  let exPactadaPrecioPersona = 0;
-  let exPactadaDrinksPct = 80;
-  let exPactadaSena = 0;
-  let exResponsable = '';
-  let exBasePersonas = 4;
-  let exBaseTotal = 0;
+    const TABLES_TERRAZA = [
+      { id: "T-1", num: "1", x: 12.2, y: 49.5 },
+      { id: "T-2", num: "2", x: 14.0, y: 44.2 },
+      { id: "T-3", num: "3", x: 16.3, y: 38.9 },
+      { id: "T-4", num: "4", x: 23.6, y: 37.6 },
+      { id: "T-5", num: "5", x: 30.0, y: 37.6 },
+      { id: "T-6", num: "6", x: 52.8, y: 39.0 },
+      { id: "T-7", num: "7", x: 40.5, y: 42.7 },
+      { id: "T-8", num: "8", x: 19.6, y: 51.4 },
+      { id: "T-9", num: "9", x: 26.8, y: 59.5 },
+      { id: "T-10", num: "10", x: 36.5, y: 59.5 },
+      { id: "T-11", num: "11", x: 45.9, y: 59.5 },
+      { id: "T-12", num: "12", x: 55.6, y: 59.5 },
+      { id: "T-13", num: "13", x: 80.0, y: 59.4 },
+      { id: "T-14", num: "14", x: 90.7, y: 59.5 },
+      { id: "T-15", num: "15", x: 88.9, y: 43.9 },
+      { id: "T-16", num: "16", x: 73.4, y: 37.2 },
+      { id: "T-17", num: "17", x: 77.7, y: 41.9 },
+      { id: "T-18", num: "18", x: 78.5, y: 46.0 },
+      { id: "T-19", num: "19", x: 79.7, y: 50.1 },
+      { id: "T-A", num: "A", x: 27.1, y: 46.3 },
+      { id: "T-B", num: "B", x: 39.4, y: 46.4 },
+      { id: "T-C", num: "C", x: 51.3, y: 46.3 },
+      { id: "T-D", num: "D", x: 38.9, y: 51.5 },
+      { id: "T-E", num: "E", x: 51.4, y: 51.5 }
+    ];
 
-  auth.onAuthStateChanged(async (user) => {
-    if (user) {
-      try {
-        const userDoc = await db.collection("users").doc(user.email.toLowerCase()).get();
-        if (userDoc.exists) {
-          const role = userDoc.data().role;
-          if (role === 'boleteria' || role === 'admin') {
-            document.getElementById('appView').style.display = 'block';
-            initApp();
+    let currentSector = 'salon';
+    let currentBolEvent = 'fecha2';
+    let bolReservasUnsub = null;
+    let config1 = {};
+    let config2 = {};
+
+    function getActiveSectorTables() {
+      return currentSector === 'terraza' ? TABLES_TERRAZA : TABLES_SALON;
+    }
+
+    function setSector(sector, force = false) {
+      if (currentSector === sector && !force) return;
+      currentSector = sector;
+
+      const tabSalon = document.getElementById("tabSectorSalon");
+      const tabTerraza = document.getElementById("tabSectorTerraza");
+      if (tabSalon) tabSalon.classList.toggle("active", sector === "salon");
+      if (tabTerraza) tabTerraza.classList.toggle("active", sector === "terraza");
+
+      const mapImgEl = document.getElementById("mapImg");
+      const ultraVipBtn = document.getElementById("ultraVipBtn");
+      const mapBgLayerEl = document.getElementById("mapBgLayer");
+
+      const cfg = (currentBolEvent === 'fecha1') ? config1 : config2;
+      if (sector === "terraza") {
+        if (mapImgEl) {
+          if (!mapImgEl.src.includes("terraza_cubano.png")) {
+            mapImgEl.onload = () => renderMesas();
+            mapImgEl.src = "terraza_cubano.png?v=20261124";
+          }
+        }
+        if (ultraVipBtn) ultraVipBtn.style.display = "none";
+        if (mapBgLayerEl) {
+          const bg = (cfg && (cfg.terraceBgUrl || cfg.bgUrl)) || "";
+          if (bg) {
+            mapBgLayerEl.style.backgroundImage = `url("${bg}")`;
+            mapBgLayerEl.style.display = "";
+          } else {
+            mapBgLayerEl.style.backgroundImage = "none";
+            mapBgLayerEl.style.display = "none";
+          }
+        }
+      } else {
+        if (mapImgEl) {
+          if (!mapImgEl.src.endsWith("Gemini_Generated_Image_pxpekipxpekipxpe.png")) {
+            mapImgEl.onload = () => renderMesas();
+            mapImgEl.src = "Gemini_Generated_Image_pxpekipxpekipxpe.png";
+          }
+        }
+        if (ultraVipBtn) ultraVipBtn.style.display = "";
+        if (mapBgLayerEl) {
+          const bg = (cfg && cfg.bgUrl) || "";
+          if (bg) {
+            mapBgLayerEl.style.backgroundImage = `url("${cfg.bgUrl}")`;
+            mapBgLayerEl.style.display = "";
+          } else {
+            mapBgLayerEl.style.backgroundImage = "none";
+          }
+        }
+      }
+
+      renderMesas();
+      actualizarUltraVip();
+    }
+
+    let estado = {};
+    let currentMesa = null;
+    let currentPeople = 4;
+    let isException = false;
+    let currentBalance = 0;
+    let cajaMovimientos = [];
+    let exPactadaPrecioPersona = 0;
+    let exPactadaDrinksPct = 80;
+    let exPactadaSena = 0;
+    let exResponsable = '';
+    let exBasePersonas = 4;
+    let exBaseTotal = 0;
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const userDoc = await db.collection("users").doc(user.email.toLowerCase()).get();
+          if (userDoc.exists) {
+            const role = userDoc.data().role;
+            if (role === 'boleteria' || role === 'admin') {
+              document.getElementById('appView').style.display = 'block';
+              initApp();
+            } else {
+              window.location.href = "admin.html";
+            }
           } else {
             window.location.href = "admin.html";
           }
-        } else {
+        } catch (e) {
+          console.error(e);
           window.location.href = "admin.html";
         }
-      } catch(e) {
-        console.error(e);
+      } else {
         window.location.href = "admin.html";
       }
-    } else {
-      window.location.href = "admin.html";
-    }
-  });
-
-  document.getElementById('logoutBtn').addEventListener('click', () => auth.signOut());
-
-  let pricingConfig = {
-    precioBaseMesa: 120000,
-    capacidadBase: 4,
-    precioPersonaExtra: 25000,
-    montoSena: 30000,
-    dias: [
-      { id: 1, name: "Lunes", pct: 90, active: true },
-      { id: 2, name: "Martes", pct: 85, active: true },
-      { id: 3, name: "Miércoles", pct: 80, active: true },
-      { id: 4, name: "Jueves", pct: 70, active: true },
-      { id: 5, name: "Viernes", pct: 60, active: true },
-      { id: 6, name: "Sábado", pct: 50, active: true },
-      { id: 0, name: "Domingo", pct: 90, active: true }
-    ]
-  };
-
-  function getTodayPromo() {
-    const dayOfWeek = new Date().getDay();
-    const found = pricingConfig.dias ? pricingConfig.dias.find(d => d.id === dayOfWeek) : null;
-    if (found && found.active) return found;
-    return { id: dayOfWeek, name: "Hoy", pct: 50, active: true };
-  }
-
-  // Configuración oficial de la Calculadora de Mesas
-  const CALC_DEFAULT_CONFIG = {
-    precioBase: 100000,
-    capacidadBase: 5,
-    precioPersonaExtra: 20000,
-    montoSena: 20000,
-    pctRecargoTransferencia: 10,
-    maxPersonas: 10
-  };
-  let calcConfig = { ...CALC_DEFAULT_CONFIG };
-  let isCalcReservation = false;
-  let calcResSelectedPayment = 'efectivo';
-
-  /**
-   * Cálculo oficial para reservas provenientes de la calculadora.
-   * Si asisten menos personas que la capacidad base (ej. 2, 3 o 4),
-   * se cobra el piso mínimo de la capacidad base (5 personas).
-   */
-  function calcularPreciosMesa(config, cantPersonas) {
-    const p = Math.max(1, Number(cantPersonas) || 1);
-    const base = Math.round(Number(config.precioBase) || 100000);
-    const capBase = Math.round(Number(config.capacidadBase) || 5);
-    const extraPorPersona = Math.round(Number(config.precioPersonaExtra) || 20000);
-    const sena = Math.round(Number(config.montoSena) || 20000);
-    const pctRecargo = Number(config.pctRecargoTransferencia) || 0;
-
-    const personasACobrar = Math.max(capBase, p);
-
-    let precioMesa = base;
-    if (personasACobrar > capBase) {
-      precioMesa = base + ((personasACobrar - capBase) * extraPorPersona);
-    }
-
-    const enPuerta = Math.max(0, precioMesa - sena);
-    const consumo = Math.max(0, precioMesa - sena);
-    const recargoTransf = Math.round((precioMesa * pctRecargo) / 100);
-    const totalTransferencia = precioMesa + recargoTransf;
-    const restoTransferencia = Math.max(0, totalTransferencia - sena);
-
-    return {
-      personasReales: p,
-      personasACobrar: personasACobrar,
-      precioMesa,
-      sena,
-      enPuerta,
-      consumo,
-      pctRecargo,
-      recargoTransf,
-      totalTransferencia,
-      restoTransferencia
-    };
-  }
-
-  function initApp() {
-    db.collection("config").doc("precios_consumo").onSnapshot(doc => {
-      if (doc.exists) {
-        const data = doc.data();
-        if (data.precioBaseMesa) pricingConfig.precioBaseMesa = data.precioBaseMesa;
-        if (data.precioPersonaExtra) pricingConfig.precioPersonaExtra = data.precioPersonaExtra;
-        if (data.montoSena) pricingConfig.montoSena = data.montoSena;
-        if (data.dias && Array.isArray(data.dias)) pricingConfig.dias = data.dias;
-      }
     });
 
-    db.collection("config").doc("calculadora_mesas").onSnapshot(doc => {
-      if (doc.exists) {
-        const data = doc.data();
-        calcConfig = {
-          precioBase: data.precioBase !== undefined ? Number(data.precioBase) : CALC_DEFAULT_CONFIG.precioBase,
-          capacidadBase: data.capacidadBase !== undefined ? Number(data.capacidadBase) : CALC_DEFAULT_CONFIG.capacidadBase,
-          precioPersonaExtra: data.precioPersonaExtra !== undefined ? Number(data.precioPersonaExtra) : CALC_DEFAULT_CONFIG.precioPersonaExtra,
-          montoSena: data.montoSena !== undefined ? Number(data.montoSena) : CALC_DEFAULT_CONFIG.montoSena,
-          pctRecargoTransferencia: data.pctRecargoTransferencia !== undefined ? Number(data.pctRecargoTransferencia) : CALC_DEFAULT_CONFIG.pctRecargoTransferencia,
-          maxPersonas: data.maxPersonas !== undefined ? Number(data.maxPersonas) : CALC_DEFAULT_CONFIG.maxPersonas
-        };
-        if (currentMesa && document.getElementById('modalOverlay')?.classList.contains('open')) {
-          updateCalc();
+    document.getElementById('logoutBtn').addEventListener('click', () => auth.signOut());
+
+    let pricingConfig = {
+      precioBaseMesa: 120000,
+      capacidadBase: 4,
+      precioPersonaExtra: 25000,
+      montoSena: 30000,
+      dias: [
+        { id: 1, name: "Lunes", pct: 90, active: true },
+        { id: 2, name: "Martes", pct: 85, active: true },
+        { id: 3, name: "Miércoles", pct: 80, active: true },
+        { id: 4, name: "Jueves", pct: 70, active: true },
+        { id: 5, name: "Viernes", pct: 60, active: true },
+        { id: 6, name: "Sábado", pct: 50, active: true },
+        { id: 0, name: "Domingo", pct: 90, active: true }
+      ]
+    };
+
+    function getTodayPromo() {
+      const dayOfWeek = new Date().getDay();
+      const found = pricingConfig.dias ? pricingConfig.dias.find(d => d.id === dayOfWeek) : null;
+      if (found && found.active) return found;
+      return { id: dayOfWeek, name: "Hoy", pct: 50, active: true };
+    }
+
+    // Configuración oficial de la Calculadora de Mesas
+    const CALC_DEFAULT_CONFIG = {
+      precioBase: 100000,
+      capacidadBase: 5,
+      precioPersonaExtra: 20000,
+      montoSena: 20000,
+      pctRecargoTransferencia: 10,
+      maxPersonas: 10
+    };
+    let calcConfig = { ...CALC_DEFAULT_CONFIG };
+    let isCalcReservation = false;
+    let calcResSelectedPayment = 'efectivo';
+
+    /**
+     * Cálculo oficial para reservas provenientes de la calculadora.
+     * Si asisten menos personas que la capacidad base (ej. 2, 3 o 4),
+     * se cobra el piso mínimo de la capacidad base (5 personas).
+     */
+    function calcularPreciosMesa(config, cantPersonas) {
+      const p = Math.max(1, Number(cantPersonas) || 1);
+      const base = Math.round(Number(config.precioBase) || 100000);
+      const capBase = Math.round(Number(config.capacidadBase) || 5);
+      const extraPorPersona = Math.round(Number(config.precioPersonaExtra) || 20000);
+      const sena = Math.round(Number(config.montoSena) || 20000);
+      const pctRecargo = Number(config.pctRecargoTransferencia) || 0;
+
+      const personasACobrar = Math.max(capBase, p);
+
+      let precioMesa = base;
+      if (personasACobrar > capBase) {
+        precioMesa = base + ((personasACobrar - capBase) * extraPorPersona);
+      }
+
+      const enPuerta = Math.max(0, precioMesa - sena);
+      const consumo = Math.max(0, precioMesa - sena);
+      const recargoTransf = Math.round((precioMesa * pctRecargo) / 100);
+      const totalTransferencia = precioMesa + recargoTransf;
+      const restoTransferencia = Math.max(0, totalTransferencia - sena);
+
+      return {
+        personasReales: p,
+        personasACobrar: personasACobrar,
+        precioMesa,
+        sena,
+        enPuerta,
+        consumo,
+        pctRecargo,
+        recargoTransf,
+        totalTransferencia,
+        restoTransferencia
+      };
+    }
+
+    function initApp() {
+      db.collection("config").doc("precios_consumo").onSnapshot(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          if (data.precioBaseMesa) pricingConfig.precioBaseMesa = data.precioBaseMesa;
+          if (data.precioPersonaExtra) pricingConfig.precioPersonaExtra = data.precioPersonaExtra;
+          if (data.montoSena) pricingConfig.montoSena = data.montoSena;
+          if (data.dias && Array.isArray(data.dias)) pricingConfig.dias = data.dias;
         }
-      }
-    });
+      });
 
-    // Estado de evento y configuraciones en ámbito general
-
-    window.getActiveBolCollection = function() {
-      return currentBolEvent === 'fecha1' ? 'reservas' : 'reservas_fecha2';
-    };
-
-    function calcularEventoBoleteria() {
-      const modo = config1.modoFechas || (config1.dobleFechaActiva ? 'ambas_1_2' : 'fecha1');
-      if (modo === 'fecha1') return 'fecha1';
-      if (modo === 'fecha2') return 'fecha2';
-
-      if (config1.boleteriaOverride === 'fecha1') return 'fecha1';
-      if (config1.boleteriaOverride === 'fecha2') return 'fecha2';
-
-      // Cálculo de fecha/hora de turno:
-      // "en boleteria solo tiene que ver la fecha del sabado hasta que finalice el evento osea hasta el domingo 7am
-      // despues de ese horario si tiene que ver las reservas del evento del domingo que comienza a las 23:59 de ese dia hasta terminar el evento"
-      const now = new Date();
-      const day = now.getDay(); // 0: Domingo, 1: Lunes, ..., 6: Sábado
-      const hour = now.getHours();
-
-      if (day === 0) { // Domingo
-        return (hour < 7) ? 'fecha2' : 'fecha1';
-      } else if (day === 1) { // Lunes
-        return (hour < 7) ? 'fecha1' : 'fecha2';
-      } else if (day === 6) { // Sábado
-        return 'fecha2';
-      } else {
-        // Miércoles, Jueves, Viernes: próximo evento en puerta es Sábado (Fecha 2)
-        return 'fecha2';
-      }
-    }
-
-    function actualizarEventoBoleteria() {
-      const nuevoEvento = calcularEventoBoleteria();
-      const eventChanged = (currentBolEvent !== nuevoEvento);
-      currentBolEvent = nuevoEvento;
-
-      const banner = document.getElementById('boleteriaEventBanner');
-      const title = document.getElementById('boleteriaEventTitle');
-
-      if (banner && title) {
-        banner.style.display = 'block';
-        const cfg = (nuevoEvento === 'fecha1') ? config1 : config2;
-        const fechaStr = (cfg.headingText || (nuevoEvento === 'fecha1' ? 'DOMINGO 11' : 'SÁBADO 10')) + (cfg.eventDate ? ' ' + cfg.eventDate : '');
-        title.textContent = 'EVENTO: ' + fechaStr;
-
-        const sectorTabsWrap = document.getElementById("sectorTabsWrap");
-        const sectorMode = cfg.sectoresHabilitados || 'ambos';
-        if (sectorTabsWrap) {
-          if (sectorMode === 'main_stage') {
-            sectorTabsWrap.style.display = "none";
-            setSector('salon', true);
-          } else if (sectorMode === 'terrace_soul') {
-            sectorTabsWrap.style.display = "none";
-            setSector('terraza', true);
-          } else {
-            sectorTabsWrap.style.display = "flex";
-            setSector(currentSector, true);
+      db.collection("config").doc("calculadora_mesas").onSnapshot(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          calcConfig = {
+            precioBase: data.precioBase !== undefined ? Number(data.precioBase) : CALC_DEFAULT_CONFIG.precioBase,
+            capacidadBase: data.capacidadBase !== undefined ? Number(data.capacidadBase) : CALC_DEFAULT_CONFIG.capacidadBase,
+            precioPersonaExtra: data.precioPersonaExtra !== undefined ? Number(data.precioPersonaExtra) : CALC_DEFAULT_CONFIG.precioPersonaExtra,
+            montoSena: data.montoSena !== undefined ? Number(data.montoSena) : CALC_DEFAULT_CONFIG.montoSena,
+            pctRecargoTransferencia: data.pctRecargoTransferencia !== undefined ? Number(data.pctRecargoTransferencia) : CALC_DEFAULT_CONFIG.pctRecargoTransferencia,
+            maxPersonas: data.maxPersonas !== undefined ? Number(data.maxPersonas) : CALC_DEFAULT_CONFIG.maxPersonas
+          };
+          if (currentMesa && document.getElementById('modalOverlay')?.classList.contains('open')) {
+            updateCalc();
           }
         }
+      });
+
+      // Estado de evento y configuraciones en ámbito general
+
+      window.getActiveBolCollection = function () {
+        return currentBolEvent === 'fecha1' ? 'reservas' : 'reservas_fecha2';
+      };
+
+      function calcularEventoBoleteria() {
+        const modo = config1.modoFechas || (config1.dobleFechaActiva ? 'ambas_1_2' : 'fecha1');
+        if (modo === 'fecha1') return 'fecha1';
+        if (modo === 'fecha2') return 'fecha2';
+
+        if (config1.boleteriaOverride === 'fecha1') return 'fecha1';
+        if (config1.boleteriaOverride === 'fecha2') return 'fecha2';
+
+        // Cálculo de fecha/hora de turno:
+        // "en boleteria solo tiene que ver la fecha del sabado hasta que finalice el evento osea hasta el domingo 7am
+        // despues de ese horario si tiene que ver las reservas del evento del domingo que comienza a las 23:59 de ese dia hasta terminar el evento"
+        const now = new Date();
+        const day = now.getDay(); // 0: Domingo, 1: Lunes, ..., 6: Sábado
+        const hour = now.getHours();
+
+        if (day === 0) { // Domingo
+          return (hour < 7) ? 'fecha2' : 'fecha1';
+        } else if (day === 1) { // Lunes
+          return (hour < 7) ? 'fecha1' : 'fecha2';
+        } else if (day === 6) { // Sábado
+          return 'fecha2';
+        } else {
+          // Miércoles, Jueves, Viernes: próximo evento en puerta es Sábado (Fecha 2)
+          return 'fecha2';
+        }
       }
 
-      if (eventChanged || !bolReservasUnsub) {
-        listenBoleteriaReservas();
-      }
-    }
+      function actualizarEventoBoleteria() {
+        const nuevoEvento = calcularEventoBoleteria();
+        const eventChanged = (currentBolEvent !== nuevoEvento);
+        currentBolEvent = nuevoEvento;
 
-    function listenBoleteriaReservas() {
-      if (bolReservasUnsub) {
-        bolReservasUnsub();
-        bolReservasUnsub = null;
-      }
-      estado = {};
-      renderMesas();
-      actualizarUltraVip();
+        const banner = document.getElementById('boleteriaEventBanner');
+        const title = document.getElementById('boleteriaEventTitle');
 
-      const colName = window.getActiveBolCollection();
-      bolReservasUnsub = db.collection(colName).onSnapshot(snapshot => {
+        if (banner && title) {
+          banner.style.display = 'block';
+          const cfg = (nuevoEvento === 'fecha1') ? config1 : config2;
+          const fechaStr = (cfg.headingText || (nuevoEvento === 'fecha1' ? 'DOMINGO 11' : 'SÁBADO 10')) + (cfg.eventDate ? ' ' + cfg.eventDate : '');
+          title.textContent = 'EVENTO: ' + fechaStr;
+
+          const sectorTabsWrap = document.getElementById("sectorTabsWrap");
+          const sectorMode = cfg.sectoresHabilitados || 'ambos';
+          if (sectorTabsWrap) {
+            if (sectorMode === 'main_stage') {
+              sectorTabsWrap.style.display = "none";
+              setSector('salon', true);
+            } else if (sectorMode === 'terrace_soul') {
+              sectorTabsWrap.style.display = "none";
+              setSector('terraza', true);
+            } else {
+              sectorTabsWrap.style.display = "flex";
+              setSector(currentSector, true);
+            }
+          }
+        }
+
+        if (eventChanged || !bolReservasUnsub) {
+          listenBoleteriaReservas();
+        }
+      }
+
+      function listenBoleteriaReservas() {
+        if (bolReservasUnsub) {
+          bolReservasUnsub();
+          bolReservasUnsub = null;
+        }
         estado = {};
-        snapshot.forEach(doc => { estado[doc.id] = doc.data(); });
         renderMesas();
         actualizarUltraVip();
-      }, err => {
-        console.error("Error escuchando " + colName, err);
+
+        const colName = window.getActiveBolCollection();
+        bolReservasUnsub = db.collection(colName).onSnapshot(snapshot => {
+          estado = {};
+          snapshot.forEach(doc => { estado[doc.id] = doc.data(); });
+          renderMesas();
+          actualizarUltraVip();
+        }, err => {
+          console.error("Error escuchando " + colName, err);
+        });
+      }
+
+      db.collection("config").doc("ultraVip").onSnapshot(doc => {
+        if (doc.exists) {
+          config1 = doc.data();
+          actualizarEventoBoleteria();
+        }
+      });
+
+      db.collection("config").doc("ultraVip_fecha2").onSnapshot(doc => {
+        if (doc.exists) {
+          config2 = doc.data();
+          actualizarEventoBoleteria();
+        }
+      });
+
+      // Revisar cambio de turno automáticamente cada minuto
+      setInterval(actualizarEventoBoleteria, 60000);
+
+      db.collection("caja_movimientos").orderBy("ts", "desc").onSnapshot(snapshot => {
+        cajaMovimientos = [];
+        const cutoff = Date.now() - 14 * 60 * 60 * 1000;
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if (data.ts >= cutoff) {
+            cajaMovimientos.push({ id: doc.id, ...data });
+          }
+        });
+        updateCajaUI();
       });
     }
 
-    db.collection("config").doc("ultraVip").onSnapshot(doc => {
-      if (doc.exists) {
-        config1 = doc.data();
-        actualizarEventoBoleteria();
-      }
-    });
+    function renderMesas() {
+      const container = document.getElementById("plano-mesas");
+      container.querySelectorAll(".table-btn").forEach(b => b.remove());
+      const mapWidth = container.offsetWidth;
+      const isTerraza = currentSector === 'terraza';
+      const btnSize = mapWidth * (isTerraza ? 0.058 : 0.078);
 
-    db.collection("config").doc("ultraVip_fecha2").onSnapshot(doc => {
-      if (doc.exists) {
-        config2 = doc.data();
-        actualizarEventoBoleteria();
-      }
-    });
+      getActiveSectorTables().forEach(t => {
+        const r = estado[t.id];
+        const isActive = r && (r.status !== "disputa" || (Number.isFinite(r.expiresAt) && r.expiresAt > Date.now()));
+        const isCortesia = isActive && (r.status === "cortesia" || r.esCortesia);
+        const isIngresada = isActive && r.status === "ingresada";
+        const isCortesiaIngresada = isIngresada && isCortesia;
+        const isApproved = isActive && ["aprobada", "ocupada", "vendida"].includes(r.status) && !isCortesia;
+        const isPending = isActive && ["disputa", "pendiente", "comprobante_subido", "pendiente_revision"].includes(r.status) && !isCortesia;
 
-    // Revisar cambio de turno automáticamente cada minuto
-    setInterval(actualizarEventoBoleteria, 60000);
-
-    db.collection("caja_movimientos").orderBy("ts", "desc").onSnapshot(snapshot => {
-      cajaMovimientos = [];
-      const cutoff = Date.now() - 14 * 60 * 60 * 1000;
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        if (data.ts >= cutoff) {
-          cajaMovimientos.push({ id: doc.id, ...data });
+        let statusClass = "";
+        if (isCortesiaIngresada) {
+          statusClass = " cortesia-ingresada";
+        } else if (isCortesia) {
+          statusClass = " cortesia";
+        } else if (isIngresada) {
+          statusClass = " ingresada";
+        } else if (isApproved) {
+          statusClass = " approved";
+        } else if (isPending) {
+          statusClass = " pending";
         }
+
+        const btn = document.createElement("button");
+        btn.className = "table-btn" + (isTerraza ? " terraza-btn" : "") + statusClass;
+        btn.style.left = t.x + "%";
+        btn.style.top = t.y + "%";
+        btn.style.width = btnSize + "px";
+        btn.style.height = btnSize + "px";
+        btn.innerHTML = '<span class="table-label">' + (t.num || t.id) + '</span>';
+        btn.onclick = () => handleTableClick(t.id);
+        container.appendChild(btn);
       });
-      updateCajaUI();
-    });
-  }
+    }
 
-  function renderMesas() {
-    const container = document.getElementById("plano-mesas");
-    container.querySelectorAll(".table-btn").forEach(b => b.remove());
-    const mapWidth = container.offsetWidth;
-    const isTerraza = currentSector === 'terraza';
-    const btnSize = mapWidth * (isTerraza ? 0.058 : 0.078);
+    function actualizarUltraVip() {
+      const btn = document.getElementById("ultraVipBtn");
+      if (currentSector === 'terraza') {
+        if (btn) btn.style.display = "none";
+        return;
+      }
+      if (btn) btn.style.display = "";
 
-    getActiveSectorTables().forEach(t => {
-      const r = estado[t.id];
+      const r = estado["ULTRA VIP"];
       const isActive = r && (r.status !== "disputa" || (Number.isFinite(r.expiresAt) && r.expiresAt > Date.now()));
       const isCortesia = isActive && (r.status === "cortesia" || r.esCortesia);
       const isIngresada = isActive && r.status === "ingresada";
@@ -899,178 +1323,137 @@
       const isApproved = isActive && ["aprobada", "ocupada", "vendida"].includes(r.status) && !isCortesia;
       const isPending = isActive && ["disputa", "pendiente", "comprobante_subido", "pendiente_revision"].includes(r.status) && !isCortesia;
 
-      let statusClass = "";
-      if (isCortesiaIngresada) {
-        statusClass = " cortesia-ingresada";
-      } else if (isCortesia) {
-        statusClass = " cortesia";
-      } else if (isIngresada) {
-        statusClass = " ingresada";
-      } else if (isApproved) {
-        statusClass = " approved";
-      } else if (isPending) {
-        statusClass = " pending";
+      btn.className = "ultra-vip-overlay" + (isCortesiaIngresada ? " cortesia-ingresada" : isCortesia ? " cortesia" : isIngresada ? " ingresada" : isApproved ? " confirmed" : isPending ? " dispute" : "");
+      btn.textContent = isCortesiaIngresada ? "CORTESÍA DENTRO" : isCortesia ? "CORTESÍA" : isIngresada ? "DENTRO" : isApproved ? "VENDIDA" : isPending ? "PENDIENTE" : "RESERVAR";
+      btn.onclick = () => handleTableClick("ULTRA VIP");
+    }
+
+    function handleTableClick(id) {
+      const r = estado[id];
+      const isActive = r && (r.status !== "disputa" || (Number.isFinite(r.expiresAt) && r.expiresAt > Date.now()));
+      if (isActive && r.status === "disputa") {
+        showToast("Mesa en proceso de seña...");
+        return;
+      }
+      currentMesa = id;
+      openModal(id, r);
+    }
+
+    function formatReservationPromoInfo(r) {
+      if (!r) {
+        const today = getTodayPromo();
+        return {
+          badgeText: `⚡ <b>Venta en Puerta</b> • Promo hoy (${today.name}): <b>${today.pct}% en Bebidas</b>`,
+          pct: today.pct,
+          originText: `Promo hoy (${today.name}): ${today.pct}%`
+        };
       }
 
-      const btn = document.createElement("button");
-      btn.className = "table-btn" + (isTerraza ? " terraza-btn" : "") + statusClass;
-      btn.style.left = t.x + "%";
-      btn.style.top = t.y + "%";
-      btn.style.width = btnSize + "px";
-      btn.style.height = btnSize + "px";
-      btn.innerHTML = '<span class="table-label">' + (t.num || t.id) + '</span>';
-      btn.onclick = () => handleTableClick(t.id);
-      container.appendChild(btn);
-    });
-  }
+      // Extraer día de la semana y fecha si existe el timestamp
+      let dayName = "";
+      let dateStr = "";
+      if (r.ts) {
+        const date = new Date(r.ts);
+        const days = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+        dayName = days[date.getDay()];
+        dateStr = date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
+      }
 
-  function actualizarUltraVip() {
-    const btn = document.getElementById("ultraVipBtn");
-    if (currentSector === 'terraza') {
-      if (btn) btn.style.display = "none";
-      return;
-    }
-    if (btn) btn.style.display = "";
+      const pct = (r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null)
+        ? r.porcentajeConsumo
+        : getTodayPromo().pct;
 
-    const r = estado["ULTRA VIP"];
-    const isActive = r && (r.status !== "disputa" || (Number.isFinite(r.expiresAt) && r.expiresAt > Date.now()));
-    const isCortesia = isActive && (r.status === "cortesia" || r.esCortesia);
-    const isIngresada = isActive && r.status === "ingresada";
-    const isCortesiaIngresada = isIngresada && isCortesia;
-    const isApproved = isActive && ["aprobada", "ocupada", "vendida"].includes(r.status) && !isCortesia;
-    const isPending = isActive && ["disputa", "pendiente", "comprobante_subido", "pendiente_revision"].includes(r.status) && !isCortesia;
+      let badgeText = "";
+      if (dayName && dateStr) {
+        badgeText = `📅 Reservado el <b>${dayName} ${dateStr}</b> • <b>${pct}% Reintegro en Bebidas</b>`;
+      } else {
+        badgeText = `🏷️ Promo acordada: <b>${pct}% Reintegro en Bebidas</b>`;
+      }
 
-    btn.className = "ultra-vip-overlay" + (isCortesiaIngresada ? " cortesia-ingresada" : isCortesia ? " cortesia" : isIngresada ? " ingresada" : isApproved ? " confirmed" : isPending ? " dispute" : "");
-    btn.textContent = isCortesiaIngresada ? "CORTESÍA DENTRO" : isCortesia ? "CORTESÍA" : isIngresada ? "DENTRO" : isApproved ? "VENDIDA" : isPending ? "PENDIENTE" : "RESERVAR";
-    btn.onclick = () => handleTableClick("ULTRA VIP");
-  }
-
-  function handleTableClick(id) {
-    const r = estado[id];
-    const isActive = r && (r.status !== "disputa" || (Number.isFinite(r.expiresAt) && r.expiresAt > Date.now()));
-    if (isActive && r.status === "disputa") {
-      showToast("Mesa en proceso de seña...");
-      return;
-    }
-    currentMesa = id;
-    openModal(id, r);
-  }
-
-  function formatReservationPromoInfo(r) {
-    if (!r) {
-      const today = getTodayPromo();
-      return {
-        badgeText: `⚡ <b>Venta en Puerta</b> • Promo hoy (${today.name}): <b>${today.pct}% en Bebidas</b>`,
-        pct: today.pct,
-        originText: `Promo hoy (${today.name}): ${today.pct}%`
-      };
-    }
-    
-    // Extraer día de la semana y fecha si existe el timestamp
-    let dayName = "";
-    let dateStr = "";
-    if (r.ts) {
-      const date = new Date(r.ts);
-      const days = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-      dayName = days[date.getDay()];
-      dateStr = date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
-    }
-    
-    const pct = (r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) 
-      ? r.porcentajeConsumo 
-      : getTodayPromo().pct;
-
-    let badgeText = "";
-    if (dayName && dateStr) {
-      badgeText = `📅 Reservado el <b>${dayName} ${dateStr}</b> • <b>${pct}% Reintegro en Bebidas</b>`;
-    } else {
-      badgeText = `🏷️ Promo acordada: <b>${pct}% Reintegro en Bebidas</b>`;
+      return { badgeText, pct, originText: `${dayName || 'Día'} ${dateStr || ''} (${pct}%)` };
     }
 
-    return { badgeText, pct, originText: `${dayName || 'Día'} ${dateStr || ''} (${pct}%)` };
-  }
+    function escapeHtml(value) {
+      if (!value) return '';
+      const el = document.createElement('div');
+      el.textContent = value;
+      return el.innerHTML;
+    }
 
-  function escapeHtml(value){
-    if (!value) return '';
-    const el = document.createElement('div');
-    el.textContent = value;
-    return el.innerHTML;
-  }
+    function openModal(id, r) {
+      const overlay = document.getElementById('modalOverlay');
+      const title = document.getElementById('modalTitle');
+      const sub = document.getElementById('modalSub');
+      const promoBadge = document.getElementById('modalPromoBadge');
+      const exBadge = document.getElementById('modalExcepcionBadge');
+      const exDetails = document.getElementById('modalExcepcionDetails');
+      const calcView = document.getElementById('calcView');
+      const infoView = document.getElementById('infoView');
+      const paymentMethodsView = document.getElementById('paymentMethodsView');
+      const mixedPayView = document.getElementById('mixedPayView');
+      const cashManagerView = document.getElementById('cashManagerView');
 
-  function openModal(id, r) {
-    const overlay = document.getElementById('modalOverlay');
-    const title = document.getElementById('modalTitle');
-    const sub = document.getElementById('modalSub');
-    const promoBadge = document.getElementById('modalPromoBadge');
-    const exBadge = document.getElementById('modalExcepcionBadge');
-    const exDetails = document.getElementById('modalExcepcionDetails');
-    const calcView = document.getElementById('calcView');
-    const infoView = document.getElementById('infoView');
-    const paymentMethodsView = document.getElementById('paymentMethodsView');
-    const mixedPayView = document.getElementById('mixedPayView');
-    const cashManagerView = document.getElementById('cashManagerView');
+      title.style.display = 'block';
+      sub.style.display = 'block';
+      const isTerrazaMesa = id.startsWith('T-');
+      title.textContent = isTerrazaMesa ? ('MESA ' + id.replace('T-', '') + ' · TERRACE SOUL') : (id === 'ULTRA VIP' ? 'ULTRA VIP · MAIN STAGE' : ('MESA ' + id + ' · MAIN STAGE'));
+      isException = false;
+      document.getElementById('exceptionForm').style.display = 'none';
+      document.getElementById('toggleException').textContent = "¿ES UNA EXCEPCIÓN? (Precio manual)";
 
-    title.style.display = 'block';
-    sub.style.display = 'block';
-    const isTerrazaMesa = id.startsWith('T-');
-    title.textContent = isTerrazaMesa ? ('MESA ' + id.replace('T-', '') + ' · TERRACE SOUL') : (id === 'ULTRA VIP' ? 'ULTRA VIP · MAIN STAGE' : ('MESA ' + id + ' · MAIN STAGE'));
-    isException = false;
-    document.getElementById('exceptionForm').style.display = 'none';
-    document.getElementById('toggleException').textContent = "¿ES UNA EXCEPCIÓN? (Precio manual)";
+      calcView.style.display = 'none';
+      infoView.style.display = 'none';
+      paymentMethodsView.style.display = 'none';
+      mixedPayView.style.display = 'none';
+      cashManagerView.style.display = 'none';
+      const cortesiaView = document.getElementById('cortesiaFormView');
+      if (cortesiaView) cortesiaView.style.display = 'none';
+      const cortesiaBadge = document.getElementById('modalCortesiaBadge');
+      if (cortesiaBadge) cortesiaBadge.style.display = 'none';
+      promoBadge.style.display = 'none';
+      if (exBadge) exBadge.style.display = 'none';
+      const calcResBadge = document.getElementById('modalCalcReservaBadge');
+      if (calcResBadge) calcResBadge.style.display = 'none';
 
-    calcView.style.display = 'none';
-    infoView.style.display = 'none';
-    paymentMethodsView.style.display = 'none';
-    mixedPayView.style.display = 'none';
-    cashManagerView.style.display = 'none';
-    const cortesiaView = document.getElementById('cortesiaFormView');
-    if (cortesiaView) cortesiaView.style.display = 'none';
-    const cortesiaBadge = document.getElementById('modalCortesiaBadge');
-    if (cortesiaBadge) cortesiaBadge.style.display = 'none';
-    promoBadge.style.display = 'none';
-    if (exBadge) exBadge.style.display = 'none';
-    const calcResBadge = document.getElementById('modalCalcReservaBadge');
-    if (calcResBadge) calcResBadge.style.display = 'none';
+      const hasPactadaEx = !!(r && (r.esExcepcion || r.excepcion));
+      const isCalcRes = !!(r && (r.origen === 'calculadora_admin' || r.formaPago || (r.montoTotal && r.saldoPuerta !== undefined && ['aprobada', 'ocupada', 'vendida'].includes(r.status))));
+      const isCortesiaRes = !!(r && (r.status === 'cortesia' || r.esCortesia));
+      const isIngresada = !!(r && r.status === 'ingresada');
 
-    const hasPactadaEx = !!(r && (r.esExcepcion || r.excepcion));
-    const isCalcRes = !!(r && (r.origen === 'calculadora_admin' || r.formaPago || (r.montoTotal && r.saldoPuerta !== undefined && ['aprobada', 'ocupada', 'vendida'].includes(r.status))));
-    const isCortesiaRes = !!(r && (r.status === 'cortesia' || r.esCortesia));
-    const isIngresada = !!(r && r.status === 'ingresada');
-
-    if (isIngresada) {
-      infoView.style.display = 'block';
-      if (isCortesiaRes) {
-        sub.textContent = "CORTESÍA INGRESADA (DENTRO)";
-        if (cortesiaBadge) {
-          cortesiaBadge.style.display = 'block';
-          document.getElementById('modalCortesiaDetails').innerHTML = `
+      if (isIngresada) {
+        infoView.style.display = 'block';
+        if (isCortesiaRes) {
+          sub.textContent = "CORTESÍA INGRESADA (DENTRO)";
+          if (cortesiaBadge) {
+            cortesiaBadge.style.display = 'block';
+            document.getElementById('modalCortesiaDetails').innerHTML = `
             👤 Beneficiario: <b>${escapeHtml(r.nombre || r.beneficiario || 'Invitado Especial')}</b><br>
             👥 Personas autorizadas: <b>${r.cantidadPersonas || 4}</b><br>
             🔑 Autorizado por: <b>${escapeHtml(r.autorizadoPor || 'Admin / Boletería')}</b>
             ${r.masterNote ? `<br>📝 Nota: <i>${escapeHtml(r.masterNote)}</i>` : ''}
-            ${r.ingresadaAt ? `<br>🚪 <b>Ingresó:</b> ${new Date(r.ingresadaAt).toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})} hs (${new Date(r.ingresadaAt).toLocaleDateString('es-AR')})` : ''}
+            ${r.ingresadaAt ? `<br>🚪 <b>Ingresó:</b> ${new Date(r.ingresadaAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })} hs (${new Date(r.ingresadaAt).toLocaleDateString('es-AR')})` : ''}
           `;
-        }
-        document.getElementById('infoDetails').innerHTML = `
+          }
+          document.getElementById('infoDetails').innerHTML = `
           <div style="font-size:15px; font-weight:800; color:#c084fc; margin-bottom:8px;">🟣🔵 MESA DE CORTESÍA DENTRO DEL LOCAL</div>
           <div style="font-size:13px; color:var(--text); line-height:1.6;">
             Esta mesa ya ingresó con <b>${r.cantidadPersonas || 4} personas</b>.<br>
             Total abonado en boletería: <b style="color:var(--green);">$0 (Cortesía)</b>
           </div>
         `;
-      } else {
-        sub.textContent = "Reserva de " + (r.nombre || "Sin nombre");
-        const promoInfo = formatReservationPromoInfo(r);
-        const isEx = !!(r.esExcepcion || r.excepcion);
-        const isCalc = !!(r.origen === 'calculadora_admin' || r.formaPago);
-        const exResponsable = r.responsableExcepcion || 'Admin / Asistente';
-        const total = r.montoTotal || r.precioTotal || 0;
-        const senado = r.montoSenado || 0;
-        const cobradoPuerta = (r.cobroEfectivo || 0) + (r.cobroTransferencia || 0);
-        const pctAbonado = r.porcentajeAbonado !== undefined ? r.porcentajeAbonado : (total > 0 ? Math.round((senado / total) * 100) : 0);
-        const pctSaldo = r.porcentajeSaldo !== undefined ? r.porcentajeSaldo : (total > 0 ? Math.round((cobradoPuerta / total) * 100) : 0);
+        } else {
+          sub.textContent = "Reserva de " + (r.nombre || "Sin nombre");
+          const promoInfo = formatReservationPromoInfo(r);
+          const isEx = !!(r.esExcepcion || r.excepcion);
+          const isCalc = !!(r.origen === 'calculadora_admin' || r.formaPago);
+          const exResponsable = r.responsableExcepcion || 'Admin / Asistente';
+          const total = r.montoTotal || r.precioTotal || 0;
+          const senado = r.montoSenado || 0;
+          const cobradoPuerta = (r.cobroEfectivo || 0) + (r.cobroTransferencia || 0);
+          const pctAbonado = r.porcentajeAbonado !== undefined ? r.porcentajeAbonado : (total > 0 ? Math.round((senado / total) * 100) : 0);
+          const pctSaldo = r.porcentajeSaldo !== undefined ? r.porcentajeSaldo : (total > 0 ? Math.round((cobradoPuerta / total) * 100) : 0);
 
-        document.getElementById('infoDetails').innerHTML = `
+          document.getElementById('infoDetails').innerHTML = `
           Personas: ${r.cantidadPersonas || 4}<br>
           Total Cobrado: $${(total).toLocaleString('es-AR')}<br>
           Entregado en Bebidas: $${(r.montoConsumicion || r.montoConsumoCredito || 0).toLocaleString('es-AR')}<br>
@@ -1096,57 +1479,57 @@
           ` : `
             <span style="color:var(--green); font-size:13px; font-weight:600;">Promo aplicada: ${promoInfo.originText}</span><br>
           `}
-          ${r.ts ? `<span style="color:var(--grey); font-size:11.5px; display:block; margin-top:6px;">Fecha reserva: ${new Date(r.ts).toLocaleString('es-AR', {dateStyle:'short', timeStyle:'short'})}</span>` : ''}
+          ${r.ts ? `<span style="color:var(--grey); font-size:11.5px; display:block; margin-top:6px;">Fecha reserva: ${new Date(r.ts).toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' })}</span>` : ''}
         `;
+        }
+        overlay.classList.add('open');
+        return;
       }
-      overlay.classList.add('open');
-      return;
-    }
 
-    if (isCortesiaRes) {
-      calcView.style.display = 'block';
-      currentPeople = (r && r.cantidadPersonas) ? parseInt(r.cantidadPersonas) : 4;
-      const countEl = document.getElementById('peopleCount');
-      if (countEl) countEl.value = currentPeople;
-      sub.textContent = "MESA DE CORTESÍA / INVITACIÓN";
-      if (cortesiaBadge) {
-        cortesiaBadge.style.display = 'block';
-        document.getElementById('modalCortesiaDetails').innerHTML = `
+      if (isCortesiaRes) {
+        calcView.style.display = 'block';
+        currentPeople = (r && r.cantidadPersonas) ? parseInt(r.cantidadPersonas) : 4;
+        const countEl = document.getElementById('peopleCount');
+        if (countEl) countEl.value = currentPeople;
+        sub.textContent = "MESA DE CORTESÍA / INVITACIÓN";
+        if (cortesiaBadge) {
+          cortesiaBadge.style.display = 'block';
+          document.getElementById('modalCortesiaDetails').innerHTML = `
           👤 Beneficiario: <b>${escapeHtml(r.nombre || r.beneficiario || 'Invitado Especial')}</b><br>
           👥 Personas autorizadas: <b>${r.cantidadPersonas || 4}</b><br>
           🔑 Autorizado por: <b>${escapeHtml(r.autorizadoPor || 'Admin / Boletería')}</b>
           ${r.masterNote ? `<br>📝 Nota: <i>${escapeHtml(r.masterNote)}</i>` : ''}
-          ${r.ts ? `<span style="color:var(--grey); font-size:11.5px; display:block; margin-top:4px;">Fecha: ${new Date(r.ts).toLocaleString('es-AR', {dateStyle:'short', timeStyle:'short'})}</span>` : ''}
+          ${r.ts ? `<span style="color:var(--grey); font-size:11.5px; display:block; margin-top:4px;">Fecha: ${new Date(r.ts).toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' })}</span>` : ''}
         `;
+        }
+        currentBalance = 0;
+        document.getElementById('valTotal').textContent = '0';
+        document.getElementById('valDrinks').textContent = '0';
+        document.getElementById('valPaid').textContent = '0';
+        document.getElementById('valBalance').textContent = '0';
+        const confirmBtn = document.getElementById('confirmIngreso');
+        if (confirmBtn) {
+          confirmBtn.textContent = "CONFIRMAR INGRESO (CORTESÍA $0)";
+          confirmBtn.style.background = "linear-gradient(145deg, #c084fc, #9333ea)";
+          confirmBtn.style.color = "#fff";
+          confirmBtn.style.boxShadow = "0 8px 20px rgba(168,85,247,0.35)";
+        }
+        const btnCort = document.getElementById('btnMarcarCortesia');
+        if (btnCort) btnCort.style.display = 'none';
+
+        overlay.classList.add('open');
+        return;
       }
-      currentBalance = 0;
-      document.getElementById('valTotal').textContent = '0';
-      document.getElementById('valDrinks').textContent = '0';
-      document.getElementById('valPaid').textContent = '0';
-      document.getElementById('valBalance').textContent = '0';
-      const confirmBtn = document.getElementById('confirmIngreso');
-      if (confirmBtn) {
-        confirmBtn.textContent = "CONFIRMAR INGRESO (CORTESÍA $0)";
-        confirmBtn.style.background = "linear-gradient(145deg, #c084fc, #9333ea)";
-        confirmBtn.style.color = "#fff";
-        confirmBtn.style.boxShadow = "0 8px 20px rgba(168,85,247,0.35)";
-      }
+
       const btnCort = document.getElementById('btnMarcarCortesia');
-      if (btnCort) btnCort.style.display = 'none';
+      if (btnCort) btnCort.style.display = 'flex';
 
-      overlay.classList.add('open');
-      return;
-    }
-
-    const btnCort = document.getElementById('btnMarcarCortesia');
-    if (btnCort) btnCort.style.display = 'flex';
-
-    calcView.style.display = 'block';
+      calcView.style.display = 'block';
       currentPeople = (r && r.cantidadPersonas) ? parseInt(r.cantidadPersonas) : 4;
       const countEl = document.getElementById('peopleCount');
       if (countEl) countEl.value = currentPeople;
       sub.textContent = r ? "Reserva de " + (r.nombre || "Sin nombre") : "VENTA EN PUERTA (Mesa libre)";
-      
+
       if (hasPactadaEx) {
         isCalcReservation = false;
         isException = true;
@@ -1203,72 +1586,72 @@
       }
 
       updateCalc();
-    overlay.classList.add('open');
-  }
+      overlay.classList.add('open');
+    }
 
-  function adjustPeople(delta) {
-    currentPeople = Math.max(1, currentPeople + delta);
-    const countEl = document.getElementById('peopleCount');
-    if (countEl) countEl.value = currentPeople;
-    updateCalc();
-  }
+    function adjustPeople(delta) {
+      currentPeople = Math.max(1, currentPeople + delta);
+      const countEl = document.getElementById('peopleCount');
+      if (countEl) countEl.value = currentPeople;
+      updateCalc();
+    }
 
-  function onPeopleInput() {
-    const countEl = document.getElementById('peopleCount');
-    let val = parseInt(countEl?.value);
-    if (isNaN(val) || val < 1) val = 1;
-    currentPeople = val;
-    updateCalc();
-  }
+    function onPeopleInput() {
+      const countEl = document.getElementById('peopleCount');
+      let val = parseInt(countEl?.value);
+      if (isNaN(val) || val < 1) val = 1;
+      currentPeople = val;
+      updateCalc();
+    }
 
-  function renderModalCalcDetails(calcRes, total, drinks, paid, balance, isTransf) {
-    const details = document.getElementById('modalCalcReservaDetails');
-    const paymentBadge = document.getElementById('modalCalcPaymentBadge');
-    const r = estado[currentMesa] || {};
-    if (!details) return;
+    function renderModalCalcDetails(calcRes, total, drinks, paid, balance, isTransf) {
+      const details = document.getElementById('modalCalcReservaDetails');
+      const paymentBadge = document.getElementById('modalCalcPaymentBadge');
+      const r = estado[currentMesa] || {};
+      if (!details) return;
 
-    if (paymentBadge) {
-      if (isTransf) {
-        paymentBadge.textContent = '💳 Transferencia / QR';
-        paymentBadge.style.background = 'rgba(88,166,255,0.2)';
-        paymentBadge.style.color = 'var(--blue)';
-        paymentBadge.style.border = '1px solid var(--blue)';
-      } else {
-        paymentBadge.textContent = '💵 Efectivo';
-        paymentBadge.style.background = 'rgba(46,230,166,0.2)';
-        paymentBadge.style.color = 'var(--green)';
-        paymentBadge.style.border = '1px solid var(--green)';
+      if (paymentBadge) {
+        if (isTransf) {
+          paymentBadge.textContent = '💳 Transferencia / QR';
+          paymentBadge.style.background = 'rgba(88,166,255,0.2)';
+          paymentBadge.style.color = 'var(--blue)';
+          paymentBadge.style.border = '1px solid var(--blue)';
+        } else {
+          paymentBadge.textContent = '💵 Efectivo';
+          paymentBadge.style.background = 'rgba(46,230,166,0.2)';
+          paymentBadge.style.color = 'var(--green)';
+          paymentBadge.style.border = '1px solid var(--green)';
+        }
       }
-    }
 
-    const btnCash = document.getElementById('btnTogglePayCash');
-    const btnTransf = document.getElementById('btnTogglePayTransf');
-    if (btnCash && btnTransf) {
-      if (isTransf) {
-        btnTransf.style.background = 'rgba(88,166,255,0.25)';
-        btnTransf.style.color = '#fff';
-        btnCash.style.background = 'transparent';
-        btnCash.style.color = 'var(--green)';
-      } else {
-        btnCash.style.background = 'rgba(46,230,166,0.25)';
-        btnCash.style.color = '#fff';
-        btnTransf.style.background = 'transparent';
-        btnTransf.style.color = 'var(--blue)';
+      const btnCash = document.getElementById('btnTogglePayCash');
+      const btnTransf = document.getElementById('btnTogglePayTransf');
+      if (btnCash && btnTransf) {
+        if (isTransf) {
+          btnTransf.style.background = 'rgba(88,166,255,0.25)';
+          btnTransf.style.color = '#fff';
+          btnCash.style.background = 'transparent';
+          btnCash.style.color = 'var(--green)';
+        } else {
+          btnCash.style.background = 'rgba(46,230,166,0.25)';
+          btnCash.style.color = '#fff';
+          btnTransf.style.background = 'transparent';
+          btnTransf.style.color = 'var(--blue)';
+        }
       }
-    }
 
-    const capBase = calcConfig.capacidadBase || 5;
-    let peopleNotice = '';
-    if (currentPeople < capBase) {
-      peopleNotice = `<span style="color:var(--amber); font-weight:700;">${currentPeople} pers (Aplica base de ${capBase} pers)</span>`;
-    } else if (currentPeople === capBase) {
-      peopleNotice = `<span style="color:var(--white);">${currentPeople} pers (Base de mesa)</span>`;
-    } else {
-      const extras = currentPeople - capBase;
-      peopleNotice = `<span style="color:var(--blue); font-weight:700;">${currentPeople} pers (${capBase} base + ${extras} extra${extras > 1 ? 's' : ''})</span>`;
-    }
+      const capBase = calcConfig.capacidadBase || 5;
+      let peopleNotice = '';
+      if (currentPeople < capBase) {
+        peopleNotice = `<span style="color:var(--amber); font-weight:700;">${currentPeople} pers (Aplica base de ${capBase} pers)</span>`;
+      } else if (currentPeople === capBase) {
+        peopleNotice = `<span style="color:var(--white);">${currentPeople} pers (Base de mesa)</span>`;
+      } else {
+        const extras = currentPeople - capBase;
+        peopleNotice = `<span style="color:var(--blue); font-weight:700;">${currentPeople} pers (${capBase} base + ${extras} extra${extras > 1 ? 's' : ''})</span>`;
+      }
 
-    details.innerHTML = `
+      details.innerHTML = `
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 12px; margin-top:4px; font-size:12px;">
         <div>👤 <b>Cliente:</b> <span style="color:var(--white); font-weight:600;">${escapeHtml(r.nombre || 'Cliente')}</span></div>
         <div>👥 <b>Asistencia:</b> ${peopleNotice}</div>
@@ -1282,34 +1665,34 @@
         </span>
       </div>
     `;
-  }
-
-  function renderModalExDetails(total, drinks, paid, unitPrice, baseHeadcount, baseTotal) {
-    const exDetails = document.getElementById('modalExcepcionDetails');
-    if (!exDetails) return;
-    const r = estado[currentMesa] || {};
-    const saldo = Math.max(0, total - paid);
-    const pctAbonado = total > 0 ? Math.round((paid / total) * 100) : 0;
-    const pctSaldo = total > 0 ? Math.max(0, 100 - pctAbonado) : 0;
-
-    const MIN_PEOPLE_FLOOR = 4;
-    let peopleDetailStr = '';
-    if (currentPeople < MIN_PEOPLE_FLOOR) {
-      const precioPorCabezaEfectivo = Math.round(total / currentPeople);
-      peopleDetailStr = `${currentPeople} pers (Piso mín. ${MIN_PEOPLE_FLOOR} pers: $${total.toLocaleString('es-AR')} — $${precioPorCabezaEfectivo.toLocaleString('es-AR')} c/u)`;
-    } else if (currentPeople < baseHeadcount) {
-      const menos = baseHeadcount - currentPeople;
-      peopleDetailStr = `${currentPeople} pers (${baseHeadcount} pactadas, ${menos} menos a -$${unitPrice.toLocaleString('es-AR')} c/u)`;
-    } else if (currentPeople === baseHeadcount) {
-      peopleDetailStr = `${currentPeople} pers (Pactadas: ${baseHeadcount} pers a $${unitPrice.toLocaleString('es-AR')} c/u)`;
-    } else {
-      const extras = currentPeople - baseHeadcount;
-      peopleDetailStr = `${currentPeople} pers (${baseHeadcount} base + ${extras} extra${extras > 1 ? 's' : ''} a +$${unitPrice.toLocaleString('es-AR')} c/u)`;
     }
 
-    const actualDrinksPct = (total > 0 && drinks > 0) ? Math.round((drinks / total) * 100) : exPactadaDrinksPct;
+    function renderModalExDetails(total, drinks, paid, unitPrice, baseHeadcount, baseTotal) {
+      const exDetails = document.getElementById('modalExcepcionDetails');
+      if (!exDetails) return;
+      const r = estado[currentMesa] || {};
+      const saldo = Math.max(0, total - paid);
+      const pctAbonado = total > 0 ? Math.round((paid / total) * 100) : 0;
+      const pctSaldo = total > 0 ? Math.max(0, 100 - pctAbonado) : 0;
 
-    exDetails.innerHTML = `
+      const MIN_PEOPLE_FLOOR = 4;
+      let peopleDetailStr = '';
+      if (currentPeople < MIN_PEOPLE_FLOOR) {
+        const precioPorCabezaEfectivo = Math.round(total / currentPeople);
+        peopleDetailStr = `${currentPeople} pers (Piso mín. ${MIN_PEOPLE_FLOOR} pers: $${total.toLocaleString('es-AR')} — $${precioPorCabezaEfectivo.toLocaleString('es-AR')} c/u)`;
+      } else if (currentPeople < baseHeadcount) {
+        const menos = baseHeadcount - currentPeople;
+        peopleDetailStr = `${currentPeople} pers (${baseHeadcount} pactadas, ${menos} menos a -$${unitPrice.toLocaleString('es-AR')} c/u)`;
+      } else if (currentPeople === baseHeadcount) {
+        peopleDetailStr = `${currentPeople} pers (Pactadas: ${baseHeadcount} pers a $${unitPrice.toLocaleString('es-AR')} c/u)`;
+      } else {
+        const extras = currentPeople - baseHeadcount;
+        peopleDetailStr = `${currentPeople} pers (${baseHeadcount} base + ${extras} extra${extras > 1 ? 's' : ''} a +$${unitPrice.toLocaleString('es-AR')} c/u)`;
+      }
+
+      const actualDrinksPct = (total > 0 && drinks > 0) ? Math.round((drinks / total) * 100) : exPactadaDrinksPct;
+
+      exDetails.innerHTML = `
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 12px; margin-top:4px; font-size:12px;">
         <div>👤 <b>Autorizado por:</b> <span style="color:var(--white);">${escapeHtml(exResponsable || 'Admin / Asistente')}</span></div>
         <div>👥 <b>Ingresan:</b> <span style="color:var(--blue); font-weight:bold;">${peopleDetailStr}</span></div>
@@ -1324,486 +1707,487 @@
       </div>
       ${r.masterNote ? `<div style="color:var(--grey); font-size:11.5px; margin-top:4px;">📝 Nota: <i>${escapeHtml(r.masterNote)}</i></div>` : ''}
     `;
-  }
+    }
 
-  function updateCalc() {
-    const r = estado[currentMesa];
-    let paid, total, drinks, balance;
-    const labelDrinks = document.getElementById('labelDrinks');
+    function updateCalc() {
+      const r = estado[currentMesa];
+      let paid, total, drinks, balance;
+      const labelDrinks = document.getElementById('labelDrinks');
 
-    if (isException) {
-      paid = exPactadaSena;
-      const unitPrice = parseInt(document.getElementById('exPrecioPersona')?.value) || (exPactadaPrecioPersona > 0 ? exPactadaPrecioPersona : (exBaseTotal && exBasePersonas > 0 ? Math.round(exBaseTotal / exBasePersonas) : 25000));
-      const baseHeadcount = exBasePersonas > 0 ? exBasePersonas : 4;
-      const baseTotal = exBaseTotal > 0 ? exBaseTotal : (parseInt(document.getElementById('exTotal')?.value) || 120000);
+      if (isException) {
+        paid = exPactadaSena;
+        const unitPrice = parseInt(document.getElementById('exPrecioPersona')?.value) || (exPactadaPrecioPersona > 0 ? exPactadaPrecioPersona : (exBaseTotal && exBasePersonas > 0 ? Math.round(exBaseTotal / exBasePersonas) : 25000));
+        const baseHeadcount = exBasePersonas > 0 ? exBasePersonas : 4;
+        const baseTotal = exBaseTotal > 0 ? exBaseTotal : (parseInt(document.getElementById('exTotal')?.value) || 120000);
 
-      const isManualFormOpen = (document.getElementById('exceptionForm')?.style.display === 'block');
+        const isManualFormOpen = (document.getElementById('exceptionForm')?.style.display === 'block');
 
-      if (isManualFormOpen) {
-        // Si el usuario tiene abierto el formulario manual y editó campos a mano, respetar inputs
-        total = parseInt(document.getElementById('exTotal')?.value) || baseTotal;
-        drinks = parseInt(document.getElementById('exDrinks')?.value) || 0;
+        if (isManualFormOpen) {
+          // Si el usuario tiene abierto el formulario manual y editó campos a mano, respetar inputs
+          total = parseInt(document.getElementById('exTotal')?.value) || baseTotal;
+          drinks = parseInt(document.getElementById('exDrinks')?.value) || 0;
+        } else {
+          // Cálculo dinámico automático:
+          // El total se ajusta sumando o restando según la cantidad de personas.
+          // Regla: el total no puede bajar del valor equivalente a 4 personas como mínimo.
+          // Si vienen menos de 4 (ej. 3, 2, 1), se cobra el piso mínimo de 4 personas.
+          const MIN_PEOPLE_FLOOR = 4;
+          const effectivePeople = Math.max(MIN_PEOPLE_FLOOR, currentPeople);
+          const diffPeople = effectivePeople - baseHeadcount;
+          total = Math.max(paid, baseTotal + (diffPeople * unitPrice));
+          const drinksPctToUse = (exPactadaDrinksPct > 0 ? exPactadaDrinksPct : 80);
+          drinks = Math.round((total * drinksPctToUse) / 100);
+
+          // Mantener sincronizados los campos del formulario manual por si luego lo abren
+          const exTotEl = document.getElementById('exTotal');
+          const exDrkEl = document.getElementById('exDrinks');
+          if (exTotEl) exTotEl.value = total;
+          if (exDrkEl) exDrkEl.value = drinks;
+        }
+
+        const drinksPct = (total > 0 && drinks > 0)
+          ? Math.min(100, Math.round((drinks / total) * 100))
+          : (exPactadaDrinksPct > 0 ? exPactadaDrinksPct : null);
+        if (labelDrinks) labelDrinks.textContent = drinksPct !== null ? `En Bebidas (${drinksPct}%)` : "En Bebidas";
+
+        renderModalExDetails(total, drinks, paid, unitPrice, baseHeadcount, baseTotal);
+        balance = Math.max(0, total - paid);
+      } else if (isCalcReservation) {
+        const calcRes = calcularPreciosMesa(calcConfig, currentPeople);
+        const isTransf = (calcResSelectedPayment === 'transferencia');
+        total = isTransf ? calcRes.totalTransferencia : calcRes.precioMesa;
+        drinks = calcRes.consumo;
+        const calcPaid = calcRes.sena;
+        paid = (r && r.montoSenado !== undefined && r.montoSenado !== null) ? parseInt(r.montoSenado) : calcPaid;
+        balance = isTransf ? calcRes.restoTransferencia : calcRes.enPuerta;
+
+        if (labelDrinks) labelDrinks.textContent = `En Bebidas ($${drinks.toLocaleString('es-AR')})`;
+        renderModalCalcDetails(calcRes, total, drinks, paid, balance, isTransf);
       } else {
-        // Cálculo dinámico automático:
-        // El total se ajusta sumando o restando según la cantidad de personas.
-        // Regla: el total no puede bajar del valor equivalente a 4 personas como mínimo.
-        // Si vienen menos de 4 (ej. 3, 2, 1), se cobra el piso mínimo de 4 personas.
-        const MIN_PEOPLE_FLOOR = 4;
-        const effectivePeople = Math.max(MIN_PEOPLE_FLOOR, currentPeople);
-        const diffPeople = effectivePeople - baseHeadcount;
-        total = Math.max(paid, baseTotal + (diffPeople * unitPrice));
-        const drinksPctToUse = (exPactadaDrinksPct > 0 ? exPactadaDrinksPct : 80);
-        drinks = Math.round((total * drinksPctToUse) / 100);
+        paid = (r && r.montoSenado) ? parseInt(r.montoSenado) : 0;
+        const basePrice = pricingConfig.precioBaseMesa || 120000;
+        const extraPrice = pricingConfig.precioPersonaExtra || 25000;
+        total = basePrice + (Math.max(0, currentPeople - 4) * extraPrice);
 
-        // Mantener sincronizados los campos del formulario manual por si luego lo abren
+        const promoPct = (r && r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null)
+          ? r.porcentajeConsumo
+          : getTodayPromo().pct;
+        drinks = Math.round((total * promoPct) / 100);
+        if (labelDrinks) labelDrinks.textContent = `En Bebidas (${promoPct}%)`;
+        balance = Math.max(0, total - paid);
+      }
+
+      currentBalance = balance;
+      document.getElementById('valTotal').textContent = total.toLocaleString('es-AR');
+      document.getElementById('valDrinks').textContent = drinks.toLocaleString('es-AR');
+      document.getElementById('valPaid').textContent = paid.toLocaleString('es-AR');
+      document.getElementById('valBalance').textContent = balance.toLocaleString('es-AR');
+
+      const confirmBtn = document.getElementById('confirmIngreso');
+      if (confirmBtn) {
+        if (balance === 0 && total > 0) {
+          confirmBtn.textContent = "CONFIRMAR INGRESO (PAGADA COMPLETA $0)";
+          confirmBtn.style.background = "var(--green)";
+          confirmBtn.style.color = "#060608";
+          confirmBtn.style.boxShadow = "0 8px 20px rgba(46,230,166,0.3)";
+        } else {
+          confirmBtn.textContent = `COBRAR SALDO ($${balance.toLocaleString('es-AR')})`;
+          confirmBtn.style.background = "var(--blue)";
+          confirmBtn.style.color = "#fff";
+          confirmBtn.style.boxShadow = "0 8px 20px rgba(88,166,255,0.3)";
+        }
+      }
+    }
+
+    document.getElementById('exPrecioPersona')?.addEventListener('input', () => {
+      const val = parseInt(document.getElementById('exPrecioPersona').value) || 0;
+      exPactadaPrecioPersona = val;
+      updateCalc();
+    });
+
+    document.getElementById('exTotal')?.addEventListener('input', () => {
+      updateCalc();
+    });
+
+    document.getElementById('exDrinks')?.addEventListener('input', () => {
+      const total = parseInt(document.getElementById('exTotal')?.value) || 0;
+      const drinks = parseInt(document.getElementById('exDrinks')?.value) || 0;
+      if (total > 0 && drinks > 0) {
+        exPactadaDrinksPct = Math.min(100, Math.round((drinks / total) * 100));
+      }
+      updateCalc();
+    });
+
+    document.getElementById('toggleException')?.addEventListener('click', () => {
+      isException = !isException;
+      document.getElementById('exceptionForm').style.display = isException ? 'block' : 'none';
+      document.getElementById('toggleException').textContent = isException ? "VOLVER A CÁLCULO AUTOMÁTICO" : "¿ES UNA EXCEPCIÓN? (Precio manual)";
+      if (isException) {
+        const curTot = parseInt(document.getElementById('valTotal')?.textContent.replace(/\D/g, '')) || 0;
+        const curDrk = parseInt(document.getElementById('valDrinks')?.textContent.replace(/\D/g, '')) || 0;
         const exTotEl = document.getElementById('exTotal');
         const exDrkEl = document.getElementById('exDrinks');
-        if (exTotEl) exTotEl.value = total;
-        if (exDrkEl) exDrkEl.value = drinks;
+        const exPrcEl = document.getElementById('exPrecioPersona');
+        if (exTotEl && !exTotEl.value && curTot > 0) exTotEl.value = curTot;
+        if (exDrkEl && !exDrkEl.value && curDrk > 0) exDrkEl.value = curDrk;
+        if (exPrcEl && !exPrcEl.value && currentPeople > 0 && curTot > 0) {
+          exPrcEl.value = Math.round(curTot / currentPeople);
+        }
       }
+      updateCalc();
+    });
 
-      const drinksPct = (total > 0 && drinks > 0)
-        ? Math.min(100, Math.round((drinks / total) * 100))
-        : (exPactadaDrinksPct > 0 ? exPactadaDrinksPct : null);
-      if (labelDrinks) labelDrinks.textContent = drinksPct !== null ? `En Bebidas (${drinksPct}%)` : "En Bebidas";
+    document.getElementById('btnTogglePayCash')?.addEventListener('click', () => {
+      calcResSelectedPayment = 'efectivo';
+      updateCalc();
+    });
 
-      renderModalExDetails(total, drinks, paid, unitPrice, baseHeadcount, baseTotal);
-      balance = Math.max(0, total - paid);
-    } else if (isCalcReservation) {
-      const calcRes = calcularPreciosMesa(calcConfig, currentPeople);
-      const isTransf = (calcResSelectedPayment === 'transferencia');
-      total = isTransf ? calcRes.totalTransferencia : calcRes.precioMesa;
-      drinks = calcRes.consumo;
-      const calcPaid = calcRes.sena;
-      paid = (r && r.montoSenado !== undefined && r.montoSenado !== null) ? parseInt(r.montoSenado) : calcPaid;
-      balance = isTransf ? calcRes.restoTransferencia : calcRes.enPuerta;
-      
-      if (labelDrinks) labelDrinks.textContent = `En Bebidas ($${drinks.toLocaleString('es-AR')})`;
-      renderModalCalcDetails(calcRes, total, drinks, paid, balance, isTransf);
-    } else {
-      paid = (r && r.montoSenado) ? parseInt(r.montoSenado) : 0;
-      const basePrice = pricingConfig.precioBaseMesa || 120000;
-      const extraPrice = pricingConfig.precioPersonaExtra || 25000;
-      total = basePrice + (Math.max(0, currentPeople - 4) * extraPrice);
-      
-      const promoPct = (r && r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) 
-        ? r.porcentajeConsumo 
-        : getTodayPromo().pct;
-      drinks = Math.round((total * promoPct) / 100);
-      if (labelDrinks) labelDrinks.textContent = `En Bebidas (${promoPct}%)`;
-      balance = Math.max(0, total - paid);
-    }
+    document.getElementById('btnTogglePayTransf')?.addEventListener('click', () => {
+      calcResSelectedPayment = 'transferencia';
+      updateCalc();
+    });
 
-    currentBalance = balance;
-    document.getElementById('valTotal').textContent = total.toLocaleString('es-AR');
-    document.getElementById('valDrinks').textContent = drinks.toLocaleString('es-AR');
-    document.getElementById('valPaid').textContent = paid.toLocaleString('es-AR');
-    document.getElementById('valBalance').textContent = balance.toLocaleString('es-AR');
+    document.getElementById('confirmIngreso').addEventListener('click', () => {
+      const rCurrent = estado[currentMesa];
+      if (rCurrent && (rCurrent.status === 'cortesia' || rCurrent.esCortesia)) {
+        finalizarCobro('cortesia', 0, 0);
+        return;
+      }
+      if (currentBalance === 0) {
+        finalizarCobro('completo_adelantado', 0, 0);
+        return;
+      }
+      document.getElementById('calcView').style.display = 'none';
+      document.getElementById('paymentMethodsView').style.display = 'block';
 
-    const confirmBtn = document.getElementById('confirmIngreso');
-    if (confirmBtn) {
-      if (balance === 0 && total > 0) {
-        confirmBtn.textContent = "CONFIRMAR INGRESO (PAGADA COMPLETA $0)";
-        confirmBtn.style.background = "var(--green)";
-        confirmBtn.style.color = "#060608";
-        confirmBtn.style.boxShadow = "0 8px 20px rgba(46,230,166,0.3)";
+      if (isCalcReservation) {
+        const calcRes = calcularPreciosMesa(calcConfig, currentPeople);
+        document.querySelectorAll('.btn-pay').forEach(btn => {
+          const m = btn.dataset.method;
+          const valEl = btn.querySelector('.pay-total-val');
+          if (m === 'efectivo') {
+            if (valEl) valEl.textContent = "$" + calcRes.enPuerta.toLocaleString('es-AR');
+            btn.style.borderColor = (calcResSelectedPayment === 'efectivo') ? 'var(--green)' : 'var(--grey-line)';
+          } else if (m === 'transferencia') {
+            if (valEl) valEl.textContent = "$" + calcRes.restoTransferencia.toLocaleString('es-AR');
+            btn.style.borderColor = (calcResSelectedPayment === 'transferencia') ? 'var(--blue)' : 'var(--grey-line)';
+          }
+        });
+        document.getElementById('payBalanceLabel').textContent = "$" + currentBalance.toLocaleString('es-AR');
       } else {
-        confirmBtn.textContent = `COBRAR SALDO ($${balance.toLocaleString('es-AR')})`;
-        confirmBtn.style.background = "var(--blue)";
-        confirmBtn.style.color = "#fff";
-        confirmBtn.style.boxShadow = "0 8px 20px rgba(88,166,255,0.3)";
+        document.getElementById('payBalanceLabel').textContent = "$" + currentBalance.toLocaleString('es-AR');
+        document.querySelectorAll('.pay-total-val').forEach(el => {
+          el.textContent = "$" + currentBalance.toLocaleString('es-AR');
+        });
       }
-    }
-  }
+    });
 
-  document.getElementById('exPrecioPersona')?.addEventListener('input', () => {
-    const val = parseInt(document.getElementById('exPrecioPersona').value) || 0;
-    exPactadaPrecioPersona = val;
-    updateCalc();
-  });
+    document.getElementById('backToCalc').addEventListener('click', () => {
+      document.getElementById('paymentMethodsView').style.display = 'none';
+      document.getElementById('calcView').style.display = 'block';
+    });
 
-  document.getElementById('exTotal')?.addEventListener('input', () => {
-    updateCalc();
-  });
-
-  document.getElementById('exDrinks')?.addEventListener('input', () => {
-    const total = parseInt(document.getElementById('exTotal')?.value) || 0;
-    const drinks = parseInt(document.getElementById('exDrinks')?.value) || 0;
-    if (total > 0 && drinks > 0) {
-      exPactadaDrinksPct = Math.min(100, Math.round((drinks / total) * 100));
-    }
-    updateCalc();
-  });
-
-  document.getElementById('toggleException')?.addEventListener('click', () => {
-    isException = !isException;
-    document.getElementById('exceptionForm').style.display = isException ? 'block' : 'none';
-    document.getElementById('toggleException').textContent = isException ? "VOLVER A CÁLCULO AUTOMÁTICO" : "¿ES UNA EXCEPCIÓN? (Precio manual)";
-    if (isException) {
-      const curTot = parseInt(document.getElementById('valTotal')?.textContent.replace(/\D/g,'')) || 0;
-      const curDrk = parseInt(document.getElementById('valDrinks')?.textContent.replace(/\D/g,'')) || 0;
-      const exTotEl = document.getElementById('exTotal');
-      const exDrkEl = document.getElementById('exDrinks');
-      const exPrcEl = document.getElementById('exPrecioPersona');
-      if (exTotEl && !exTotEl.value && curTot > 0) exTotEl.value = curTot;
-      if (exDrkEl && !exDrkEl.value && curDrk > 0) exDrkEl.value = curDrk;
-      if (exPrcEl && !exPrcEl.value && currentPeople > 0 && curTot > 0) {
-        exPrcEl.value = Math.round(curTot / currentPeople);
-      }
-    }
-    updateCalc();
-  });
-
-  document.getElementById('btnTogglePayCash')?.addEventListener('click', () => {
-    calcResSelectedPayment = 'efectivo';
-    updateCalc();
-  });
-
-  document.getElementById('btnTogglePayTransf')?.addEventListener('click', () => {
-    calcResSelectedPayment = 'transferencia';
-    updateCalc();
-  });
-
-  document.getElementById('confirmIngreso').addEventListener('click', () => {
-    const rCurrent = estado[currentMesa];
-    if (rCurrent && (rCurrent.status === 'cortesia' || rCurrent.esCortesia)) {
-      finalizarCobro('cortesia', 0, 0);
-      return;
-    }
-    if (currentBalance === 0) {
-      finalizarCobro('completo_adelantado', 0, 0);
-      return;
-    }
-    document.getElementById('calcView').style.display = 'none';
-    document.getElementById('paymentMethodsView').style.display = 'block';
-
-    if (isCalcReservation) {
-      const calcRes = calcularPreciosMesa(calcConfig, currentPeople);
-      document.querySelectorAll('.btn-pay').forEach(btn => {
-        const m = btn.dataset.method;
-        const valEl = btn.querySelector('.pay-total-val');
-        if (m === 'efectivo') {
-          if (valEl) valEl.textContent = "$" + calcRes.enPuerta.toLocaleString('es-AR');
-          btn.style.borderColor = (calcResSelectedPayment === 'efectivo') ? 'var(--green)' : 'var(--grey-line)';
-        } else if (m === 'transferencia') {
-          if (valEl) valEl.textContent = "$" + calcRes.restoTransferencia.toLocaleString('es-AR');
-          btn.style.borderColor = (calcResSelectedPayment === 'transferencia') ? 'var(--blue)' : 'var(--grey-line)';
+    document.querySelectorAll('.btn-pay').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const method = btn.dataset.method;
+        if (isCalcReservation && (method === 'efectivo' || method === 'transferencia')) {
+          calcResSelectedPayment = method;
+          const calcRes = calcularPreciosMesa(calcConfig, currentPeople);
+          const actualBalance = (method === 'efectivo') ? calcRes.enPuerta : calcRes.restoTransferencia;
+          currentBalance = actualBalance;
+          await finalizarCobro(method, method === 'efectivo' ? actualBalance : 0, method === 'transferencia' ? actualBalance : 0);
+          return;
+        }
+        if (method === 'cortesia') {
+          abrirFormularioCortesia();
+          return;
+        }
+        if (method === 'mixto') {
+          document.getElementById('paymentMethodsView').style.display = 'none';
+          document.getElementById('mixedPayView').style.display = 'block';
+          document.getElementById('mixCash').value = "";
+          document.getElementById('mixTransf').value = currentBalance;
+        } else {
+          await finalizarCobro(method, method === 'efectivo' ? currentBalance : 0, method === 'transferencia' ? currentBalance : 0);
         }
       });
-      document.getElementById('payBalanceLabel').textContent = "$" + currentBalance.toLocaleString('es-AR');
-    } else {
-      document.getElementById('payBalanceLabel').textContent = "$" + currentBalance.toLocaleString('es-AR');
-      document.querySelectorAll('.pay-total-val').forEach(el => {
-        el.textContent = "$" + currentBalance.toLocaleString('es-AR');
-      });
-    }
-  });
-
-  document.getElementById('backToCalc').addEventListener('click', () => {
-    document.getElementById('paymentMethodsView').style.display = 'none';
-    document.getElementById('calcView').style.display = 'block';
-  });
-
-  document.querySelectorAll('.btn-pay').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const method = btn.dataset.method;
-      if (isCalcReservation && (method === 'efectivo' || method === 'transferencia')) {
-        calcResSelectedPayment = method;
-        const calcRes = calcularPreciosMesa(calcConfig, currentPeople);
-        const actualBalance = (method === 'efectivo') ? calcRes.enPuerta : calcRes.restoTransferencia;
-        currentBalance = actualBalance;
-        await finalizarCobro(method, method === 'efectivo' ? actualBalance : 0, method === 'transferencia' ? actualBalance : 0);
-        return;
-      }
-      if (method === 'cortesia') {
-        abrirFormularioCortesia();
-        return;
-      }
-      if (method === 'mixto') {
-        document.getElementById('paymentMethodsView').style.display = 'none';
-        document.getElementById('mixedPayView').style.display = 'block';
-        document.getElementById('mixCash').value = "";
-        document.getElementById('mixTransf').value = currentBalance;
-      } else {
-        await finalizarCobro(method, method === 'efectivo' ? currentBalance : 0, method === 'transferencia' ? currentBalance : 0);
-      }
     });
-  });
 
-  document.getElementById('mixCash').addEventListener('input', () => {
-    const cash = parseInt(document.getElementById('mixCash').value) || 0;
-    document.getElementById('mixTransf').value = Math.max(0, currentBalance - cash);
-  });
+    document.getElementById('mixCash').addEventListener('input', () => {
+      const cash = parseInt(document.getElementById('mixCash').value) || 0;
+      document.getElementById('mixTransf').value = Math.max(0, currentBalance - cash);
+    });
 
-  document.getElementById('confirmMixed').addEventListener('click', async () => {
-    const cash = parseInt(document.getElementById('mixCash').value) || 0;
-    const transf = parseInt(document.getElementById('mixTransf').value) || 0;
-    if (cash + transf !== currentBalance) {
-      showToast("La suma debe ser $" + currentBalance.toLocaleString('es-AR'));
-      return;
-    }
-    await finalizarCobro('mixto', cash, transf);
-  });
+    document.getElementById('confirmMixed').addEventListener('click', async () => {
+      const cash = parseInt(document.getElementById('mixCash').value) || 0;
+      const transf = parseInt(document.getElementById('mixTransf').value) || 0;
+      if (cash + transf !== currentBalance) {
+        showToast("La suma debe ser $" + currentBalance.toLocaleString('es-AR'));
+        return;
+      }
+      await finalizarCobro('mixto', cash, transf);
+    });
 
-  document.getElementById('backToMethods').addEventListener('click', () => {
-    document.getElementById('mixedPayView').style.display = 'none';
-    document.getElementById('paymentMethodsView').style.display = 'block';
-  });
+    document.getElementById('backToMethods').addEventListener('click', () => {
+      document.getElementById('mixedPayView').style.display = 'none';
+      document.getElementById('paymentMethodsView').style.display = 'block';
+    });
 
-  function abrirFormularioCortesia() {
-    document.getElementById('calcView').style.display = 'none';
-    document.getElementById('infoView').style.display = 'none';
-    document.getElementById('paymentMethodsView').style.display = 'none';
-    document.getElementById('mixedPayView').style.display = 'none';
-    document.getElementById('cortesiaFormView').style.display = 'block';
+    function abrirFormularioCortesia() {
+      document.getElementById('calcView').style.display = 'none';
+      document.getElementById('infoView').style.display = 'none';
+      document.getElementById('paymentMethodsView').style.display = 'none';
+      document.getElementById('mixedPayView').style.display = 'none';
+      document.getElementById('cortesiaFormView').style.display = 'block';
 
-    const r = estado[currentMesa] || {};
-    const inputBeneficiario = document.getElementById('cortesiaBeneficiarioInput');
-    const inputPersonas = document.getElementById('cortesiaPersonasInput');
-    const inputNota = document.getElementById('cortesiaNotaInput');
-
-    if (inputBeneficiario) inputBeneficiario.value = r.nombre || r.beneficiario || '';
-    if (inputPersonas) inputPersonas.value = currentPeople || r.cantidadPersonas || 4;
-    if (inputNota) inputNota.value = r.masterNote || '';
-  }
-
-  document.getElementById('btnMarcarCortesia')?.addEventListener('click', abrirFormularioCortesia);
-  document.getElementById('btnMarcarCortesiaInfo')?.addEventListener('click', abrirFormularioCortesia);
-
-  document.getElementById('btnCancelarCortesiaForm')?.addEventListener('click', () => {
-    document.getElementById('cortesiaFormView').style.display = 'none';
-    openModal(currentMesa, estado[currentMesa]);
-  });
-
-  document.getElementById('btnConfirmarGuardarCortesia')?.addEventListener('click', async () => {
-    const btn = document.getElementById('btnConfirmarGuardarCortesia');
-    btn.disabled = true;
-    try {
-      const beneficiario = document.getElementById('cortesiaBeneficiarioInput')?.value.trim() || 'Invitado Especial';
-      const personas = parseInt(document.getElementById('cortesiaPersonasInput')?.value) || currentPeople || 4;
-      const nota = document.getElementById('cortesiaNotaInput')?.value.trim() || '';
       const r = estado[currentMesa] || {};
+      const inputBeneficiario = document.getElementById('cortesiaBeneficiarioInput');
+      const inputPersonas = document.getElementById('cortesiaPersonasInput');
+      const inputNota = document.getElementById('cortesiaNotaInput');
 
-      const payload = {
-        ...r,
-        status: 'cortesia',
-        esCortesia: true,
-        formaPago: 'cortesia',
-        montoTotal: 0,
-        precioTotal: 0,
-        montoSenado: 0,
-        saldoPuerta: 0,
-        montoConsumicion: 0,
-        montoConsumoCredito: 0,
-        porcentajeConsumo: 0,
-        cobroEfectivo: 0,
-        cobroTransferencia: 0,
-        nombre: beneficiario,
-        beneficiario: beneficiario,
-        cantidadPersonas: personas,
-        masterNote: nota || r.masterNote || '',
-        autorizadoPor: auth.currentUser?.email || 'Boletería',
-        cortesiaAt: Date.now(),
-        ts: r.ts || Date.now()
-      };
-
-      const targetCol = window.getActiveBolCollection ? window.getActiveBolCollection() : 'reservas';
-      await db.collection(targetCol).doc(currentMesa).set(payload, { merge: true });
-      showToast("Mesa " + currentMesa + " asignada como CORTESÍA (Púrpura)");
-      document.getElementById('modalOverlay').classList.remove('open');
-    } catch(err) {
-      alert("Error al guardar cortesía: " + err.message);
-    } finally {
-      btn.disabled = false;
+      if (inputBeneficiario) inputBeneficiario.value = r.nombre || r.beneficiario || '';
+      if (inputPersonas) inputPersonas.value = currentPeople || r.cantidadPersonas || 4;
+      if (inputNota) inputNota.value = r.masterNote || '';
     }
-  });
 
-  document.getElementById('btnQuitarCortesia')?.addEventListener('click', async () => {
-    if (!confirm("¿Deseas quitar el estado de cortesía a la mesa " + currentMesa + " y dejarla disponible nuevamente?")) return;
-    try {
-      const targetCol = window.getActiveBolCollection ? window.getActiveBolCollection() : 'reservas';
-      await db.collection(targetCol).doc(currentMesa).delete();
-      showToast("Mesa " + currentMesa + " liberada con éxito.");
-      document.getElementById('modalOverlay').classList.remove('open');
-    } catch(err) {
-      alert("Error al liberar mesa: " + err.message);
-    }
-  });
+    document.getElementById('btnMarcarCortesia')?.addEventListener('click', abrirFormularioCortesia);
+    document.getElementById('btnMarcarCortesiaInfo')?.addEventListener('click', abrirFormularioCortesia);
 
-  async function finalizarCobro(metodo, cash, transf) {
-    const btnConfirm = document.getElementById('confirmIngreso');
-    const btnMixed = document.getElementById('confirmMixed');
-    btnConfirm.disabled = true;
-    btnMixed.disabled = true;
-    const r = estado[currentMesa] || {};
-    const finalTotal = parseInt(document.getElementById('valTotal').textContent.replace(/\D/g,'')) || 0;
-    const finalDrinks = parseInt(document.getElementById('valDrinks').textContent.replace(/\D/g,'')) || 0;
-    try {
-      const isCortesia = !!(r.status === 'cortesia' || r.esCortesia || metodo === 'cortesia');
-      const isEx = isException || !!(r && (r.esExcepcion || r.excepcion));
-      const senaMonto = isEx ? exPactadaSena : ((r && r.montoSenado !== undefined && r.montoSenado !== null) ? r.montoSenado : (isCortesia ? 0 : 20000));
-      const pctAbonado = (finalTotal > 0 ? Math.round((senaMonto / finalTotal) * 100) : 0);
-      const pctSaldo = (finalTotal > 0 ? Math.max(0, 100 - pctAbonado) : 0);
-      const unitPrice = exPactadaPrecioPersona > 0 ? exPactadaPrecioPersona : (r.precioPorPersona || (currentPeople > 0 ? Math.round(finalTotal / currentPeople) : 0));
-
-      const dataToSave = {
-        ...r,
-        status: 'ingresada',
-        esCortesia: isCortesia,
-        cortesiaIngresada: isCortesia,
-        cantidadPersonas: currentPeople,
-        precioPorPersona: isCortesia ? 0 : unitPrice,
-        montoTotal: isCortesia ? 0 : finalTotal,
-        precioTotal: isCortesia ? 0 : finalTotal,
-        montoConsumicion: isCortesia ? 0 : finalDrinks,
-        montoConsumoCredito: isCortesia ? 0 : finalDrinks,
-        porcentajeConsumo: isCortesia ? 0 : (isEx ? exPactadaDrinksPct : (isCalcReservation ? (finalTotal > 0 ? Math.round((finalDrinks / finalTotal) * 100) : 80) : ((r && r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) ? r.porcentajeConsumo : getTodayPromo().pct))),
-        formaPago: isCortesia ? 'cortesia' : (isCalcReservation ? calcResSelectedPayment : (r.formaPago || metodo)),
-        origen: isCortesia ? (r.origen || 'cortesia') : (isCalcReservation ? 'calculadora_admin' : (r.origen || 'puerta')),
-        excepcion: isCortesia ? false : isEx,
-        esExcepcion: isCortesia ? false : isEx,
-        responsableExcepcion: isCortesia ? null : (r.responsableExcepcion || (isEx ? ('Cobrado en boletería por ' + (auth?.currentUser?.email || 'boleteria')) : null)),
-        montoSenado: isCortesia ? 0 : senaMonto,
-        saldoPuerta: 0,
-        porcentajeAbonado: isCortesia ? 0 : pctAbonado,
-        porcentajeSaldo: isCortesia ? 0 : pctSaldo,
-        metodoCobro: isCortesia ? 'cortesia' : metodo,
-        cobroEfectivo: isCortesia ? 0 : cash,
-        cobroTransferencia: isCortesia ? 0 : transf,
-        ingresadaAt: Date.now(),
-        ingresadaBy: auth.currentUser?.email || 'boleteria'
-      };
-      if (!dataToSave.ts) dataToSave.ts = Date.now();
-      const targetCol = window.getActiveBolCollection ? window.getActiveBolCollection() : 'reservas';
-      await db.collection(targetCol).doc(currentMesa).set(dataToSave, { merge: true });
-      showToast(isCortesia ? "Ingreso de CORTESÍA confirmado." : "Cobro registrado e ingreso confirmado.");
-      document.getElementById('modalOverlay').classList.remove('open');
-    } catch (e) {
-      alert("Error al guardar: " + e.message);
-    } finally {
-      btnConfirm.disabled = false;
-      btnMixed.disabled = false;
-    }
-  }
-
-  function openCashManager(mode) {
-    const overlay = document.getElementById('modalOverlay');
-    const title = document.getElementById('cashManagerTitle');
-    const form = document.getElementById('cashManagerForm');
-    const report = document.getElementById('cashStatusReport');
-
-    // Hide global table headers
-    document.getElementById('modalTitle').style.display = 'none';
-    document.getElementById('modalSub').style.display = 'none';
-
-    // Hide all views first
-    document.getElementById('calcView').style.display = 'none';
-    document.getElementById('infoView').style.display = 'none';
-    document.getElementById('paymentMethodsView').style.display = 'none';
-    document.getElementById('mixedPayView').style.display = 'none';
-    document.getElementById('cashManagerView').style.display = 'block';
-
-    document.getElementById('cashAmount').value = "";
-    document.getElementById('cashNote').value = "";
-
-    if (mode === 'ver') {
-      title.textContent = "Estado de Caja Global";
-      form.style.display = 'none';
-      report.style.display = 'block';
-      calculateReport();
-    } else {
-      title.textContent = mode === 'inicial' ? "Caja Inicial del Turno" : "Retiro de Caja Global";
-      document.getElementById('cashAmountLabel').textContent = mode === 'inicial' ? "Monto Inicial" : "Monto a Retirar";
-      form.style.display = 'block';
-      report.style.display = 'none';
-      document.getElementById('saveCashMove').onclick = () => saveCashMove(mode);
-    }
-    overlay.classList.add('open');
-  }
-
-  async function saveCashMove(tipo) {
-    const monto = parseInt(document.getElementById('cashAmount').value);
-    const nota = document.getElementById('cashNote').value.trim();
-    if (!monto) return showToast("Ingresá un monto válido");
-    try {
-      await db.collection('caja_movimientos').add({
-        tipo: tipo === 'inicial' ? 'apertura' : 'retiro',
-        monto: monto,
-        nota: nota,
-        ts: Date.now(),
-        by: auth.currentUser.email
-      });
-      showToast("Movimiento registrado");
-      document.getElementById('modalOverlay').classList.remove('open');
-    } catch(e) { alert(e.message); }
-  }
-
-  function calculateReport() {
-    let totalEfectivoIn = 0;
-    let totalEfectivoOut = 0;
-    let totalTransf = 0;
-    let totalAdelantos = 0;
-    cajaMovimientos.forEach(m => {
-      if (m.tipo === 'apertura') totalEfectivoIn += m.monto;
-      if (m.tipo === 'retiro') totalEfectivoOut += m.monto;
+    document.getElementById('btnCancelarCortesiaForm')?.addEventListener('click', () => {
+      document.getElementById('cortesiaFormView').style.display = 'none';
+      openModal(currentMesa, estado[currentMesa]);
     });
-    Object.values(estado).forEach(r => {
-      if (r.status === 'ingresada') {
-        totalEfectivoIn += (r.cobroEfectivo || 0);
-        totalTransf += (r.cobroTransferencia || 0);
-        totalAdelantos += (r.montoSenado || 0);
+
+    document.getElementById('btnConfirmarGuardarCortesia')?.addEventListener('click', async () => {
+      const btn = document.getElementById('btnConfirmarGuardarCortesia');
+      btn.disabled = true;
+      try {
+        const beneficiario = document.getElementById('cortesiaBeneficiarioInput')?.value.trim() || 'Invitado Especial';
+        const personas = parseInt(document.getElementById('cortesiaPersonasInput')?.value) || currentPeople || 4;
+        const nota = document.getElementById('cortesiaNotaInput')?.value.trim() || '';
+        const r = estado[currentMesa] || {};
+
+        const payload = {
+          ...r,
+          status: 'cortesia',
+          esCortesia: true,
+          formaPago: 'cortesia',
+          montoTotal: 0,
+          precioTotal: 0,
+          montoSenado: 0,
+          saldoPuerta: 0,
+          montoConsumicion: 0,
+          montoConsumoCredito: 0,
+          porcentajeConsumo: 0,
+          cobroEfectivo: 0,
+          cobroTransferencia: 0,
+          nombre: beneficiario,
+          beneficiario: beneficiario,
+          cantidadPersonas: personas,
+          masterNote: nota || r.masterNote || '',
+          autorizadoPor: auth.currentUser?.email || 'Boletería',
+          cortesiaAt: Date.now(),
+          ts: r.ts || Date.now()
+        };
+
+        const targetCol = window.getActiveBolCollection ? window.getActiveBolCollection() : 'reservas';
+        await db.collection(targetCol).doc(currentMesa).set(payload, { merge: true });
+        showToast("Mesa " + currentMesa + " asignada como CORTESÍA (Púrpura)");
+        document.getElementById('modalOverlay').classList.remove('open');
+      } catch (err) {
+        alert("Error al guardar cortesía: " + err.message);
+      } finally {
+        btn.disabled = false;
       }
     });
-    document.getElementById('reportCash').textContent = (totalEfectivoIn - totalEfectivoOut).toLocaleString();
-    document.getElementById('reportTransf').textContent = totalTransf.toLocaleString();
-    document.getElementById('reportAdelantos').textContent = totalAdelantos.toLocaleString();
-  }
 
-  function updateCajaUI() {
-    const hasApertura = cajaMovimientos.some(m => m.tipo === 'apertura');
-    document.getElementById('btnCajaInicial').style.display = hasApertura ? 'none' : 'block';
-  }
+    document.getElementById('btnQuitarCortesia')?.addEventListener('click', async () => {
+      if (!confirm("¿Deseas quitar el estado de cortesía a la mesa " + currentMesa + " y dejarla disponible nuevamente?")) return;
+      try {
+        const targetCol = window.getActiveBolCollection ? window.getActiveBolCollection() : 'reservas';
+        await db.collection(targetCol).doc(currentMesa).delete();
+        showToast("Mesa " + currentMesa + " liberada con éxito.");
+        document.getElementById('modalOverlay').classList.remove('open');
+      } catch (err) {
+        alert("Error al liberar mesa: " + err.message);
+      }
+    });
 
-  // --- Global Event Listeners ---
-  document.getElementById('btnCajaInicial').onclick = () => openCashManager('inicial');
-  document.getElementById('btnRetiro').onclick = () => openCashManager('retiro');
-  document.getElementById('btnVerCaja').onclick = () => openCashManager('ver');
-  document.getElementById('closeModal').onclick = () => document.getElementById('modalOverlay').classList.remove('open');
+    async function finalizarCobro(metodo, cash, transf) {
+      const btnConfirm = document.getElementById('confirmIngreso');
+      const btnMixed = document.getElementById('confirmMixed');
+      btnConfirm.disabled = true;
+      btnMixed.disabled = true;
+      const r = estado[currentMesa] || {};
+      const finalTotal = parseInt(document.getElementById('valTotal').textContent.replace(/\D/g, '')) || 0;
+      const finalDrinks = parseInt(document.getElementById('valDrinks').textContent.replace(/\D/g, '')) || 0;
+      try {
+        const isCortesia = !!(r.status === 'cortesia' || r.esCortesia || metodo === 'cortesia');
+        const isEx = isException || !!(r && (r.esExcepcion || r.excepcion));
+        const senaMonto = isEx ? exPactadaSena : ((r && r.montoSenado !== undefined && r.montoSenado !== null) ? r.montoSenado : (isCortesia ? 0 : 20000));
+        const pctAbonado = (finalTotal > 0 ? Math.round((senaMonto / finalTotal) * 100) : 0);
+        const pctSaldo = (finalTotal > 0 ? Math.max(0, 100 - pctAbonado) : 0);
+        const unitPrice = exPactadaPrecioPersona > 0 ? exPactadaPrecioPersona : (r.precioPorPersona || (currentPeople > 0 ? Math.round(finalTotal / currentPeople) : 0));
 
-  document.getElementById('btnCierreDefinitivo').onclick = async () => {
-    if (!confirm("¿Estás seguro de que querés cerrar la caja del turno actual? Las mesas NO se liberarán.")) return;
-    if (!confirm("Confirmación final: Se vaciarán todos los movimientos de caja registrados en este turno.")) return;
-
-    const btn = document.getElementById('btnCierreDefinitivo');
-    btn.disabled = true;
-    btn.textContent = "Cerrando...";
-
-    try {
-      const batch = db.batch();
-
-      const cajaSnapshot = await db.collection('caja_movimientos').get();
-      cajaSnapshot.forEach(doc => batch.delete(doc.ref));
-
-      await batch.commit();
-      showToast("Caja de turno reiniciada con éxito.");
-    } catch(e) {
-      alert("Error al procesar el cierre de caja: " + e.message);
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "Cerrar Caja de Turno";
+        const dataToSave = {
+          ...r,
+          status: 'ingresada',
+          esCortesia: isCortesia,
+          cortesiaIngresada: isCortesia,
+          cantidadPersonas: currentPeople,
+          precioPorPersona: isCortesia ? 0 : unitPrice,
+          montoTotal: isCortesia ? 0 : finalTotal,
+          precioTotal: isCortesia ? 0 : finalTotal,
+          montoConsumicion: isCortesia ? 0 : finalDrinks,
+          montoConsumoCredito: isCortesia ? 0 : finalDrinks,
+          porcentajeConsumo: isCortesia ? 0 : (isEx ? exPactadaDrinksPct : (isCalcReservation ? (finalTotal > 0 ? Math.round((finalDrinks / finalTotal) * 100) : 80) : ((r && r.porcentajeConsumo !== undefined && r.porcentajeConsumo !== null) ? r.porcentajeConsumo : getTodayPromo().pct))),
+          formaPago: isCortesia ? 'cortesia' : (isCalcReservation ? calcResSelectedPayment : (r.formaPago || metodo)),
+          origen: isCortesia ? (r.origen || 'cortesia') : (isCalcReservation ? 'calculadora_admin' : (r.origen || 'puerta')),
+          excepcion: isCortesia ? false : isEx,
+          esExcepcion: isCortesia ? false : isEx,
+          responsableExcepcion: isCortesia ? null : (r.responsableExcepcion || (isEx ? ('Cobrado en boletería por ' + (auth?.currentUser?.email || 'boleteria')) : null)),
+          montoSenado: isCortesia ? 0 : senaMonto,
+          saldoPuerta: 0,
+          porcentajeAbonado: isCortesia ? 0 : pctAbonado,
+          porcentajeSaldo: isCortesia ? 0 : pctSaldo,
+          metodoCobro: isCortesia ? 'cortesia' : metodo,
+          cobroEfectivo: isCortesia ? 0 : cash,
+          cobroTransferencia: isCortesia ? 0 : transf,
+          ingresadaAt: Date.now(),
+          ingresadaBy: auth.currentUser?.email || 'boleteria'
+        };
+        if (!dataToSave.ts) dataToSave.ts = Date.now();
+        const targetCol = window.getActiveBolCollection ? window.getActiveBolCollection() : 'reservas';
+        await db.collection(targetCol).doc(currentMesa).set(dataToSave, { merge: true });
+        showToast(isCortesia ? "Ingreso de CORTESÍA confirmado." : "Cobro registrado e ingreso confirmado.");
+        document.getElementById('modalOverlay').classList.remove('open');
+      } catch (e) {
+        alert("Error al guardar: " + e.message);
+      } finally {
+        btnConfirm.disabled = false;
+        btnMixed.disabled = false;
+      }
     }
-  };
 
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
-  }
+    function openCashManager(mode) {
+      const overlay = document.getElementById('modalOverlay');
+      const title = document.getElementById('cashManagerTitle');
+      const form = document.getElementById('cashManagerForm');
+      const report = document.getElementById('cashStatusReport');
 
-  document.getElementById('tabSectorSalon')?.addEventListener('click', () => setSector('salon'));
-  document.getElementById('tabSectorTerraza')?.addEventListener('click', () => setSector('terraza'));
-  window.addEventListener('resize', renderMesas);
-</script>
+      // Hide global table headers
+      document.getElementById('modalTitle').style.display = 'none';
+      document.getElementById('modalSub').style.display = 'none';
+
+      // Hide all views first
+      document.getElementById('calcView').style.display = 'none';
+      document.getElementById('infoView').style.display = 'none';
+      document.getElementById('paymentMethodsView').style.display = 'none';
+      document.getElementById('mixedPayView').style.display = 'none';
+      document.getElementById('cashManagerView').style.display = 'block';
+
+      document.getElementById('cashAmount').value = "";
+      document.getElementById('cashNote').value = "";
+
+      if (mode === 'ver') {
+        title.textContent = "Estado de Caja Global";
+        form.style.display = 'none';
+        report.style.display = 'block';
+        calculateReport();
+      } else {
+        title.textContent = mode === 'inicial' ? "Caja Inicial del Turno" : "Retiro de Caja Global";
+        document.getElementById('cashAmountLabel').textContent = mode === 'inicial' ? "Monto Inicial" : "Monto a Retirar";
+        form.style.display = 'block';
+        report.style.display = 'none';
+        document.getElementById('saveCashMove').onclick = () => saveCashMove(mode);
+      }
+      overlay.classList.add('open');
+    }
+
+    async function saveCashMove(tipo) {
+      const monto = parseInt(document.getElementById('cashAmount').value);
+      const nota = document.getElementById('cashNote').value.trim();
+      if (!monto) return showToast("Ingresá un monto válido");
+      try {
+        await db.collection('caja_movimientos').add({
+          tipo: tipo === 'inicial' ? 'apertura' : 'retiro',
+          monto: monto,
+          nota: nota,
+          ts: Date.now(),
+          by: auth.currentUser.email
+        });
+        showToast("Movimiento registrado");
+        document.getElementById('modalOverlay').classList.remove('open');
+      } catch (e) { alert(e.message); }
+    }
+
+    function calculateReport() {
+      let totalEfectivoIn = 0;
+      let totalEfectivoOut = 0;
+      let totalTransf = 0;
+      let totalAdelantos = 0;
+      cajaMovimientos.forEach(m => {
+        if (m.tipo === 'apertura') totalEfectivoIn += m.monto;
+        if (m.tipo === 'retiro') totalEfectivoOut += m.monto;
+      });
+      Object.values(estado).forEach(r => {
+        if (r.status === 'ingresada') {
+          totalEfectivoIn += (r.cobroEfectivo || 0);
+          totalTransf += (r.cobroTransferencia || 0);
+          totalAdelantos += (r.montoSenado || 0);
+        }
+      });
+      document.getElementById('reportCash').textContent = (totalEfectivoIn - totalEfectivoOut).toLocaleString();
+      document.getElementById('reportTransf').textContent = totalTransf.toLocaleString();
+      document.getElementById('reportAdelantos').textContent = totalAdelantos.toLocaleString();
+    }
+
+    function updateCajaUI() {
+      const hasApertura = cajaMovimientos.some(m => m.tipo === 'apertura');
+      document.getElementById('btnCajaInicial').style.display = hasApertura ? 'none' : 'block';
+    }
+
+    // --- Global Event Listeners ---
+    document.getElementById('btnCajaInicial').onclick = () => openCashManager('inicial');
+    document.getElementById('btnRetiro').onclick = () => openCashManager('retiro');
+    document.getElementById('btnVerCaja').onclick = () => openCashManager('ver');
+    document.getElementById('closeModal').onclick = () => document.getElementById('modalOverlay').classList.remove('open');
+
+    document.getElementById('btnCierreDefinitivo').onclick = async () => {
+      if (!confirm("¿Estás seguro de que querés cerrar la caja del turno actual? Las mesas NO se liberarán.")) return;
+      if (!confirm("Confirmación final: Se vaciarán todos los movimientos de caja registrados en este turno.")) return;
+
+      const btn = document.getElementById('btnCierreDefinitivo');
+      btn.disabled = true;
+      btn.textContent = "Cerrando...";
+
+      try {
+        const batch = db.batch();
+
+        const cajaSnapshot = await db.collection('caja_movimientos').get();
+        cajaSnapshot.forEach(doc => batch.delete(doc.ref));
+
+        await batch.commit();
+        showToast("Caja de turno reiniciada con éxito.");
+      } catch (e) {
+        alert("Error al procesar el cierre de caja: " + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Cerrar Caja de Turno";
+      }
+    };
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    document.getElementById('tabSectorSalon')?.addEventListener('click', () => setSector('salon'));
+    document.getElementById('tabSectorTerraza')?.addEventListener('click', () => setSector('terraza'));
+    window.addEventListener('resize', renderMesas);
+  </script>
 </body>
+
 </html>
