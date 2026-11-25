@@ -500,6 +500,14 @@
       transition: background-image 0.4s ease, opacity 0.4s ease;
     }
 
+    .map-bg-layer video.map-bg-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+
     .map-frame::after {
       content: "";
       position: absolute;
@@ -2119,6 +2127,114 @@
       return currentSector === 'terraza' ? TABLES_TERRAZA : TABLES_SALON;
     }
 
+    function isVideoMediaUrl(url) {
+      if (!url || typeof url !== "string") return false;
+      const clean = url.split("?")[0].split("#")[0].toLowerCase();
+      if (/\.(mp4|webm|mov|m4v|ogv)$/.test(clean)) return true;
+      return url.toLowerCase().includes("/video/upload/");
+    }
+
+    function applyBgMedia(containerEl, url) {
+      if (!containerEl) return;
+      let videoEl = containerEl.querySelector("video.map-bg-video");
+      if (!url) {
+        containerEl.style.backgroundImage = "none";
+        containerEl.style.display = "none";
+        if (videoEl) {
+          videoEl.pause();
+          videoEl.removeAttribute("src");
+          videoEl.load();
+          videoEl.remove();
+        }
+        return;
+      }
+      containerEl.style.display = "";
+      if (isVideoMediaUrl(url)) {
+        containerEl.style.backgroundImage = "none";
+        if (!videoEl) {
+          videoEl = document.createElement("video");
+          videoEl.className = "map-bg-video";
+          videoEl.autoplay = true;
+          videoEl.loop = true;
+          videoEl.muted = true;
+          videoEl.playsInline = true;
+          videoEl.setAttribute("muted", "");
+          videoEl.setAttribute("playsinline", "");
+          videoEl.setAttribute("webkit-playsinline", "");
+          videoEl.preload = "auto";
+          containerEl.appendChild(videoEl);
+        }
+        if (videoEl.getAttribute("data-src") !== url) {
+          videoEl.setAttribute("data-src", url);
+          videoEl.src = url;
+          videoEl.load();
+        }
+        videoEl.muted = true;
+        videoEl.play().catch(() => {});
+      } else {
+        if (videoEl) {
+          videoEl.pause();
+          videoEl.removeAttribute("src");
+          videoEl.load();
+          videoEl.remove();
+        }
+        containerEl.style.backgroundImage = `url("${url}")`;
+      }
+    }
+
+    function applyOverlayMedia(imgEl, url, altText) {
+      if (!imgEl) return;
+      const videoId = imgEl.id + "Video";
+      let videoEl = document.getElementById(videoId);
+      if (!url) {
+        imgEl.src = "";
+        imgEl.style.display = "none";
+        if (videoEl) {
+          videoEl.pause();
+          videoEl.removeAttribute("src");
+          videoEl.load();
+          videoEl.style.display = "none";
+        }
+        return;
+      }
+      if (isVideoMediaUrl(url)) {
+        imgEl.src = "";
+        imgEl.style.display = "none";
+        if (!videoEl) {
+          videoEl = document.createElement("video");
+          videoEl.id = videoId;
+          videoEl.className = imgEl.className;
+          videoEl.autoplay = true;
+          videoEl.loop = true;
+          videoEl.muted = true;
+          videoEl.playsInline = true;
+          videoEl.setAttribute("muted", "");
+          videoEl.setAttribute("playsinline", "");
+          videoEl.setAttribute("webkit-playsinline", "");
+          videoEl.preload = "auto";
+          imgEl.parentNode.insertBefore(videoEl, imgEl.nextSibling);
+        }
+        if (videoEl.getAttribute("data-src") !== url) {
+          videoEl.setAttribute("data-src", url);
+          videoEl.src = url;
+          videoEl.load();
+        }
+        videoEl.muted = true;
+        videoEl.style.display = "block";
+        videoEl.play().catch(() => {});
+      } else {
+        if (videoEl) {
+          videoEl.pause();
+          videoEl.removeAttribute("src");
+          videoEl.load();
+          videoEl.style.display = "none";
+        }
+        imgEl.src = url;
+        if (altText !== undefined) imgEl.alt = altText;
+        imgEl.style.display = "block";
+      }
+    }
+
     function setSector(sector) {
       if (currentSector === sector) return;
       currentSector = sector;
@@ -2141,33 +2257,19 @@
       if (sector === "terraza") {
         if (mapImgEl) mapImgEl.src = "terraza_cubano.png?v=20261124_orig";
         if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "none";
-        if (eventLogoOverlay) eventLogoOverlay.style.display = "none";
+        applyOverlayMedia(eventLogoOverlay, "");
 
         const cfg = currentEventKey === 'fecha1' ? configFecha1 : configFecha2;
 
-        // Fondo temático de terraza
-        if (mapBgLayerEl) {
-          const terraceBg = cfg.terraceBgUrl || cfg.bgUrl;
-          if (terraceBg) {
-            mapBgLayerEl.style.backgroundImage = `url("${terraceBg}")`;
-            mapBgLayerEl.style.display = "";
-          } else {
-            mapBgLayerEl.style.backgroundImage = "none";
-            mapBgLayerEl.style.display = "none";
-          }
-        }
+        // Fondo temático de terraza (imagen o video)
+        applyBgMedia(mapBgLayerEl, cfg.terraceBgUrl || cfg.bgUrl);
 
-        // Logo exclusivo de terraza
-        if (terraceLogoOverlay) {
-          if (cfg.terraceLogoUrl) {
-            terraceLogoOverlay.src = cfg.terraceLogoUrl;
-            terraceLogoOverlay.alt = cfg.terraceEventName ? ("Logo de " + cfg.terraceEventName) : "Logo Terrace Soul";
-            terraceLogoOverlay.style.display = "block";
-          } else {
-            terraceLogoOverlay.src = "";
-            terraceLogoOverlay.style.display = "none";
-          }
-        }
+        // Logo exclusivo de terraza (imagen o video)
+        applyOverlayMedia(
+          terraceLogoOverlay,
+          cfg.terraceLogoUrl,
+          cfg.terraceEventName ? ("Logo de " + cfg.terraceEventName) : "Logo Terrace Soul"
+        );
 
         // Fecha en recuadro verde de terraza
         if (terraceDateBadge) {
@@ -2182,34 +2284,19 @@
 
         // Logo inferior exclusivo de terraza (debajo de la fecha)
         const terraceFooterLogoEl = document.getElementById("terraceFooterLogoOverlay");
-        if (terraceFooterLogoEl) {
-          if (cfg.terraceFooterLogoUrl) {
-            terraceFooterLogoEl.src = cfg.terraceFooterLogoUrl;
-            terraceFooterLogoEl.style.display = "block";
-          } else {
-            terraceFooterLogoEl.src = "";
-            terraceFooterLogoEl.style.display = "none";
-          }
-        }
+        applyOverlayMedia(terraceFooterLogoEl, cfg.terraceFooterLogoUrl);
 
         if (legendEl) legendEl.textContent = "Sector TERRACE SOUL (al aire libre): mesas 1 a 19 y mesas A, B, C, D, E";
       } else {
         if (mapImgEl) mapImgEl.src = "Gemini_Generated_Image_pxpekipxpekipxpe.png";
         if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "";
-        if (terraceLogoOverlay) terraceLogoOverlay.style.display = "none";
+        applyOverlayMedia(terraceLogoOverlay, "");
         if (terraceDateBadge) terraceDateBadge.style.display = "none";
         const terraceFooterLogoEl = document.getElementById("terraceFooterLogoOverlay");
-        if (terraceFooterLogoEl) terraceFooterLogoEl.style.display = "none";
+        applyOverlayMedia(terraceFooterLogoEl, "");
 
         const cfg = currentEventKey === 'fecha1' ? configFecha1 : configFecha2;
-        if (mapBgLayerEl) {
-          if (cfg.bgUrl) {
-            mapBgLayerEl.style.backgroundImage = `url("${cfg.bgUrl}")`;
-            mapBgLayerEl.style.display = "";
-          } else {
-            mapBgLayerEl.style.backgroundImage = "none";
-          }
-        }
+        applyBgMedia(mapBgLayerEl, cfg.bgUrl);
         cargarLogoEvento();
         if (legendEl) legendEl.textContent = "Sector MAIN STAGE: mesas 1 a 20 y mesas B, C, D";
       }
@@ -2435,19 +2522,14 @@
       const mapBgLayer = document.getElementById("mapBgLayer");
 
       if (currentSector === 'terraza') {
-        if (eventLogoOverlay) eventLogoOverlay.style.display = "none";
+        applyOverlayMedia(eventLogoOverlay, "");
         if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "none";
 
-        if (terraceLogoOverlay) {
-          if (cfg.terraceLogoUrl) {
-            terraceLogoOverlay.src = cfg.terraceLogoUrl;
-            terraceLogoOverlay.alt = cfg.terraceEventName ? ("Logo de " + cfg.terraceEventName) : "Logo Terrace Soul";
-            terraceLogoOverlay.style.display = "block";
-          } else {
-            terraceLogoOverlay.src = "";
-            terraceLogoOverlay.style.display = "none";
-          }
-        }
+        applyOverlayMedia(
+          terraceLogoOverlay,
+          cfg.terraceLogoUrl,
+          cfg.terraceEventName ? ("Logo de " + cfg.terraceEventName) : "Logo Terrace Soul"
+        );
 
         if (terraceDateBadge) {
           const fechaTxt = cfg.terraceDate || (cfg.headingText ? (cfg.headingText + (cfg.eventDate ? ' ' + cfg.eventDate : '')) : cfg.eventDate);
@@ -2460,45 +2542,23 @@
         }
 
         const terraceFooterLogoEl = document.getElementById("terraceFooterLogoOverlay");
-        if (terraceFooterLogoEl) {
-          if (cfg.terraceFooterLogoUrl) {
-            terraceFooterLogoEl.src = cfg.terraceFooterLogoUrl;
-            terraceFooterLogoEl.style.display = "block";
-          } else {
-            terraceFooterLogoEl.src = "";
-            terraceFooterLogoEl.style.display = "none";
-          }
-        }
+        applyOverlayMedia(terraceFooterLogoEl, cfg.terraceFooterLogoUrl);
 
-        if (mapBgLayer) {
-          const terraceBg = cfg.terraceBgUrl || cfg.bgUrl;
-          if (terraceBg) {
-            mapBgLayer.style.backgroundImage = `url("${terraceBg}")`;
-            mapBgLayer.style.display = "";
-          } else {
-            mapBgLayer.style.backgroundImage = "none";
-            mapBgLayer.style.display = "none";
-          }
-        }
+        applyBgMedia(mapBgLayer, cfg.terraceBgUrl || cfg.bgUrl);
       } else {
-        if (terraceLogoOverlay) terraceLogoOverlay.style.display = "none";
+        applyOverlayMedia(terraceLogoOverlay, "");
         if (terraceDateBadge) terraceDateBadge.style.display = "none";
         const terraceFooterLogoEl = document.getElementById("terraceFooterLogoOverlay");
-        if (terraceFooterLogoEl) terraceFooterLogoEl.style.display = "none";
+        applyOverlayMedia(terraceFooterLogoEl, "");
         if (ultraVipReserveBtn) ultraVipReserveBtn.style.display = "";
 
-        eventLogoOverlay.src = cfg.logoUrl || "";
-        eventLogoOverlay.alt = cfg.eventName ? "Logo de " + cfg.eventName : "Logo del evento ULTRA VIP";
-        eventLogoOverlay.style.display = cfg.logoUrl ? "block" : "none";
+        applyOverlayMedia(
+          eventLogoOverlay,
+          cfg.logoUrl,
+          cfg.eventName ? "Logo de " + cfg.eventName : "Logo del evento ULTRA VIP"
+        );
 
-        if (mapBgLayer) {
-          if (cfg.bgUrl) {
-            mapBgLayer.style.backgroundImage = `url("${cfg.bgUrl}")`;
-            mapBgLayer.style.display = "";
-          } else {
-            mapBgLayer.style.backgroundImage = "none";
-          }
-        }
+        applyBgMedia(mapBgLayer, cfg.bgUrl);
       }
 
       // Configuración de sectores disponibles en esta fecha: 'ambos' | 'main_stage' | 'terrace_soul'

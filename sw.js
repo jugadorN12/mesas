@@ -1,5 +1,5 @@
 // Service Worker para Cubano Bar, Joseo Terrace y Demos (PWA)
-const CACHE_NAME = 'mesas-v17';
+const CACHE_NAME = 'mesas-v18';
 const STATIC_ASSETS = [
   './shared.css',
   './manifest.json',
